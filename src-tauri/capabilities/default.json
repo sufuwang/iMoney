@@ -1,0 +1,60 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "enables the default permissions",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    "notification:default",
+    "notification:allow-is-permission-granted",
+    "notification:allow-request-permission",
+    "notification:allow-notify",
+    "log:default",
+    "dialog:default",
+    {
+      "identifier": "fs:allow-write-text-file",
+      "config": {
+        "scope": ["**", "$HOME/**", "$DOCUMENT/**", "$DOWNLOAD/**", "$TEMP/**"]
+      }
+    },
+    {
+      "identifier": "fs:allow-read-text-file",
+      "config": {
+        "scope": ["**", "$HOME/**", "$DOCUMENT/**", "$DOWNLOAD/**", "$TEMP/**"]
+      }
+    },
+    {
+      "identifier": "fs:allow-write-file",
+      "config": {
+        "scope": ["**", "$HOME/**", "$DOCUMENT/**", "$DOWNLOAD/**", "$TEMP/**"]
+      }
+    },
+    {
+      "identifier": "fs:allow-read-file",
+      "config": {
+        "scope": ["**", "$HOME/**", "$DOCUMENT/**", "$DOWNLOAD/**", "$TEMP/**"]
+      }
+    },
+    {
+      "identifier": "fs:allow-exists",
+      "config": {
+        "scope": ["**", "$HOME/**", "$DOCUMENT/**", "$DOWNLOAD/**", "$TEMP/**"]
+      }
+    },
+    {
+      "identifier": "fs:allow-stat",
+      "config": {
+        "scope": ["**", "$HOME/**", "$DOCUMENT/**", "$DOWNLOAD/**", "$TEMP/**"]
+      }
+    },
+    {
+      "identifier": "fs:allow-mkdir",
+      "config": {
+        "scope": ["**", "$HOME/**", "$DOCUMENT/**", "$DOWNLOAD/**", "$TEMP/**"]
+      }
+    },
+    "fs:default"
+  ]
+}

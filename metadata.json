@@ -1,0 +1,5 @@
+{
+  "name": "iMoney - 个人记账助手",
+  "description": "一款简约、高效的 iOS 风格个人记账应用，支持多维度收支统计、趋势分析及数据导入导出。",
+  "requestFramePermissions": []
+}

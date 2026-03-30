@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+}
+
+@theme {
+  --spacing-safe-top: env(safe-area-inset-top);
+  --spacing-safe-bottom: env(safe-area-inset-bottom);
+  --radius-2xl: 20px;
+}
+
+@utility pt-safe {
+  padding-top: var(--spacing-safe-top);
+}
+
+@utility pb-safe {
+  padding-bottom: var(--spacing-safe-bottom);
+}
+
+@utility h-safe {
+  height: var(--spacing-safe-bottom);
+}
+
+.recharts-surface:focus,
+.recharts-surface *:focus {
+  outline: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
