@@ -260,8 +260,6 @@ export default function App() {
   const [lastReminderDate, setLastReminderDate] = useState(() => localStorage.getItem('imoney_last_reminder_date') || '');
   const [backupPath, setBackupPath] = useState(() => localStorage.getItem('imoney_backup_path') || '');
   const [lastBackupTime, setLastBackupTime] = useState(() => localStorage.getItem('imoney_last_backup_time') || '');
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
 
   const [currencyConfigs, setCurrencyConfigs] = useState<CurrencyConfig[]>(() => {
     const saved = localStorage.getItem('imoney_currency_configs');
@@ -366,22 +364,25 @@ export default function App() {
       if (Notification.permission === "granted") {
         try {
           new Notification(title, { body, icon: '32x32.png' });
+          return;
         } catch (e) {
           console.error("Web notification failed", e);
         }
       } else if (Notification.permission !== "denied") {
-        Notification.requestPermission();
+        const permission = await Notification.requestPermission();
+        if (permission === "granted") {
+          try {
+            new Notification(title, { body, icon: '32x32.png' });
+            return;
+          } catch (e) {
+            console.error("Web notification failed", e);
+          }
+        }
       }
     }
 
-    // Fallback to Toast UI
-    showToastUI(body);
-  };
-
-  const showToastUI = (message: string) => {
-    setToastMessage(message);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 5000);
+    // Fallback to System Alert (as requested: "全部采用系统弹窗")
+    window.alert(`${title}: ${body}`);
   };
 
   const displayToast = (message: string) => {
@@ -1839,8 +1840,10 @@ export default function App() {
               )}
 
               <div className="p-4 flex items-center justify-between hover:bg-red-50 cursor-pointer transition-colors group" onClick={() => {
-                setTransactions([]);
-                notify("iMoney", "所有记录已清空！");
+                if (window.confirm("确定要清空所有记录吗？此操作不可撤销。")) {
+                  setTransactions([]);
+                  notify("iMoney", "所有记录已清空！");
+                }
               }}>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-red-50 text-red-600 rounded-lg flex items-center justify-center">
@@ -1881,31 +1884,6 @@ export default function App() {
         <TabButton active={activeTab === 'trends'} icon={BarChart3} label="趋势" onClick={() => setActiveTab('trends')} />
         <TabButton active={activeTab === 'settings'} icon={SettingsIcon} label="设置" onClick={() => setActiveTab('settings')} />
       </nav>
-
-      {/* In-app Toast Notification */}
-      <AnimatePresence>
-        {showToast && (
-          <motion.div 
-            initial={{ opacity: 0, y: -50, scale: 0.9 }}
-            animate={{ opacity: 1, y: 20, scale: 1 }}
-            exit={{ opacity: 0, y: -50, scale: 0.9 }}
-            className="fixed top-[calc(1rem+var(--spacing-safe-top))] left-6 right-6 z-[100] flex justify-center"
-          >
-            <div className="bg-gray-900/90 backdrop-blur-md text-white px-6 py-4 rounded-xl shadow-2xl border border-white/10 flex items-center gap-3 max-w-md w-full">
-              <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center shrink-0">
-                <Bell size={20} className="text-white" />
-              </div>
-              <div className="flex-1">
-                <div className="text-xs font-bold text-blue-400 mb-0.5">记账提醒</div>
-                <div className="text-sm font-medium leading-tight">{toastMessage}</div>
-              </div>
-              <button onClick={() => setShowToast(false)} className="text-gray-400 hover:text-white p-1">
-                <X size={18} />
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Add/Edit Transaction Modal */}
       <AnimatePresence>
@@ -2066,39 +2044,42 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="pt-6 pb-12">
-                {editingTransaction ? (
-                  <div className="grid grid-cols-2 gap-4">
-                    <button 
-                      onClick={() => {
+            </div>
+
+            <footer className="px-6 pt-4 pb-safe border-t border-gray-50 bg-white shrink-0">
+              {editingTransaction ? (
+                <div className="grid grid-cols-2 gap-4">
+                  <button 
+                    onClick={() => {
+                      if (window.confirm("确定要删除这条记录吗？")) {
                         deleteTransaction(editingTransaction.id);
                         setIsAdding(false);
                         setEditingTransaction(null);
-                      }}
-                      className="flex items-center justify-center gap-2 text-red-500 font-bold py-3.5 rounded-xl bg-red-50 active:scale-95 transition-all"
-                    >
-                      <Trash2 size={18} />
-                      <span>删除</span>
-                    </button>
-                    <button 
-                      onClick={addTransaction}
-                      className="flex items-center justify-center gap-2 text-white font-bold py-3.5 rounded-xl bg-blue-600 shadow-lg shadow-blue-100 active:scale-95 transition-all"
-                    >
-                      <span>保存修改</span>
-                    </button>
-                  </div>
-                ) : (
+                      }
+                    }}
+                    className="flex items-center justify-center gap-2 text-red-500 font-bold py-3.5 rounded-xl bg-red-50 active:scale-95 transition-all"
+                  >
+                    <Trash2 size={18} />
+                    <span>删除</span>
+                  </button>
                   <button 
                     onClick={addTransaction}
-                    disabled={!newAmount}
-                    className="w-full flex items-center justify-center gap-2 text-white font-bold py-4 rounded-2xl bg-blue-600 shadow-xl shadow-blue-100 active:scale-95 transition-all disabled:opacity-30 disabled:shadow-none"
+                    className="flex items-center justify-center gap-2 text-white font-bold py-3.5 rounded-xl bg-blue-600 shadow-lg shadow-blue-100 active:scale-95 transition-all"
                   >
-                    <Plus size={20} />
-                    <span>完成记账</span>
+                    <span>保存修改</span>
                   </button>
-                )}
-              </div>
-            </div>
+                </div>
+              ) : (
+                <button 
+                  onClick={addTransaction}
+                  disabled={!newAmount}
+                  className="w-full flex items-center justify-center gap-2 text-white font-bold py-4 rounded-2xl bg-blue-600 shadow-xl shadow-blue-100 active:scale-95 transition-all disabled:opacity-30 disabled:shadow-none"
+                >
+                  <Plus size={20} />
+                  <span>完成记账</span>
+                </button>
+              )}
+            </footer>
           </motion.div>
         )}
       </AnimatePresence>
