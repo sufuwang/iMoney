@@ -896,6 +896,30 @@ export default function App() {
     return { income, expense, balance: income - expense };
   }, [filteredHistory, currencyConfigs]);
 
+  const historyCategoryStats = useMemo(() => {
+    const expenseGroups: Record<string, number> = {};
+    const incomeGroups: Record<string, number> = {};
+    
+    filteredHistory.forEach(t => {
+      const amount = convertToBase(t.amount, t.currency || 'CNY');
+      if (t.type === 'expense') {
+        expenseGroups[t.category] = (expenseGroups[t.category] || 0) + amount;
+      } else {
+        incomeGroups[t.category] = (incomeGroups[t.category] || 0) + amount;
+      }
+    });
+
+    const expenses = Object.entries(expenseGroups)
+      .map(([categoryId, amount]) => ({ categoryId, amount }))
+      .sort((a, b) => b.amount - a.amount);
+      
+    const incomes = Object.entries(incomeGroups)
+      .map(([categoryId, amount]) => ({ categoryId, amount }))
+      .sort((a, b) => b.amount - a.amount);
+
+    return { expenses, incomes };
+  }, [filteredHistory, currencyConfigs]);
+
   const expenseCategories = useMemo(() => CATEGORIES.filter(c => c.type === 'expense'), []);
   const incomeCategories = useMemo(() => CATEGORIES.filter(c => c.type === 'income'), []);
 
@@ -1210,6 +1234,89 @@ export default function App() {
                   text={`¥${formatAmount(historyStats.balance)}`} 
                   className="text-sm font-bold text-blue-500 leading-tight" 
                 />
+              </div>
+            </div>
+            
+            {/* Category Statistics */}
+            <div className="grid grid-cols-1 gap-4">
+              {/* Expense Category Stats */}
+              <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center">
+                    <Folder size={18} />
+                  </div>
+                  <span className="font-bold text-gray-800">支出分类统计</span>
+                </div>
+                
+                {historyCategoryStats.expenses.length > 0 ? (
+                  <div className="space-y-4">
+                    {historyCategoryStats.expenses.map(({ categoryId, amount }) => {
+                      const category = CATEGORIES.find(c => c.id === categoryId) || CATEGORIES[CATEGORIES.length - 1];
+                      const percentage = historyStats.expense > 0 ? (amount / historyStats.expense) * 100 : 0;
+                      return (
+                        <div key={categoryId} className="space-y-1.5">
+                          <div className="flex items-center justify-between text-xs">
+                            <div className="flex items-center gap-2">
+                              <CategoryIcon name={category.icon} size={14} className="text-gray-400" />
+                              <span className="font-medium text-gray-700">{category.name}</span>
+                              <span className="text-gray-400">{percentage.toFixed(1)}%</span>
+                            </div>
+                            <span className="font-bold text-gray-900">¥{formatAmount(amount)}</span>
+                          </div>
+                          <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                            <motion.div 
+                              initial={{ width: 0 }}
+                              animate={{ width: `${percentage}%` }}
+                              className="h-full bg-red-500 rounded-full"
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-400 text-center py-4">暂无支出分类数据</p>
+                )}
+              </div>
+
+              {/* Income Category Stats */}
+              <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 bg-green-50 text-green-500 rounded-full flex items-center justify-center">
+                    <Folder size={18} />
+                  </div>
+                  <span className="font-bold text-gray-800">收入分类统计</span>
+                </div>
+                
+                {historyCategoryStats.incomes.length > 0 ? (
+                  <div className="space-y-4">
+                    {historyCategoryStats.incomes.map(({ categoryId, amount }) => {
+                      const category = CATEGORIES.find(c => c.id === categoryId) || CATEGORIES[CATEGORIES.length - 1];
+                      const percentage = historyStats.income > 0 ? (amount / historyStats.income) * 100 : 0;
+                      return (
+                        <div key={categoryId} className="space-y-1.5">
+                          <div className="flex items-center justify-between text-xs">
+                            <div className="flex items-center gap-2">
+                              <CategoryIcon name={category.icon} size={14} className="text-gray-400" />
+                              <span className="font-medium text-gray-700">{category.name}</span>
+                              <span className="text-gray-400">{percentage.toFixed(1)}%</span>
+                            </div>
+                            <span className="font-bold text-gray-900">¥{formatAmount(amount)}</span>
+                          </div>
+                          <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                            <motion.div 
+                              initial={{ width: 0 }}
+                              animate={{ width: `${percentage}%` }}
+                              className="h-full bg-green-500 rounded-full"
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-400 text-center py-4">暂无收入分类数据</p>
+                )}
               </div>
             </div>
             
