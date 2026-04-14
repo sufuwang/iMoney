@@ -244,6 +244,8 @@ export default function App() {
     const saved = localStorage.getItem('imoney_page_size');
     return saved ? parseInt(saved) : 5;
   });
+  const [detailFilter, setDetailFilter] = useState<{ categoryId: string, type: TransactionType } | null>(null);
+  const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
 
   useEffect(() => {
     localStorage.setItem('imoney_page_size', pageSize.toString());
@@ -920,6 +922,12 @@ export default function App() {
     return { expenses, incomes };
   }, [filteredHistory, currencyConfigs]);
 
+  const detailTransactions = useMemo(() => {
+    if (!detailFilter) return [];
+    return filteredHistory.filter(t => t.category === detailFilter.categoryId && t.type === detailFilter.type)
+      .sort((a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime());
+  }, [filteredHistory, detailFilter]);
+
   const expenseCategories = useMemo(() => CATEGORIES.filter(c => c.type === 'expense'), []);
   const incomeCategories = useMemo(() => CATEGORIES.filter(c => c.type === 'income'), []);
 
@@ -1253,8 +1261,20 @@ export default function App() {
                     {historyCategoryStats.expenses.map(({ categoryId, amount }) => {
                       const category = CATEGORIES.find(c => c.id === categoryId) || CATEGORIES[CATEGORIES.length - 1];
                       const percentage = historyStats.expense > 0 ? (amount / historyStats.expense) * 100 : 0;
+                      const count = filteredHistory.filter(t => t.category === categoryId && t.type === 'expense').length;
                       return (
-                        <div key={categoryId} className="space-y-1.5">
+                        <div 
+                          key={categoryId} 
+                          className="space-y-1.5 cursor-pointer active:opacity-70"
+                          onClick={() => {
+                            if (count > 1) {
+                              setDetailFilter({ categoryId, type: 'expense' });
+                            } else {
+                              const t = filteredHistory.find(t => t.category === categoryId && t.type === 'expense');
+                              if (t) setViewingTransaction(t);
+                            }
+                          }}
+                        >
                           <div className="flex items-center justify-between text-xs">
                             <div className="flex items-center gap-2">
                               <CategoryIcon name={category.icon} size={14} className="text-gray-400" />
@@ -1293,8 +1313,20 @@ export default function App() {
                     {historyCategoryStats.incomes.map(({ categoryId, amount }) => {
                       const category = CATEGORIES.find(c => c.id === categoryId) || CATEGORIES[CATEGORIES.length - 1];
                       const percentage = historyStats.income > 0 ? (amount / historyStats.income) * 100 : 0;
+                      const count = filteredHistory.filter(t => t.category === categoryId && t.type === 'income').length;
                       return (
-                        <div key={categoryId} className="space-y-1.5">
+                        <div 
+                          key={categoryId} 
+                          className="space-y-1.5 cursor-pointer active:opacity-70"
+                          onClick={() => {
+                            if (count > 1) {
+                              setDetailFilter({ categoryId, type: 'income' });
+                            } else {
+                              const t = filteredHistory.find(t => t.category === categoryId && t.type === 'income');
+                              if (t) setViewingTransaction(t);
+                            }
+                          }}
+                        >
                           <div className="flex items-center justify-between text-xs">
                             <div className="flex items-center gap-2">
                               <CategoryIcon name={category.icon} size={14} className="text-gray-400" />
@@ -1337,7 +1369,11 @@ export default function App() {
                       {topRankings.expenses.map((t, idx) => {
                         const category = CATEGORIES.find(c => c.id === t.category) || CATEGORIES[CATEGORIES.length - 1];
                         return (
-                          <div key={t.id} className="flex items-center justify-between">
+                          <div 
+                            key={t.id} 
+                            className="flex items-center justify-between active:bg-gray-50 p-1 rounded-lg transition-colors cursor-pointer"
+                            onClick={() => setViewingTransaction(t)}
+                          >
                             <div className="flex items-center gap-3">
                               <span className={cn(
                                 "text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full",
@@ -1381,7 +1417,11 @@ export default function App() {
                       {topRankings.incomes.map((t, idx) => {
                         const category = CATEGORIES.find(c => c.id === t.category) || CATEGORIES[CATEGORIES.length - 1];
                         return (
-                          <div key={t.id} className="flex items-center justify-between">
+                          <div 
+                            key={t.id} 
+                            className="flex items-center justify-between active:bg-gray-50 p-1 rounded-lg transition-colors cursor-pointer"
+                            onClick={() => setViewingTransaction(t)}
+                          >
                             <div className="flex items-center gap-3">
                               <span className={cn(
                                 "text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full",
@@ -1450,14 +1490,26 @@ export default function App() {
                     <TransactionItem 
                       key={t.id} 
                       transaction={t} 
-                      onEdit={startEditing}
+                      onEdit={(trans) => setViewingTransaction(trans)}
                     />
                   ))
                 ) : (
                   groupedHistory?.slice((historyPage - 1) * pageSize, historyPage * pageSize).map(group => {
                     const category = CATEGORIES.find(c => c.id === group.category) || CATEGORIES[CATEGORIES.length - 1];
+                    const count = filteredHistory.filter(t => t.category === group.category && t.type === group.type).length;
                     return (
-                      <div key={`${group.type}-${group.category}`} className="flex items-center justify-between py-2.5 border-b border-gray-100 last:border-0">
+                      <div 
+                        key={`${group.type}-${group.category}`} 
+                        className="flex items-center justify-between py-2.5 border-b border-gray-100 last:border-0 active:bg-gray-50 cursor-pointer"
+                        onClick={() => {
+                          if (count > 1) {
+                            setDetailFilter({ categoryId: group.category, type: group.type });
+                          } else {
+                            const t = filteredHistory.find(t => t.category === group.category && t.type === group.type);
+                            if (t) setViewingTransaction(t);
+                          }
+                        }}
+                      >
                         <div className="flex items-center gap-3">
                           <div className={cn(
                             "w-10 h-10 rounded-full flex items-center justify-center",
@@ -1468,7 +1520,7 @@ export default function App() {
                           <div>
                             <div className="font-medium text-gray-900">{category.name}</div>
                             <div className="text-xs text-gray-400">
-                              {filteredHistory.filter(t => t.category === group.category && t.type === group.type).length} 笔记录
+                              {count} 笔记录
                             </div>
                           </div>
                         </div>
@@ -2186,6 +2238,127 @@ export default function App() {
                   <span>完成记账</span>
                 </button>
               )}
+            </footer>
+          </motion.div>
+        )}
+
+        {detailFilter && (
+          <motion.div 
+            initial={{ opacity: 0, x: '100%' }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: '100%' }}
+            className="absolute inset-0 bg-gray-50 z-[60] flex flex-col overscroll-none"
+          >
+            <header className="px-6 pt-safe pb-4 flex items-center gap-4 border-b border-gray-100 bg-white sticky top-0 z-10 shrink-0">
+              <button 
+                onClick={() => setDetailFilter(null)} 
+                className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 bg-gray-50 rounded-full active:scale-90 transition-all"
+              >
+                <ChevronLeft size={24} />
+              </button>
+              <div className="flex-1">
+                <div className="text-sm font-bold text-gray-900">
+                  {CATEGORIES.find(c => c.id === detailFilter.categoryId)?.name} 明细
+                </div>
+                <div className="text-[10px] text-gray-400 font-medium">
+                  共 {detailTransactions.length} 笔记录
+                </div>
+              </div>
+            </header>
+            
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-2 scrollbar-hide overscroll-contain">
+              {detailTransactions.map(t => (
+                <TransactionItem 
+                  key={t.id} 
+                  transaction={t} 
+                  onEdit={(trans) => setViewingTransaction(trans)}
+                />
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {viewingTransaction && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="absolute inset-0 bg-white z-[70] flex flex-col overscroll-none"
+          >
+            <header className="px-6 pt-safe pb-4 flex items-center justify-between border-b border-gray-50 bg-white sticky top-0 z-10 shrink-0">
+              <button 
+                onClick={() => setViewingTransaction(null)} 
+                className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 bg-gray-50 rounded-full active:scale-90 transition-all"
+              >
+                <X size={20} />
+              </button>
+              <div className="text-sm font-bold text-gray-900">交易详情</div>
+              <button 
+                onClick={() => {
+                  startEditing(viewingTransaction);
+                  setViewingTransaction(null);
+                }}
+                className="w-10 h-10 flex items-center justify-center text-blue-600 bg-blue-50 rounded-full active:scale-90 transition-all"
+              >
+                <Edit2 size={18} />
+              </button>
+            </header>
+            
+            <div className="flex-1 overflow-y-auto px-6 py-8 space-y-8 scrollbar-hide overscroll-contain">
+              <div className="text-center space-y-2">
+                <div className={cn(
+                  "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4",
+                  viewingTransaction.type === 'income' ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
+                )}>
+                  <CategoryIcon name={CATEGORIES.find(c => c.id === viewingTransaction.category)?.icon || 'MoreHorizontal'} size={40} />
+                </div>
+                <div className="text-lg font-medium text-gray-500">
+                  {CATEGORIES.find(c => c.id === viewingTransaction.category)?.name}
+                </div>
+                <div className={cn(
+                  "text-4xl font-black",
+                  viewingTransaction.type === 'income' ? "text-green-600" : "text-red-600"
+                )}>
+                  {viewingTransaction.type === 'income' ? '+' : '-'}{CURRENCY_SYMBOLS[viewingTransaction.currency || 'CNY']}{viewingTransaction.amount.toLocaleString()}
+                </div>
+              </div>
+              
+              <div className="bg-gray-50 rounded-2xl p-6 space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">交易时间</span>
+                  <span className="text-sm font-medium text-gray-700">{format(parseISO(viewingTransaction.date), 'yyyy-MM-dd HH:mm')}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">交易类型</span>
+                  <span className={cn(
+                    "text-xs font-bold px-2 py-1 rounded-md",
+                    viewingTransaction.type === 'income' ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
+                  )}>
+                    {viewingTransaction.type === 'income' ? '收入' : '支出'}
+                  </span>
+                </div>
+                <div className="pt-4 border-t border-gray-100">
+                  <div className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-2">备注</div>
+                  <div className="text-sm text-gray-700 font-medium leading-relaxed">
+                    {viewingTransaction.note || '无备注'}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <footer className="px-6 pt-4 pb-safe border-t border-gray-50 bg-white shrink-0">
+              <button 
+                onClick={() => {
+                  if (window.confirm("确定要删除这条记录吗？")) {
+                    deleteTransaction(viewingTransaction.id);
+                    setViewingTransaction(null);
+                  }
+                }}
+                className="w-full flex items-center justify-center gap-2 text-red-500 font-bold py-4 rounded-2xl bg-red-50 active:scale-95 transition-all"
+              >
+                <Trash2 size={20} />
+                <span>删除记录</span>
+              </button>
             </footer>
           </motion.div>
         )}
