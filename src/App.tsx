@@ -32,7 +32,18 @@ import {
   Clock,
   PlusCircle,
   HelpCircle,
-  PieChart as PieChartIcon
+  PieChart as PieChartIcon,
+  Smartphone,
+  Dumbbell,
+  Plane,
+  Baby,
+  Building,
+  Undo,
+  Coins,
+  Receipt,
+  Recycle,
+  Trophy,
+  PiggyBank
 } from 'lucide-react';
 import { 
   format, 
@@ -101,7 +112,9 @@ const formatHeaderAmount = (amount: number) => {
 const CategoryIcon = ({ name, size = 20, className }: { name: string, size?: number, className?: string }) => {
   const icons: Record<string, React.ElementType> = {
     Utensils, ShoppingBag, Bus, Gamepad2, Home, Stethoscope, GraduationCap, 
-    MoreHorizontal, Wallet, Gift, TrendingUp, Clock, PlusCircle
+    MoreHorizontal, Wallet, Gift, TrendingUp, Clock, PlusCircle,
+    Smartphone, Dumbbell, Plane, Baby, Building, Undo, Coins,
+    Receipt, Recycle, Trophy, PiggyBank
   };
   const Icon = icons[name] || HelpCircle;
   return <Icon size={size} className={className} />;
@@ -243,6 +256,18 @@ export default function App() {
   const [pageSize, setPageSize] = useState(() => {
     const saved = localStorage.getItem('imoney_page_size');
     return saved ? parseInt(saved) : 5;
+  });
+  const [trendStartDate, setTrendStartDate] = useState<Date>(() => {
+    const now = new Date();
+    if (trendView === 'day') return subDays(now, 30);
+    if (trendView === 'month') return subMonths(now, 11);
+    return subYears(now, 9);
+  });
+  const [trendEndDate, setTrendEndDate] = useState<Date>(() => {
+    const now = new Date();
+    if (trendView === 'day') return now;
+    if (trendView === 'month') return new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    return new Date(now.getFullYear(), 11, 31);
   });
   const [detailFilter, setDetailFilter] = useState<{ categoryId: string, type: TransactionType } | null>(null);
   const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
@@ -716,22 +741,23 @@ export default function App() {
   }, [transactions, currencyConfigs]);
 
   const chartData = useMemo(() => {
-    const now = new Date();
     let interval: { start: Date, end: Date };
     let formatStr: string;
-    let step: (date: Date) => Date;
     let eachInterval: (interval: { start: Date, end: Date }) => Date[];
 
+    // Ensure start is before end
+    const start = trendStartDate < trendEndDate ? trendStartDate : trendEndDate;
+    const end = trendStartDate < trendEndDate ? trendEndDate : trendStartDate;
+    
+    interval = { start, end };
+
     if (trendView === 'day') {
-      interval = { start: subDays(now, 6), end: now };
       formatStr = 'MM-dd';
       eachInterval = eachDayOfInterval;
     } else if (trendView === 'month') {
-      interval = { start: subMonths(now, 5), end: now };
       formatStr = 'yyyy-MM';
       eachInterval = eachMonthOfInterval;
     } else {
-      interval = { start: subYears(now, 4), end: now };
       formatStr = 'yyyy';
       eachInterval = eachYearOfInterval;
     }
@@ -769,7 +795,7 @@ export default function App() {
 
       return dataPoint;
     });
-  }, [transactions, trendView, currencyConfigs]);
+  }, [transactions, trendView, trendStartDate, trendEndDate, currencyConfigs]);
 
   const filteredHistory = useMemo(() => {
     return transactions.filter(t => {
@@ -798,14 +824,14 @@ export default function App() {
 
   const expensePieData = useMemo(() => {
     const categories = CATEGORIES.filter(c => c.type === 'expense');
-    const now = new Date();
+    const start = trendStartDate < trendEndDate ? trendStartDate : trendEndDate;
+    const end = trendStartDate < trendEndDate ? trendEndDate : trendStartDate;
+    
     return categories
       .map((cat, idx) => {
         const total = transactions.filter(t => {
           const tDate = parseISO(t.date);
-          if (trendView === 'day') return isSameDay(tDate, now);
-          if (trendView === 'month') return isSameMonth(tDate, now);
-          return isSameYear(tDate, now);
+          return tDate >= start && tDate <= end;
         })
         .filter(t => t.category === cat.id)
         .reduce((acc, t) => acc + convertToBase(t.amount, t.currency || 'CNY'), 0);
@@ -818,18 +844,18 @@ export default function App() {
         };
       })
       .filter(d => d.value > 0 && !hiddenPieCategories.includes(d.id));
-  }, [transactions, trendView, hiddenPieCategories, currencyConfigs]);
+  }, [transactions, trendStartDate, trendEndDate, hiddenPieCategories, currencyConfigs]);
 
   const incomePieData = useMemo(() => {
     const categories = CATEGORIES.filter(c => c.type === 'income');
-    const now = new Date();
+    const start = trendStartDate < trendEndDate ? trendStartDate : trendEndDate;
+    const end = trendStartDate < trendEndDate ? trendEndDate : trendStartDate;
+
     return categories
       .map((cat, idx) => {
         const total = transactions.filter(t => {
           const tDate = parseISO(t.date);
-          if (trendView === 'day') return isSameDay(tDate, now);
-          if (trendView === 'month') return isSameMonth(tDate, now);
-          return isSameYear(tDate, now);
+          return tDate >= start && tDate <= end;
         })
         .filter(t => t.category === cat.id)
         .reduce((acc, t) => acc + convertToBase(t.amount, t.currency || 'CNY'), 0);
@@ -842,16 +868,14 @@ export default function App() {
         };
       })
       .filter(d => d.value > 0 && !hiddenPieCategories.includes(d.id));
-  }, [transactions, trendView, hiddenPieCategories, currencyConfigs]);
+  }, [transactions, trendStartDate, trendEndDate, hiddenPieCategories, currencyConfigs]);
 
   const expensePieTotal = useMemo(() => expensePieData.reduce((acc, d) => acc + d.value, 0), [expensePieData]);
   const incomePieTotal = useMemo(() => incomePieData.reduce((acc, d) => acc + d.value, 0), [incomePieData]);
 
   const timeRangeLabel = useMemo(() => {
-    if (trendView === 'day') return '当天';
-    if (trendView === 'month') return '当月';
-    return '当年';
-  }, [trendView]);
+    return '时间范围内';
+  }, []);
 
   const CustomPieTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -931,41 +955,77 @@ export default function App() {
   const expenseCategories = useMemo(() => CATEGORIES.filter(c => c.type === 'expense'), []);
   const incomeCategories = useMemo(() => CATEGORIES.filter(c => c.type === 'income'), []);
 
-  const expenseLegendPayload = useMemo(() => expenseCategories.map((cat, idx) => ({
-    value: cat.name,
-    id: cat.id,
-    type: 'circle' as const,
-    color: hiddenTrendCategories.includes(cat.id) ? '#e5e7eb' : ['#ef4444', '#f59e0b', '#8b5cf6', '#ec4899', '#f97316', '#3b82f6', '#10b981', '#06b6d4'][idx % 8],
-    dataKey: cat.id,
-    inactive: hiddenTrendCategories.includes(cat.id)
-  })), [expenseCategories, hiddenTrendCategories]);
+  const activeTrendExpenseCategories = useMemo(() => {
+    return expenseCategories.filter(cat => 
+      chartData.some(d => (d[cat.id] as number || 0) > 0)
+    );
+  }, [expenseCategories, chartData]);
 
-  const incomeLegendPayload = useMemo(() => incomeCategories.map((cat, idx) => ({
-    value: cat.name,
-    id: cat.id,
-    type: 'circle' as const,
-    color: hiddenTrendCategories.includes(cat.id) ? '#e5e7eb' : ['#10b981', '#3b82f6', '#06b6d4', '#14b8a6', '#6366f1', '#8b5cf6', '#ec4899', '#f59e0b'][idx % 8],
-    dataKey: cat.id,
-    inactive: hiddenTrendCategories.includes(cat.id)
-  })), [incomeCategories, hiddenTrendCategories]);
+  const activeTrendIncomeCategories = useMemo(() => {
+    return incomeCategories.filter(cat => 
+      chartData.some(d => (d[cat.id] as number || 0) > 0)
+    );
+  }, [incomeCategories, chartData]);
 
-  const expensePieLegendPayload = useMemo(() => expenseCategories.map((cat, idx) => ({
-    value: cat.name,
-    id: cat.id,
-    type: 'circle' as const,
-    color: hiddenPieCategories.includes(cat.id) ? '#e5e7eb' : ['#ef4444', '#f59e0b', '#8b5cf6', '#ec4899', '#f97316', '#3b82f6', '#10b981', '#06b6d4'][idx % 8],
-    dataKey: cat.id,
-    inactive: hiddenPieCategories.includes(cat.id)
-  })), [expenseCategories, hiddenPieCategories]);
+  const expenseLegendPayload = useMemo(() => activeTrendExpenseCategories.map((cat) => {
+    const originalIdx = expenseCategories.findIndex(c => c.id === cat.id);
+    return {
+      value: cat.name,
+      id: cat.id,
+      type: 'circle' as const,
+      color: hiddenTrendCategories.includes(cat.id) ? '#e5e7eb' : ['#ef4444', '#f59e0b', '#8b5cf6', '#ec4899', '#f97316', '#3b82f6', '#10b981', '#06b6d4'][originalIdx % 8],
+      dataKey: cat.id,
+      inactive: hiddenTrendCategories.includes(cat.id)
+    };
+  }), [expenseCategories, activeTrendExpenseCategories, hiddenTrendCategories]);
 
-  const incomePieLegendPayload = useMemo(() => incomeCategories.map((cat, idx) => ({
-    value: cat.name,
-    id: cat.id,
-    type: 'circle' as const,
-    color: hiddenPieCategories.includes(cat.id) ? '#e5e7eb' : ['#10b981', '#3b82f6', '#06b6d4', '#14b8a6', '#6366f1', '#8b5cf6', '#ec4899', '#f59e0b'][idx % 8],
-    dataKey: cat.id,
-    inactive: hiddenPieCategories.includes(cat.id)
-  })), [incomeCategories, hiddenPieCategories]);
+  const incomeLegendPayload = useMemo(() => activeTrendIncomeCategories.map((cat) => {
+    const originalIdx = incomeCategories.findIndex(c => c.id === cat.id);
+    return {
+      value: cat.name,
+      id: cat.id,
+      type: 'circle' as const,
+      color: hiddenTrendCategories.includes(cat.id) ? '#e5e7eb' : ['#10b981', '#3b82f6', '#06b6d4', '#14b8a6', '#6366f1', '#8b5cf6', '#ec4899', '#f59e0b'][originalIdx % 8],
+      dataKey: cat.id,
+      inactive: hiddenTrendCategories.includes(cat.id)
+    };
+  }), [incomeCategories, activeTrendIncomeCategories, hiddenTrendCategories]);
+
+  const expensePieLegendPayload = useMemo(() => {
+    const activeCategories = expenseCategories.filter(cat => 
+      expensePieData.some(d => d.id === cat.id) || hiddenPieCategories.includes(cat.id)
+    );
+    // Actually if we want to hide empty ones, we should just filter by pie data
+    const displayCategories = expenseCategories.filter(cat => expensePieData.some(d => d.id === cat.id));
+    
+    return displayCategories.map((cat) => {
+      const originalIdx = expenseCategories.findIndex(c => c.id === cat.id);
+      return {
+        value: cat.name,
+        id: cat.id,
+        type: 'circle' as const,
+        color: hiddenPieCategories.includes(cat.id) ? '#e5e7eb' : ['#ef4444', '#f59e0b', '#8b5cf6', '#ec4899', '#f97316', '#3b82f6', '#10b981', '#06b6d4'][originalIdx % 8],
+        dataKey: cat.id,
+        inactive: hiddenPieCategories.includes(cat.id)
+      };
+    });
+  }, [expenseCategories, expensePieData, hiddenPieCategories]);
+
+  const incomePieLegendPayload = useMemo(() => {
+    const displayCategories = incomeCategories.filter(cat => incomePieData.some(d => d.id === cat.id));
+    
+    return displayCategories.map((cat) => {
+      const originalIdx = incomeCategories.findIndex(c => c.id === cat.id);
+      return {
+        value: cat.name,
+        id: cat.id,
+        type: 'circle' as const,
+        color: hiddenPieCategories.includes(cat.id) ? '#e5e7eb' : ['#10b981', '#3b82f6', '#06b6d4', '#14b8a6', '#6366f1', '#8b5cf6', '#ec4899', '#f59e0b'][originalIdx % 8],
+        dataKey: cat.id,
+        inactive: hiddenPieCategories.includes(cat.id)
+      };
+    });
+  }, [incomeCategories, incomePieData, hiddenPieCategories]);
 
   const CustomTrendTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -1563,20 +1623,124 @@ export default function App() {
         )}
         {activeTab === 'trends' && (
           <div className="space-y-6 pb-32">
-            <div className="flex justify-end items-center">
-              <div className="flex bg-gray-100 p-1 rounded-lg">
-                {(['day', 'month', 'year'] as const).map(v => (
-                  <button
-                    key={v}
-                    onClick={() => setTrendView(v)}
-                    className={cn(
-                      "px-3 py-1 text-xs rounded-md transition-all",
-                      trendView === v ? "bg-white shadow-sm text-blue-600 font-bold" : "text-gray-500"
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <CalendarIcon size={16} className="text-blue-500" />
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">趋势周期与范围</span>
+                </div>
+                <div className="flex bg-gray-100 p-1 rounded-lg">
+                  {(['day', 'month', 'year'] as const).map(v => (
+                    <button
+                      key={v}
+                      onClick={() => {
+                        setTrendView(v);
+                        const now = new Date();
+                        if (v === 'day') {
+                          setTrendStartDate(subDays(now, 30));
+                          setTrendEndDate(now);
+                        } else if (v === 'month') {
+                          setTrendStartDate(subMonths(now, 11));
+                          const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                          setTrendEndDate(endOfMonth);
+                        } else {
+                          setTrendStartDate(subYears(now, 9));
+                          const endOfYear = new Date(now.getFullYear(), 11, 31);
+                          setTrendEndDate(endOfYear);
+                        }
+                      }}
+                      className={cn(
+                        "px-3 py-1 text-[10px] rounded-md transition-all",
+                        trendView === v ? "bg-white shadow-sm text-blue-600 font-bold" : "text-gray-500"
+                      )}
+                    >
+                      {v === 'day' ? '按日' : v === 'month' ? '按月' : '按年'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3 pt-2 border-t border-gray-50 mt-2">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] text-gray-400 font-bold ml-1 uppercase tracking-tight">起始</label>
+                  <div className="relative">
+                    {trendView === 'day' ? (
+                      <input 
+                        type="date" 
+                        value={format(trendStartDate, 'yyyy-MM-dd')}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val) setTrendStartDate(new Date(val));
+                        }}
+                        className="w-full bg-gray-50 border-none rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
+                      />
+                    ) : trendView === 'month' ? (
+                      <input 
+                        type="month" 
+                        value={format(trendStartDate, 'yyyy-MM')}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val) setTrendStartDate(new Date(val + '-01'));
+                        }}
+                        className="w-full bg-gray-50 border-none rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
+                      />
+                    ) : (
+                      <input 
+                        type="number" 
+                        min="2000"
+                        max="2100"
+                        value={format(trendStartDate, 'yyyy')}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val) setTrendStartDate(new Date(`${val}-01-01`));
+                        }}
+                        className="w-full bg-gray-50 border-none rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
+                      />
                     )}
-                  >
-                    {v === 'day' ? '日' : v === 'month' ? '月' : '年'}
-                  </button>
-                ))}
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] text-gray-400 font-bold ml-1 uppercase tracking-tight">结束</label>
+                  <div className="relative">
+                    {trendView === 'day' ? (
+                      <input 
+                        type="date" 
+                        value={format(trendEndDate, 'yyyy-MM-dd')}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val) setTrendEndDate(new Date(val));
+                        }}
+                        className="w-full bg-gray-50 border-none rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
+                      />
+                    ) : trendView === 'month' ? (
+                      <input 
+                        type="month" 
+                        value={format(trendEndDate, 'yyyy-MM')}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val) {
+                            // Set to the end of that month
+                            const date = new Date(val + '-01');
+                            setTrendEndDate(new Date(date.getFullYear(), date.getMonth() + 1, 0));
+                          }
+                        }}
+                        className="w-full bg-gray-50 border-none rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
+                      />
+                    ) : (
+                      <input 
+                        type="number" 
+                        min="2000"
+                        max="2100"
+                        value={format(trendEndDate, 'yyyy')}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val) setTrendEndDate(new Date(`${val}-12-31`));
+                        }}
+                        className="w-full bg-gray-50 border-none rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
+                      />
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1664,19 +1828,22 @@ export default function App() {
                         onClick={(e) => toggleTrendCategory(e.dataKey)}
                         wrapperStyle={{ fontSize: '10px', paddingTop: '12px' }}
                       />
-                      {expenseCategories.map((cat, idx) => (
-                        <Line 
-                          key={cat.id}
-                          hide={hiddenTrendCategories.includes(cat.id)}
-                          type="monotone" 
-                          dataKey={cat.id} 
-                          stroke={['#ef4444', '#f59e0b', '#8b5cf6', '#ec4899', '#f97316', '#3b82f6', '#10b981', '#06b6d4'][idx % 8]} 
-                          strokeWidth={2.5} 
-                          dot={false}
-                          activeDot={{ r: 4, strokeWidth: 0 }}
-                          name={cat.name}
-                        />
-                      ))}
+                      {activeTrendExpenseCategories.map((cat) => {
+                        const originalIdx = expenseCategories.findIndex(c => c.id === cat.id);
+                        return (
+                          <Line 
+                            key={cat.id}
+                            hide={hiddenTrendCategories.includes(cat.id)}
+                            type="monotone" 
+                            dataKey={cat.id} 
+                            stroke={['#ef4444', '#f59e0b', '#8b5cf6', '#ec4899', '#f97316', '#3b82f6', '#10b981', '#06b6d4'][originalIdx % 8]} 
+                            strokeWidth={2.5} 
+                            dot={false}
+                            activeDot={{ r: 4, strokeWidth: 0 }}
+                            name={cat.name}
+                          />
+                        );
+                      })}
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
@@ -1751,19 +1918,22 @@ export default function App() {
                         onClick={(e) => toggleTrendCategory(e.dataKey)}
                         wrapperStyle={{ fontSize: '10px', paddingTop: '12px' }}
                       />
-                      {incomeCategories.map((cat, idx) => (
-                        <Line 
-                          key={cat.id}
-                          hide={hiddenTrendCategories.includes(cat.id)}
-                          type="monotone" 
-                          dataKey={cat.id} 
-                          stroke={['#10b981', '#3b82f6', '#06b6d4', '#14b8a6', '#6366f1', '#8b5cf6', '#ec4899', '#f59e0b'][idx % 8]} 
-                          strokeWidth={2.5} 
-                          dot={false}
-                          activeDot={{ r: 4, strokeWidth: 0 }}
-                          name={cat.name}
-                        />
-                      ))}
+                      {activeTrendIncomeCategories.map((cat) => {
+                        const originalIdx = incomeCategories.findIndex(c => c.id === cat.id);
+                        return (
+                          <Line 
+                            key={cat.id}
+                            hide={hiddenTrendCategories.includes(cat.id)}
+                            type="monotone" 
+                            dataKey={cat.id} 
+                            stroke={['#10b981', '#3b82f6', '#06b6d4', '#14b8a6', '#6366f1', '#8b5cf6', '#ec4899', '#f59e0b'][originalIdx % 8]} 
+                            strokeWidth={2.5} 
+                            dot={false}
+                            activeDot={{ r: 4, strokeWidth: 0 }}
+                            name={cat.name}
+                          />
+                        );
+                      })}
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
