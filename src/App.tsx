@@ -1123,165 +1123,105 @@ export default function App() {
       <main ref={mainRef} className="flex-1 overflow-y-auto px-6 py-4 scrollbar-hide overscroll-contain">
         {activeTab === 'history' && (
           <div className="space-y-6 pb-32">
-            {/* Cascading Date Selector */}
             <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <CalendarIcon size={16} className="text-blue-500" />
                   <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">时间筛选</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  {/* 今日 */}
-                  {(!isSameDay(historyDate, new Date()) || historyView !== 'day') ? (
-                    <button 
-                      onClick={() => {
-                        setHistoryDate(new Date());
-                        setHistoryView('day');
-                      }}
-                      className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg active:scale-95 transition-all"
+                <div className="flex bg-gray-100 p-1 rounded-lg">
+                  {(['day', 'month', 'year'] as const).map(v => (
+                    <button
+                      key={v}
+                      onClick={() => setHistoryView(v)}
+                      className={cn(
+                        "px-3 py-1 text-[10px] rounded-md transition-all",
+                        historyView === v ? "bg-white shadow-sm text-blue-600 font-bold" : "text-gray-500"
+                      )}
                     >
-                      今日
+                      {v === 'day' ? '按日' : v === 'month' ? '按月' : '按年'}
                     </button>
-                  ) : (
-                    <div className="text-[10px] font-bold text-gray-300 bg-gray-50 px-2 py-1 rounded-lg">今日</div>
-                  )}
-                  {/* 全月 */}
-                  {(!isSameMonth(historyDate, new Date()) || historyView !== 'month') ? (
-                    <button 
-                      onClick={() => {
-                        setHistoryDate(new Date());
-                        setHistoryView('month');
-                      }}
-                      className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg active:scale-95 transition-all"
-                    >
-                      全月
-                    </button>
-                  ) : (
-                    <div className="text-[10px] font-bold text-gray-300 bg-gray-50 px-2 py-1 rounded-lg">全月</div>
-                  )}
-                  {/* 全年 */}
-                  {(!isSameYear(historyDate, new Date()) || historyView !== 'year') ? (
-                    <button 
-                      onClick={() => {
-                        setHistoryDate(new Date());
-                        setHistoryView('year');
-                      }}
-                      className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg active:scale-95 transition-all"
-                    >
-                      全年
-                    </button>
-                  ) : (
-                    <div className="text-[10px] font-bold text-gray-300 bg-gray-50 px-2 py-1 rounded-lg">全年</div>
-                  )}
+                  ))}
                 </div>
               </div>
               
-              <div className="grid grid-cols-3 gap-2">
-                {/* Year Select */}
-                <div className="relative group">
-                  <select 
-                    value={historyDate.getFullYear()} 
-                    onChange={(e) => {
-                      const newDate = new Date(historyDate);
-                      newDate.setFullYear(parseInt(e.target.value));
-                      setHistoryDate(newDate);
-                    }}
-                    className="w-full bg-gray-50 border-none rounded-xl px-3 py-2.5 text-sm font-bold text-gray-700 appearance-none focus:ring-0 focus:outline-none transition-all cursor-pointer"
-                  >
-                    {years.map(y => <option key={y} value={y}>{y}年</option>)}
-                  </select>
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                    <ChevronRight size={14} className="rotate-90" />
-                  </div>
-                </div>
-
-                {/* Month Select */}
-                <div className="relative group">
-                  <select 
-                    value={historyView === 'year' ? 'all' : historyDate.getMonth() + 1} 
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (val === 'all') {
-                        setHistoryView('year');
-                      } else {
-                        const newDate = new Date(historyDate);
-                        newDate.setMonth(parseInt(val) - 1);
-                        setHistoryDate(newDate);
-                        if (historyView === 'year') setHistoryView('month');
-                      }
-                    }}
-                    className={cn(
-                      "w-full bg-gray-50 border-none rounded-xl px-3 py-2.5 text-sm font-bold appearance-none focus:ring-0 focus:outline-none transition-all cursor-pointer",
-                      historyView === 'year' ? "text-blue-600 bg-blue-50" : "text-gray-700"
+              <div className="pt-2 border-t border-gray-50 mt-2">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] text-gray-400 font-bold ml-1 uppercase tracking-tight">选择日期</label>
+                  <div className="relative">
+                    {historyView === 'day' ? (
+                      <input 
+                        type="date" 
+                        value={format(historyDate, 'yyyy-MM-dd')}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val) setHistoryDate(new Date(val));
+                        }}
+                        className="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
+                      />
+                    ) : historyView === 'month' ? (
+                      <input 
+                        type="month" 
+                        value={format(historyDate, 'yyyy-MM')}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val) setHistoryDate(new Date(val + '-01'));
+                        }}
+                        className="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
+                      />
+                    ) : (
+                      <select 
+                        value={format(historyDate, 'yyyy')}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val) setHistoryDate(new Date(`${val}-01-01`));
+                        }}
+                        className="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
+                      >
+                        {Array.from({ length: (new Date().getFullYear() + 10) - 2000 + 1 }, (_, i) => 2000 + i).map(year => (
+                          <option key={year} value={year}>{year} 年</option>
+                        ))}
+                      </select>
                     )}
-                  >
-                    <option value="all">全年</option>
-                    {months.map(m => <option key={m} value={m}>{m}月</option>)}
-                  </select>
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                    <ChevronRight size={14} className="rotate-90" />
                   </div>
                 </div>
 
-                {/* Day Select */}
-                <div className="relative group">
-                  <select 
-                    disabled={historyView === 'year'}
-                    value={historyView === 'month' ? 'all' : historyDate.getDate()} 
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (val === 'all') {
-                        setHistoryView('month');
-                      } else {
-                        const newDate = new Date(historyDate);
-                        newDate.setDate(parseInt(val));
-                        setHistoryDate(newDate);
-                        setHistoryView('day');
-                      }
+                {/* Quick Navigation Controls */}
+                <div className="flex items-center justify-between mt-4">
+                  <button 
+                    onClick={() => {
+                      if (historyView === 'day') setHistoryDate(subDays(historyDate, 1));
+                      else if (historyView === 'month') setHistoryDate(subMonths(historyDate, 1));
+                      else setHistoryDate(subYears(historyDate, 1));
                     }}
-                    className={cn(
-                      "w-full bg-gray-50 border-none rounded-xl px-3 py-2.5 text-sm font-bold appearance-none focus:ring-0 focus:outline-none transition-all cursor-pointer disabled:opacity-30",
-                      (historyView === 'day' || historyView === 'month') ? "text-blue-600 bg-blue-50" : "text-gray-700"
-                    )}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 rounded-lg text-[10px] font-bold text-gray-500 transition-all active:scale-95"
                   >
-                    <option value="all">全月</option>
-                    {daysInMonth.map(d => <option key={d} value={d}>{d}日</option>)}
-                  </select>
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                    <ChevronRight size={14} className="rotate-90" />
-                  </div>
-                </div>
-              </div>
+                    <ChevronLeft size={14} />
+                    上一{historyView === 'day' ? '天' : historyView === 'month' ? '月' : '年'}
+                  </button>
 
-              {/* Quick Navigation */}
-              <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
-                <button 
-                  onClick={() => {
-                    if (historyView === 'day') setHistoryDate(subDays(historyDate, 1));
-                    else if (historyView === 'month') setHistoryDate(subMonths(historyDate, 1));
-                    else setHistoryDate(subYears(historyDate, 1));
-                  }}
-                  className="flex items-center gap-1 text-xs font-bold text-gray-400 hover:text-blue-600 transition-colors"
-                >
-                  <ChevronLeft size={16} />
-                  前一{historyView === 'day' ? '天' : historyView === 'month' ? '月' : '年'}
-                </button>
-                
-                <div className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">
-                  {historyView === 'day' ? '按日查看' : historyView === 'month' ? '按月查看' : '按年查看'}
-                </div>
+                  <button 
+                    onClick={() => {
+                      setHistoryDate(new Date());
+                      setHistoryView('day');
+                    }}
+                    className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 rounded-lg text-[10px] font-bold text-blue-600 transition-all active:scale-95"
+                  >
+                    返回今日
+                  </button>
 
-                <button 
-                  onClick={() => {
-                    if (historyView === 'day') setHistoryDate(addDays(historyDate, 1));
-                    else if (historyView === 'month') setHistoryDate(addMonths(historyDate, 1));
-                    else setHistoryDate(addYears(historyDate, 1));
-                  }}
-                  className="flex items-center gap-1 text-xs font-bold text-gray-400 hover:text-blue-600 transition-colors"
-                >
-                  后一{historyView === 'day' ? '天' : historyView === 'month' ? '月' : '年'}
-                  <ChevronRight size={16} />
-                </button>
+                  <button 
+                    onClick={() => {
+                      if (historyView === 'day') setHistoryDate(addDays(historyDate, 1));
+                      else if (historyView === 'month') setHistoryDate(addMonths(historyDate, 1));
+                      else setHistoryDate(addYears(historyDate, 1));
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 rounded-lg text-[10px] font-bold text-gray-500 transition-all active:scale-95"
+                  >
+                    下一{historyView === 'day' ? '天' : historyView === 'month' ? '月' : '年'}
+                    <ChevronRight size={14} />
+                  </button>
+                </div>
               </div>
             </div>
 
