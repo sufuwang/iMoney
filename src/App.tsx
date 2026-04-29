@@ -230,8 +230,12 @@ export default function App() {
     }
   }, [activeTab]);
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
-    const saved = localStorage.getItem('imoney_transactions');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('imoney_transactions');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
   });
   const [isAdding, setIsAdding] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
@@ -242,16 +246,28 @@ export default function App() {
   const [newNote, setNewNote] = useState('');
   const [newDate, setNewDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [trendView, setTrendView] = useState<'day' | 'month' | 'year'>(() => {
-    const saved = localStorage.getItem('imoney_trend_view');
-    return (saved as 'day' | 'month' | 'year') || 'day';
+    try {
+      const saved = localStorage.getItem('imoney_trend_view');
+      return (saved as 'day' | 'month' | 'year') || 'day';
+    } catch {
+      return 'day';
+    }
   });
   const [historyView, setHistoryView] = useState<'day' | 'month' | 'year'>(() => {
-    const saved = localStorage.getItem('imoney_history_view');
-    return (saved as 'day' | 'month' | 'year') || 'day';
+    try {
+      const saved = localStorage.getItem('imoney_history_view');
+      return (saved as 'day' | 'month' | 'year') || 'day';
+    } catch {
+      return 'day';
+    }
   });
   const [historyDate, setHistoryDate] = useState(() => {
-    const saved = localStorage.getItem('imoney_history_date');
-    return saved ? new Date(saved) : new Date();
+    try {
+      const saved = localStorage.getItem('imoney_history_date');
+      return saved ? new Date(saved) : new Date();
+    } catch {
+      return new Date();
+    }
   });
   const [historyPage, setHistoryPage] = useState(1);
   const [pageSize, setPageSize] = useState(() => {
@@ -1129,86 +1145,140 @@ export default function App() {
                   <CalendarIcon size={16} className="text-blue-500" />
                   <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">时间筛选</span>
                 </div>
-                <div className="flex bg-gray-100 p-1 rounded-lg">
-                  {(['day', 'month', 'year'] as const).map(v => (
-                    <button
-                      key={v}
-                      onClick={() => setHistoryView(v)}
-                      className={cn(
-                        "px-3 py-1 text-[10px] rounded-md transition-all",
-                        historyView === v ? "bg-white shadow-sm text-blue-600 font-bold" : "text-gray-500"
-                      )}
-                    >
-                      {v === 'day' ? '按日' : v === 'month' ? '按月' : '按年'}
-                    </button>
-                  ))}
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => {
+                      setHistoryDate(new Date());
+                      setHistoryView('day');
+                    }}
+                    className="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 rounded-lg text-[10px] font-bold text-blue-600 transition-all active:scale-95"
+                  >
+                    返回今日
+                  </button>
+                  <div className="flex bg-gray-100 p-1 rounded-lg">
+                    {(['day', 'month', 'year'] as const).map(v => (
+                      <button
+                        key={v}
+                        onClick={() => {
+                          setHistoryView(v);
+                          setHistoryDate(new Date());
+                          setHistoryPage(1);
+                        }}
+                        className={cn(
+                          "px-3 py-1 text-[10px] rounded-md transition-all",
+                          historyView === v ? "bg-white shadow-sm text-blue-600 font-bold" : "text-gray-500"
+                        )}
+                      >
+                        {v === 'day' ? '按日' : v === 'month' ? '按月' : '按年'}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
               
-              <div className="pt-2 border-t border-gray-50 mt-2">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] text-gray-400 font-bold ml-1 uppercase tracking-tight">选择日期</label>
-                  <div className="relative">
-                    {historyView === 'day' ? (
-                      <input 
-                        type="date" 
-                        value={format(historyDate, 'yyyy-MM-dd')}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (val) setHistoryDate(new Date(val));
-                        }}
-                        className="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
-                      />
-                    ) : historyView === 'month' ? (
-                      <input 
-                        type="month" 
-                        value={format(historyDate, 'yyyy-MM')}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (val) setHistoryDate(new Date(val + '-01'));
-                        }}
-                        className="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
-                      />
-                    ) : (
-                      <select 
-                        value={format(historyDate, 'yyyy')}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (val) setHistoryDate(new Date(`${val}-01-01`));
-                        }}
-                        className="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
-                      >
-                        {Array.from({ length: (new Date().getFullYear() + 10) - 2000 + 1 }, (_, i) => 2000 + i).map(year => (
-                          <option key={year} value={year}>{year} 年</option>
-                        ))}
-                      </select>
-                    )}
-                  </div>
-                </div>
-
-                {/* Quick Navigation Controls */}
-                <div className="flex items-center justify-between mt-4">
+              <div className="pt-3 border-t border-gray-50 mt-2">
+                <div className="flex items-center gap-2 h-10">
                   <button 
                     onClick={() => {
                       if (historyView === 'day') setHistoryDate(subDays(historyDate, 1));
                       else if (historyView === 'month') setHistoryDate(subMonths(historyDate, 1));
                       else setHistoryDate(subYears(historyDate, 1));
                     }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 rounded-lg text-[10px] font-bold text-gray-500 transition-all active:scale-95"
+                    className="flex-shrink-0 flex items-center justify-center w-10 h-full bg-gray-50 hover:bg-gray-100 rounded-xl text-gray-400 transition-all active:scale-90"
+                    title={`上一${historyView === 'day' ? '天' : historyView === 'month' ? '月' : '年'}`}
                   >
-                    <ChevronLeft size={14} />
-                    上一{historyView === 'day' ? '天' : historyView === 'month' ? '月' : '年'}
+                    <ChevronLeft size={18} />
                   </button>
 
-                  <button 
-                    onClick={() => {
-                      setHistoryDate(new Date());
-                      setHistoryView('day');
-                    }}
-                    className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 rounded-lg text-[10px] font-bold text-blue-600 transition-all active:scale-95"
-                  >
-                    返回今日
-                  </button>
+                  <div className="flex-1 h-full relative">
+                    {historyView === 'day' ? (
+                      <div 
+                        className="w-full h-full relative flex items-center justify-center bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors"
+                        onClick={(e) => {
+                          const input = e.currentTarget.querySelector('input');
+                          if (input) {
+                            try {
+                              if ('showPicker' in input) {
+                                (input as any).showPicker();
+                              } else {
+                                input.focus();
+                                input.click();
+                              }
+                            } catch (err) {
+                              console.warn('showPicker failed', err);
+                              input.focus();
+                              input.click();
+                            }
+                          }
+                        }}
+                      >
+                        <span className="text-xs font-bold text-gray-700 pointer-events-none">{format(historyDate, 'yyyy年M月d日')}</span>
+                        <input 
+                          type="date" 
+                          value={format(historyDate, 'yyyy-MM-dd')}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val) {
+                              setHistoryDate(new Date(val));
+                              setHistoryPage(1);
+                            }
+                          }}
+                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+                        />
+                      </div>
+                    ) : historyView === 'month' ? (
+                      <div 
+                        className="w-full h-full relative flex items-center justify-center bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors"
+                        onClick={(e) => {
+                          const input = e.currentTarget.querySelector('input');
+                          if (input) {
+                            try {
+                              if ('showPicker' in input) {
+                                (input as any).showPicker();
+                              } else {
+                                input.focus();
+                                input.click();
+                              }
+                            } catch (err) {
+                              console.warn('showPicker failed', err);
+                              input.focus();
+                              input.click();
+                            }
+                          }
+                        }}
+                      >
+                        <span className="text-xs font-bold text-gray-700 pointer-events-none">{format(historyDate, 'yyyy年M月')}</span>
+                        <input 
+                          type="month" 
+                          value={format(historyDate, 'yyyy-MM')}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val) {
+                              setHistoryDate(new Date(val + '-01'));
+                              setHistoryPage(1);
+                            }
+                          }}
+                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-full h-full relative flex items-center justify-center bg-gray-50 rounded-xl">
+                        <span className="text-xs font-bold text-gray-700">{format(historyDate, 'yyyy年')}</span>
+                        <select 
+                          value={format(historyDate, 'yyyy')}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val) setHistoryDate(new Date(`${val}-01-01`));
+                          }}
+                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+                        >
+                          {Array.from({ length: (new Date().getFullYear() + 10) - 2000 + 1 }, (_, i) => 2000 + i).map(year => (
+                            <option key={year} value={year}>{year} 年</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                  </div>
 
                   <button 
                     onClick={() => {
@@ -1216,10 +1286,10 @@ export default function App() {
                       else if (historyView === 'month') setHistoryDate(addMonths(historyDate, 1));
                       else setHistoryDate(addYears(historyDate, 1));
                     }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 rounded-lg text-[10px] font-bold text-gray-500 transition-all active:scale-95"
+                    className="flex-shrink-0 flex items-center justify-center w-10 h-full bg-gray-50 hover:bg-gray-100 rounded-xl text-gray-400 transition-all active:scale-90"
+                    title={`下一${historyView === 'day' ? '天' : historyView === 'month' ? '月' : '年'}`}
                   >
-                    下一{historyView === 'day' ? '天' : historyView === 'month' ? '月' : '年'}
-                    <ChevronRight size={14} />
+                    <ChevronRight size={18} />
                   </button>
                 </div>
               </div>
@@ -1597,12 +1667,10 @@ export default function App() {
                           setTrendEndDate(now);
                         } else if (v === 'month') {
                           setTrendStartDate(subMonths(now, 11));
-                          const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-                          setTrendEndDate(endOfMonth);
+                          setTrendEndDate(new Date(now.getFullYear(), now.getMonth() + 1, 0));
                         } else {
                           setTrendStartDate(subYears(now, 9));
-                          const endOfYear = new Date(now.getFullYear(), 11, 31);
-                          setTrendEndDate(endOfYear);
+                          setTrendEndDate(new Date(now.getFullYear(), 11, 31));
                         }
                       }}
                       className={cn(
@@ -1616,86 +1684,134 @@ export default function App() {
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-3 pt-2 border-t border-gray-50 mt-2">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] text-gray-400 font-bold ml-1 uppercase tracking-tight">起始</label>
-                  <div className="relative">
+              <div className="grid grid-cols-2 gap-3 pt-3 border-t border-gray-50 mt-2">
+                <div 
+                  className="h-10 flex bg-gray-50 rounded-xl px-3 items-center justify-center gap-1 focus-within:ring-1 focus-within:ring-blue-100 transition-all overflow-hidden cursor-pointer"
+                  onClick={(e) => {
+                    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return;
+                    const input = e.currentTarget.querySelector('input');
+                    const select = e.currentTarget.querySelector('select');
+                    try {
+                      if (input && 'showPicker' in input) (input as any).showPicker();
+                      else if (select && 'showPicker' in select) (select as any).showPicker();
+                      else if (select) select.focus();
+                    } catch (err) {
+                      console.warn('showPicker failed', err);
+                      if (select) select.focus();
+                    }
+                  }}
+                >
+                  <span className="text-[10px] text-gray-400 font-bold whitespace-nowrap uppercase tracking-tight shrink-0">起始</span>
+                  <div className="flex-1 min-w-0 relative h-full flex items-center justify-center">
                     {trendView === 'day' ? (
-                      <input 
-                        type="date" 
-                        value={format(trendStartDate, 'yyyy-MM-dd')}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (val) setTrendStartDate(new Date(val));
-                        }}
-                        className="w-full bg-gray-50 border-none rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
-                      />
+                      <>
+                        <span className="text-[11px] font-bold text-gray-700 truncate">{format(trendStartDate, 'yyyy年M月d日')}</span>
+                        <input 
+                          type="date" 
+                          value={format(trendStartDate, 'yyyy-MM-dd')}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val) setTrendStartDate(new Date(val));
+                          }}
+                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+                        />
+                      </>
                     ) : trendView === 'month' ? (
-                      <input 
-                        type="month" 
-                        value={format(trendStartDate, 'yyyy-MM')}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (val) setTrendStartDate(new Date(val + '-01'));
-                        }}
-                        className="w-full bg-gray-50 border-none rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
-                      />
+                      <>
+                        <span className="text-[11px] font-bold text-gray-700 truncate">{format(trendStartDate, 'yyyy年M月')}</span>
+                        <input 
+                          type="month" 
+                          value={format(trendStartDate, 'yyyy-MM')}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val) setTrendStartDate(new Date(val + '-01'));
+                          }}
+                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+                        />
+                      </>
                     ) : (
-                      <select 
-                        value={format(trendStartDate, 'yyyy')}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (val) setTrendStartDate(new Date(`${val}-01-01`));
-                        }}
-                        className="w-full bg-gray-50 border-none rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
-                      >
-                        {Array.from({ length: (new Date().getFullYear() + 10) - 2000 + 1 }, (_, i) => 2000 + i).map(year => (
-                          <option key={year} value={year}>{year} 年</option>
-                        ))}
-                      </select>
+                      <>
+                        <span className="text-[11px] font-bold text-gray-700 truncate">{format(trendStartDate, 'yyyy年')}</span>
+                        <select 
+                          value={format(trendStartDate, 'yyyy')}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val) setTrendStartDate(new Date(`${val}-01-01`));
+                          }}
+                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+                        >
+                          {Array.from({ length: (new Date().getFullYear() + 10) - 2000 + 1 }, (_, i) => 2000 + i).map(year => (
+                            <option key={year} value={year}>{year} 年</option>
+                          ))}
+                        </select>
+                      </>
                     )}
                   </div>
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] text-gray-400 font-bold ml-1 uppercase tracking-tight">结束</label>
-                  <div className="relative">
+
+                <div 
+                  className="h-10 flex bg-gray-50 rounded-xl px-3 items-center justify-center gap-1 focus-within:ring-1 focus-within:ring-blue-100 transition-all overflow-hidden cursor-pointer"
+                  onClick={(e) => {
+                    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return;
+                    const input = e.currentTarget.querySelector('input');
+                    const select = e.currentTarget.querySelector('select');
+                    try {
+                      if (input && 'showPicker' in input) (input as any).showPicker();
+                      else if (select && 'showPicker' in select) (select as any).showPicker();
+                      else if (select) select.focus();
+                    } catch (err) {
+                      console.warn('showPicker failed', err);
+                      if (select) select.focus();
+                    }
+                  }}
+                >
+                  <span className="text-[10px] text-gray-400 font-bold whitespace-nowrap uppercase tracking-tight shrink-0">结束</span>
+                  <div className="flex-1 min-w-0 relative h-full flex items-center justify-center">
                     {trendView === 'day' ? (
-                      <input 
-                        type="date" 
-                        value={format(trendEndDate, 'yyyy-MM-dd')}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (val) setTrendEndDate(new Date(val));
-                        }}
-                        className="w-full bg-gray-50 border-none rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
-                      />
+                      <>
+                        <span className="text-[11px] font-bold text-gray-700 truncate">{format(trendEndDate, 'yyyy年M月d日')}</span>
+                        <input 
+                          type="date" 
+                          value={format(trendEndDate, 'yyyy-MM-dd')}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val) setTrendEndDate(new Date(val));
+                          }}
+                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+                        />
+                      </>
                     ) : trendView === 'month' ? (
-                      <input 
-                        type="month" 
-                        value={format(trendEndDate, 'yyyy-MM')}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (val) {
-                            // Set to the end of that month
-                            const date = new Date(val + '-01');
-                            setTrendEndDate(new Date(date.getFullYear(), date.getMonth() + 1, 0));
-                          }
-                        }}
-                        className="w-full bg-gray-50 border-none rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
-                      />
+                      <>
+                        <span className="text-[11px] font-bold text-gray-700 truncate">{format(trendEndDate, 'yyyy年M月')}</span>
+                        <input 
+                          type="month" 
+                          value={format(trendEndDate, 'yyyy-MM')}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val) {
+                              const date = new Date(val + '-01');
+                              setTrendEndDate(new Date(date.getFullYear(), date.getMonth() + 1, 0));
+                            }
+                          }}
+                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+                        />
+                      </>
                     ) : (
-                      <select 
-                        value={format(trendEndDate, 'yyyy')}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (val) setTrendEndDate(new Date(`${val}-12-31`));
-                        }}
-                        className="w-full bg-gray-50 border-none rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
-                      >
-                        {Array.from({ length: (new Date().getFullYear() + 10) - 2000 + 1 }, (_, i) => 2000 + i).map(year => (
-                          <option key={year} value={year}>{year} 年</option>
-                        ))}
-                      </select>
+                      <>
+                        <span className="text-[11px] font-bold text-gray-700 truncate">{format(trendEndDate, 'yyyy年')}</span>
+                        <select 
+                          value={format(trendEndDate, 'yyyy')}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val) setTrendEndDate(new Date(`${val}-12-31`));
+                          }}
+                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+                        >
+                          {Array.from({ length: (new Date().getFullYear() + 10) - 2000 + 1 }, (_, i) => 2000 + i).map(year => (
+                            <option key={year} value={year}>{year} 年</option>
+                          ))}
+                        </select>
+                      </>
                     )}
                   </div>
                 </div>
