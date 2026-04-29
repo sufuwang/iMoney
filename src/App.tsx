@@ -240,6 +240,7 @@ export default function App() {
   const [newCurrency, setNewCurrency] = useState<Currency>('CNY');
   const [newCategory, setNewCategory] = useState(CATEGORIES.find(c => c.type === 'expense')?.id || '');
   const [newNote, setNewNote] = useState('');
+  const [newDate, setNewDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [trendView, setTrendView] = useState<'day' | 'month' | 'year'>(() => {
     const saved = localStorage.getItem('imoney_trend_view');
     return (saved as 'day' | 'month' | 'year') || 'day';
@@ -576,10 +577,24 @@ export default function App() {
     if (editingTransaction) {
       const updatedTransactions = transactions.map(t => 
         t.id === editingTransaction.id 
-          ? { ...t, type: newType, amount: amount, currency: newCurrency, category: newCategory, note: newNote }
+          ? { ...t, type: newType, amount: amount, currency: newCurrency, category: newCategory, note: newNote, date: newDate ? new Date(newDate).toISOString() : t.date }
           : t
       );
       setTransactions(updatedTransactions);
+      
+      // Update viewingTransaction if it's the one being edited
+      if (viewingTransaction && viewingTransaction.id === editingTransaction.id) {
+        setViewingTransaction({ 
+          ...viewingTransaction, 
+          type: newType, 
+          amount: amount, 
+          currency: newCurrency, 
+          category: newCategory, 
+          note: newNote,
+          date: newDate ? new Date(newDate).toISOString() : viewingTransaction.date
+        });
+      }
+      
       notify("iMoney", "修改成功", "log");
     } else {
       const transaction: Transaction = {
@@ -588,8 +603,8 @@ export default function App() {
         amount: amount,
         currency: newCurrency,
         category: newCategory,
-        date: new Date().toISOString(),
-        note: newNote
+        note: newNote,
+        date: newDate ? new Date(newDate).toISOString() : new Date().toISOString()
       };
       setTransactions([transaction, ...transactions]);
       notify("iMoney", "记账成功", "log");
@@ -609,6 +624,7 @@ export default function App() {
     setNewCurrency(transaction.currency || 'CNY');
     setNewCategory(transaction.category);
     setNewNote(transaction.note || '');
+    setNewDate(format(parseISO(transaction.date), 'yyyy-MM-dd'));
     setIsAdding(true);
   };
 
@@ -752,7 +768,7 @@ export default function App() {
     interval = { start, end };
 
     if (trendView === 'day') {
-      formatStr = 'MM-dd';
+      formatStr = 'yyyy-MM-dd'; 
       eachInterval = eachDayOfInterval;
     } else if (trendView === 'month') {
       formatStr = 'yyyy-MM';
@@ -1685,17 +1701,18 @@ export default function App() {
                         className="w-full bg-gray-50 border-none rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
                       />
                     ) : (
-                      <input 
-                        type="number" 
-                        min="2000"
-                        max="2100"
+                      <select 
                         value={format(trendStartDate, 'yyyy')}
                         onChange={(e) => {
                           const val = e.target.value;
                           if (val) setTrendStartDate(new Date(`${val}-01-01`));
                         }}
                         className="w-full bg-gray-50 border-none rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
-                      />
+                      >
+                        {Array.from({ length: (new Date().getFullYear() + 10) - 2000 + 1 }, (_, i) => 2000 + i).map(year => (
+                          <option key={year} value={year}>{year} 年</option>
+                        ))}
+                      </select>
                     )}
                   </div>
                 </div>
@@ -1727,17 +1744,18 @@ export default function App() {
                         className="w-full bg-gray-50 border-none rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
                       />
                     ) : (
-                      <input 
-                        type="number" 
-                        min="2000"
-                        max="2100"
+                      <select 
                         value={format(trendEndDate, 'yyyy')}
                         onChange={(e) => {
                           const val = e.target.value;
                           if (val) setTrendEndDate(new Date(`${val}-12-31`));
                         }}
                         className="w-full bg-gray-50 border-none rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 focus:ring-2 focus:ring-blue-100 transition-all outline-none appearance-none"
-                      />
+                      >
+                        {Array.from({ length: (new Date().getFullYear() + 10) - 2000 + 1 }, (_, i) => 2000 + i).map(year => (
+                          <option key={year} value={year}>{year} 年</option>
+                        ))}
+                      </select>
                     )}
                   </div>
                 </div>
@@ -1783,6 +1801,10 @@ export default function App() {
                       axisLine={false} 
                       tickLine={false} 
                       tick={{ fontSize: 10, fill: '#999' }} 
+                      tickFormatter={(val) => {
+                        if (trendView === 'day') return val.split('-').slice(1).join('-'); // MM-dd
+                        return val;
+                      }}
                       dy={10}
                     />
                     <YAxis hide />
@@ -1816,6 +1838,10 @@ export default function App() {
                         axisLine={false} 
                         tickLine={false} 
                         tick={{ fontSize: 10, fill: '#999' }} 
+                        tickFormatter={(val) => {
+                          if (trendView === 'day') return val.split('-').slice(1).join('-'); // MM-dd
+                          return val;
+                        }}
                         dy={10}
                       />
                       <YAxis hide />
@@ -1906,6 +1932,10 @@ export default function App() {
                         axisLine={false} 
                         tickLine={false} 
                         tick={{ fontSize: 10, fill: '#999' }} 
+                        tickFormatter={(val) => {
+                          if (trendView === 'day') return val.split('-').slice(1).join('-'); // MM-dd
+                          return val;
+                        }}
                         dy={10}
                       />
                       <YAxis hide />
@@ -2218,10 +2248,11 @@ export default function App() {
       <AnimatePresence>
         {isAdding && (
           <motion.div 
+            key="add-modal"
             initial={{ opacity: 0, y: 100 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 100 }}
-            className="absolute inset-0 bg-white z-50 flex flex-col overscroll-none"
+            className="absolute inset-0 bg-white z-[80] flex flex-col overscroll-none"
           >
             <header className="px-6 pt-safe pb-4 flex justify-between items-center border-b border-gray-50 bg-white sticky top-0 z-10 shrink-0">
               <button 
@@ -2269,12 +2300,15 @@ export default function App() {
             </header>
 
             <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6 scrollbar-hide overscroll-contain">
-              <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-5 text-center border border-gray-100 shadow-sm">
-                <div className="flex items-center justify-center gap-2 mb-3">
-                  <CalendarIcon size={10} className="text-gray-300" />
-                  <div className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">
-                    {format(new Date(), 'yyyy-MM-dd')}
-                  </div>
+              <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-5 text-center border border-gray-100 shadow-sm transition-all focus-within:ring-2 focus-within:ring-blue-50">
+                <div className="flex items-center justify-center gap-2 mb-3 relative">
+                  <CalendarIcon size={12} className="text-blue-500" />
+                  <input 
+                    type="date"
+                    value={newDate}
+                    onChange={(e) => setNewDate(e.target.value)}
+                    className="text-[10px] text-gray-600 font-bold uppercase tracking-widest bg-transparent border-none p-0 focus:outline-none cursor-pointer"
+                  />
                 </div>
                 <div className="flex flex-col items-center gap-4">
                   <div className="flex items-baseline justify-center gap-2">
@@ -2414,6 +2448,7 @@ export default function App() {
 
         {detailFilter && (
           <motion.div 
+            key="detail-modal"
             initial={{ opacity: 0, x: '100%' }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
@@ -2450,6 +2485,7 @@ export default function App() {
 
         {viewingTransaction && (
           <motion.div 
+            key="view-modal"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
@@ -2466,7 +2502,6 @@ export default function App() {
               <button 
                 onClick={() => {
                   startEditing(viewingTransaction);
-                  setViewingTransaction(null);
                 }}
                 className="w-10 h-10 flex items-center justify-center text-blue-600 bg-blue-50 rounded-full active:scale-90 transition-all"
               >
