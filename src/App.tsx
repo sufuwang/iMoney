@@ -49,7 +49,12 @@ import {
   format, 
   startOfDay, 
   startOfMonth, 
-  startOfYear, 
+  startOfYear,
+  endOfMonth,
+  endOfYear,
+  differenceInDays,
+  differenceInMonths,
+  differenceInYears,
   isSameDay, 
   isSameMonth, 
   isSameYear, 
@@ -276,15 +281,15 @@ export default function App() {
   });
   const [trendStartDate, setTrendStartDate] = useState<Date>(() => {
     const now = new Date();
-    if (trendView === 'day') return subDays(now, 30);
-    if (trendView === 'month') return subMonths(now, 11);
-    return subYears(now, 9);
+    if (trendView === 'day') return startOfMonth(now);
+    if (trendView === 'month') return startOfYear(now);
+    return startOfYear(subYears(now, 4));
   });
   const [trendEndDate, setTrendEndDate] = useState<Date>(() => {
     const now = new Date();
     if (trendView === 'day') return now;
-    if (trendView === 'month') return new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    return new Date(now.getFullYear(), 11, 31);
+    if (trendView === 'month') return endOfMonth(now);
+    return endOfYear(now);
   });
   const [detailFilter, setDetailFilter] = useState<{ categoryId: string, type: TransactionType } | null>(null);
   const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
@@ -999,6 +1004,42 @@ export default function App() {
     );
   }, [incomeCategories, chartData]);
 
+  const subcategoryAverages = useMemo(() => {
+    const start = trendStartDate < trendEndDate ? trendStartDate : trendEndDate;
+    const end = trendStartDate < trendEndDate ? trendEndDate : trendStartDate;
+    
+    let unitCount = 0;
+    if (trendView === 'day') {
+      unitCount = differenceInDays(end, start) + 1;
+    } else if (trendView === 'month') {
+      unitCount = differenceInMonths(end, start) + 1;
+    } else {
+      unitCount = differenceInYears(end, start) + 1;
+    }
+    
+    const filtered = transactions.filter(t => {
+      const tDate = parseISO(t.date);
+      return tDate >= start && tDate <= end;
+    });
+
+    const groups: Record<string, { categoryId: string, note: string, total: number, type: TransactionType }> = {};
+    
+    filtered.forEach(t => {
+      const key = `${t.category}-${t.note || ''}-${t.type}`;
+      if (!groups[key]) {
+        groups[key] = { categoryId: t.category, note: t.note || '', total: 0, type: t.type };
+      }
+      groups[key].total += convertToBase(t.amount, t.currency || 'CNY');
+    });
+
+    return Object.values(groups)
+      .map(g => ({
+        ...g,
+        average: g.total / (unitCount || 1)
+      }))
+      .sort((a, b) => b.average - a.average);
+  }, [transactions, trendStartDate, trendEndDate, currencyConfigs, trendView]);
+
   const expenseLegendPayload = useMemo(() => activeTrendExpenseCategories.map((cat) => {
     const originalIdx = expenseCategories.findIndex(c => c.id === cat.id);
     return {
@@ -1663,14 +1704,14 @@ export default function App() {
                         setTrendView(v);
                         const now = new Date();
                         if (v === 'day') {
-                          setTrendStartDate(subDays(now, 30));
+                          setTrendStartDate(startOfMonth(now));
                           setTrendEndDate(now);
                         } else if (v === 'month') {
-                          setTrendStartDate(subMonths(now, 11));
-                          setTrendEndDate(new Date(now.getFullYear(), now.getMonth() + 1, 0));
-                        } else {
-                          setTrendStartDate(subYears(now, 9));
-                          setTrendEndDate(new Date(now.getFullYear(), 11, 31));
+                          setTrendStartDate(startOfYear(now));
+                          setTrendEndDate(endOfMonth(now));
+                        } else if (v === 'year') {
+                          setTrendStartDate(startOfYear(subYears(now, 4)));
+                          setTrendEndDate(endOfYear(now));
                         }
                       }}
                       className={cn(
@@ -2062,6 +2103,75 @@ export default function App() {
                     </ResponsiveContainer>
                   ) : (
                     <div className="h-full flex items-center justify-center text-xs text-gray-400">暂无收入数据</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="w-8 h-8 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center">
+                    <History size={18} />
+                  </div>
+                  <span className="font-bold text-gray-800">子分类平均值</span>
+                  <div className="ml-auto text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                    {(() => {
+                      const start = trendStartDate < trendEndDate ? trendStartDate : trendEndDate;
+                      const end = trendStartDate < trendEndDate ? trendEndDate : trendStartDate;
+                      if (trendView === 'day') {
+                        const count = differenceInDays(end, start) + 1;
+                        return `日均统计 (共${count}天)`;
+                      } else if (trendView === 'month') {
+                        const count = differenceInMonths(end, start) + 1;
+                        return `月均统计 (共${count}个月)`;
+                      } else {
+                        const count = differenceInYears(end, start) + 1;
+                        return `年均统计 (共${count}年)`;
+                      }
+                    })()}
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  {subcategoryAverages.length > 0 ? (
+                    subcategoryAverages.map((item, idx) => {
+                      const category = CATEGORIES.find(c => c.id === item.categoryId);
+                      return (
+                        <div key={idx} className="flex items-center justify-between group">
+                          <div className="flex items-center gap-3">
+                            <div className={cn(
+                              "w-8 h-8 rounded-full flex items-center justify-center text-white",
+                              category?.color || 'bg-gray-400'
+                            )}>
+                              <CategoryIcon name={category?.icon || 'HelpCircle'} size={14} />
+                            </div>
+                            <div>
+                              <div className="font-medium text-gray-900 flex items-center gap-1">
+                                {category?.name}
+                                {item.note && (
+                                  <>
+                                    <span className="text-gray-300 mx-0.5">/</span>
+                                    <span className="text-gray-400 text-xs font-normal">{item.note}</span>
+                                  </>
+                                )}
+                              </div>
+                              <div className="text-xs text-gray-500">总额: ¥{formatAmount(item.total)}</div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className={cn(
+                              "font-semibold",
+                              item.type === 'income' ? "text-green-600" : "text-red-600"
+                            )}>
+                              ¥{formatAmount(item.average)}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="py-12 flex flex-col items-center justify-center text-gray-300 gap-2">
+                      <HelpCircle size={32} strokeWidth={1.5} />
+                      <span className="text-[10px] font-bold uppercase tracking-widest">暂无子分类平均统计</span>
+                    </div>
                   )}
                 </div>
               </div>
