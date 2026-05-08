@@ -1375,7 +1375,7 @@ export default function App() {
                 </div>
                 
                 {historyCategoryStats.expenses.length > 0 ? (
-                  <div className="space-y-1">
+                  <div className="space-y-3">
                     {historyCategoryStats.expenses.map(({ categoryId, amount }) => {
                       const category = CATEGORIES.find(c => c.id === categoryId) || CATEGORIES[CATEGORIES.length - 1];
                       const percentage = historyStats.expense > 0 ? (amount / historyStats.expense) * 100 : 0;
@@ -1427,7 +1427,7 @@ export default function App() {
                 </div>
                 
                 {historyCategoryStats.incomes.length > 0 ? (
-                  <div className="space-y-1">
+                  <div className="space-y-3">
                     {historyCategoryStats.incomes.map(({ categoryId, amount }) => {
                       const category = CATEGORIES.find(c => c.id === categoryId) || CATEGORIES[CATEGORIES.length - 1];
                       const percentage = historyStats.income > 0 ? (amount / historyStats.income) * 100 : 0;
@@ -1596,7 +1596,7 @@ export default function App() {
                 <p className="text-gray-400 text-sm">该时间段内没有记录</p>
               </div>
             ) : (
-              <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-50">
+              <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center">
