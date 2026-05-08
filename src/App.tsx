@@ -187,7 +187,7 @@ const TransactionItem: React.FC<{
   return (
     <div 
       onClick={() => onEdit(transaction)}
-      className="flex items-center justify-between py-2.5 border-b border-gray-100 last:border-0 active:bg-gray-50 transition-colors cursor-pointer"
+      className="flex items-center justify-between py-1.5 active:bg-gray-50 transition-colors cursor-pointer"
     >
       <div className="flex items-center gap-3">
         <div className={cn(
@@ -202,7 +202,7 @@ const TransactionItem: React.FC<{
             <div className="text-xs text-gray-500">{format(parseISO(transaction.date), 'MM-dd HH:mm')}</div>
             {transaction.note && (
               <div className="text-xs text-gray-400 truncate max-w-[120px]">
-                {transaction.note}
+                · {transaction.note}
               </div>
             )}
           </div>
@@ -274,11 +274,6 @@ export default function App() {
       return new Date();
     }
   });
-  const [historyPage, setHistoryPage] = useState(1);
-  const [pageSize, setPageSize] = useState(() => {
-    const saved = localStorage.getItem('imoney_page_size');
-    return saved ? parseInt(saved) : 5;
-  });
   const [trendStartDate, setTrendStartDate] = useState<Date>(() => {
     const now = new Date();
     if (trendView === 'day') return startOfMonth(now);
@@ -293,10 +288,6 @@ export default function App() {
   });
   const [detailFilter, setDetailFilter] = useState<{ categoryId: string, type: TransactionType } | null>(null);
   const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
-
-  useEffect(() => {
-    localStorage.setItem('imoney_page_size', pageSize.toString());
-  }, [pageSize]);
 
   const [reminderEnabled, setReminderEnabled] = useState(() => localStorage.getItem('imoney_reminder_enabled') === 'true');
   const [reminderTime, setReminderTime] = useState(() => localStorage.getItem('imoney_reminder_time') || '20:00');
@@ -535,9 +526,6 @@ export default function App() {
     return amount * config.rate;
   };
 
-  useEffect(() => {
-    setHistoryPage(1);
-  }, [historyDate, historyView]);
   const [hiddenTrendCategories, setHiddenTrendCategories] = useState<string[]>(() => {
     const saved = localStorage.getItem('imoney_hidden_trend_categories');
     return saved ? JSON.parse(saved) : [];
@@ -983,11 +971,21 @@ export default function App() {
     return { expenses, incomes };
   }, [filteredHistory, currencyConfigs]);
 
+  const trendFilteredTransactions = useMemo(() => {
+    const start = trendStartDate < trendEndDate ? trendStartDate : trendEndDate;
+    const end = trendStartDate < trendEndDate ? trendEndDate : trendStartDate;
+    return transactions.filter(t => {
+      const tDate = parseISO(t.date);
+      return tDate >= start && tDate <= end;
+    });
+  }, [transactions, trendStartDate, trendEndDate]);
+
   const detailTransactions = useMemo(() => {
     if (!detailFilter) return [];
-    return filteredHistory.filter(t => t.category === detailFilter.categoryId && t.type === detailFilter.type)
+    const source = activeTab === 'trends' ? trendFilteredTransactions : filteredHistory;
+    return source.filter(t => t.category === detailFilter.categoryId && t.type === detailFilter.type)
       .sort((a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime());
-  }, [filteredHistory, detailFilter]);
+  }, [filteredHistory, trendFilteredTransactions, detailFilter, activeTab]);
 
   const expenseCategories = useMemo(() => CATEGORIES.filter(c => c.type === 'expense'), []);
   const incomeCategories = useMemo(() => CATEGORIES.filter(c => c.type === 'income'), []);
@@ -1017,19 +1015,15 @@ export default function App() {
       unitCount = differenceInYears(end, start) + 1;
     }
     
-    const filtered = transactions.filter(t => {
-      const tDate = parseISO(t.date);
-      return tDate >= start && tDate <= end;
-    });
-
-    const groups: Record<string, { categoryId: string, note: string, total: number, type: TransactionType }> = {};
+    const groups: Record<string, { categoryId: string, total: number, type: TransactionType, count: number }> = {};
     
-    filtered.forEach(t => {
-      const key = `${t.category}-${t.note || ''}-${t.type}`;
+    trendFilteredTransactions.forEach(t => {
+      const key = `${t.category}-${t.type}`;
       if (!groups[key]) {
-        groups[key] = { categoryId: t.category, note: t.note || '', total: 0, type: t.type };
+        groups[key] = { categoryId: t.category, total: 0, type: t.type, count: 0 };
       }
       groups[key].total += convertToBase(t.amount, t.currency || 'CNY');
+      groups[key].count += 1;
     });
 
     return Object.values(groups)
@@ -1037,8 +1031,8 @@ export default function App() {
         ...g,
         average: g.total / (unitCount || 1)
       }))
-      .sort((a, b) => b.average - a.average);
-  }, [transactions, trendStartDate, trendEndDate, currencyConfigs, trendView]);
+      .sort((a, b) => b.total - a.total); // Sort by total amount as it's more intuitive for "top" subcategories
+  }, [trendFilteredTransactions, trendStartDate, trendEndDate, currencyConfigs, trendView]);
 
   const expenseLegendPayload = useMemo(() => activeTrendExpenseCategories.map((cat) => {
     const originalIdx = expenseCategories.findIndex(c => c.id === cat.id);
@@ -1181,7 +1175,7 @@ export default function App() {
         {activeTab === 'history' && (
           <div className="space-y-6 pb-32">
             <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <CalendarIcon size={16} className="text-blue-500" />
                   <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">时间筛选</span>
@@ -1203,7 +1197,6 @@ export default function App() {
                         onClick={() => {
                           setHistoryView(v);
                           setHistoryDate(new Date());
-                          setHistoryPage(1);
                         }}
                         className={cn(
                           "px-3 py-1 text-[10px] rounded-md transition-all",
@@ -1217,7 +1210,7 @@ export default function App() {
                 </div>
               </div>
               
-              <div className="pt-3 border-t border-gray-50 mt-2">
+              <div>
                 <div className="flex items-center gap-2 h-10">
                   <button 
                     onClick={() => {
@@ -1261,7 +1254,6 @@ export default function App() {
                             const val = e.target.value;
                             if (val) {
                               setHistoryDate(new Date(val));
-                              setHistoryPage(1);
                             }
                           }}
                           className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
@@ -1296,7 +1288,6 @@ export default function App() {
                             const val = e.target.value;
                             if (val) {
                               setHistoryDate(new Date(val + '-01'));
-                              setHistoryPage(1);
                             }
                           }}
                           className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
@@ -1376,7 +1367,7 @@ export default function App() {
             <div className="grid grid-cols-1 gap-4">
               {/* Expense Category Stats */}
               <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-                <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center">
                     <Folder size={18} />
                   </div>
@@ -1384,7 +1375,7 @@ export default function App() {
                 </div>
                 
                 {historyCategoryStats.expenses.length > 0 ? (
-                  <div className="space-y-4">
+                  <div className="space-y-1">
                     {historyCategoryStats.expenses.map(({ categoryId, amount }) => {
                       const category = CATEGORIES.find(c => c.id === categoryId) || CATEGORIES[CATEGORIES.length - 1];
                       const percentage = historyStats.expense > 0 ? (amount / historyStats.expense) * 100 : 0;
@@ -1404,7 +1395,7 @@ export default function App() {
                         >
                           <div className="flex items-center justify-between text-xs">
                             <div className="flex items-center gap-2">
-                              <CategoryIcon name={category.icon} size={14} className="text-gray-400" />
+                              <CategoryIcon name={category.icon} size={18} className="text-gray-400" />
                               <span className="font-medium text-gray-700">{category.name}</span>
                               <span className="text-gray-400">{percentage.toFixed(1)}%</span>
                             </div>
@@ -1428,7 +1419,7 @@ export default function App() {
 
               {/* Income Category Stats */}
               <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-                <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 bg-green-50 text-green-500 rounded-full flex items-center justify-center">
                     <Folder size={18} />
                   </div>
@@ -1436,7 +1427,7 @@ export default function App() {
                 </div>
                 
                 {historyCategoryStats.incomes.length > 0 ? (
-                  <div className="space-y-4">
+                  <div className="space-y-1">
                     {historyCategoryStats.incomes.map(({ categoryId, amount }) => {
                       const category = CATEGORIES.find(c => c.id === categoryId) || CATEGORIES[CATEGORIES.length - 1];
                       const percentage = historyStats.income > 0 ? (amount / historyStats.income) * 100 : 0;
@@ -1456,7 +1447,7 @@ export default function App() {
                         >
                           <div className="flex items-center justify-between text-xs">
                             <div className="flex items-center gap-2">
-                              <CategoryIcon name={category.icon} size={14} className="text-gray-400" />
+                              <CategoryIcon name={category.icon} size={18} className="text-gray-400" />
                               <span className="font-medium text-gray-700">{category.name}</span>
                               <span className="text-gray-400">{percentage.toFixed(1)}%</span>
                             </div>
@@ -1484,43 +1475,51 @@ export default function App() {
               <div className="grid grid-cols-1 gap-4">
                 {/* Top Expenses */}
                 <div className="bg-white rounded-2xl p-4 shadow-sm">
-                  <div className="flex items-center gap-2 mb-4">
+                  <div className="flex items-center gap-2 mb-3">
                     <div className="w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center">
                       <ArrowDownCircle size={18} />
                     </div>
-                    <span className="font-bold text-gray-800">支出排行 <span className="text-[10px] text-gray-400 font-normal ml-1">Top 5</span></span>
+                    <span className="font-bold text-gray-800">支出排行</span>
                   </div>
                   
                   {topRankings.expenses.length > 0 ? (
-                    <div className="space-y-3">
+                    <div className="space-y-1">
                       {topRankings.expenses.map((t, idx) => {
                         const category = CATEGORIES.find(c => c.id === t.category) || CATEGORIES[CATEGORIES.length - 1];
                         return (
                           <div 
                             key={t.id} 
-                            className="flex items-center justify-between active:bg-gray-50 p-1 rounded-lg transition-colors cursor-pointer"
+                            className="flex items-center justify-between active:bg-gray-50 py-2 -mx-1 px-1 rounded-xl transition-colors cursor-pointer"
                             onClick={() => setViewingTransaction(t)}
                           >
                             <div className="flex items-center gap-3">
-                              <span className={cn(
-                                "text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full",
-                                idx === 0 ? "bg-red-500 text-white" : "bg-gray-100 text-gray-400"
-                              )}>
-                                {idx + 1}
-                              </span>
+                              <div className="relative">
+                                <div className={cn(
+                                  "w-10 h-10 rounded-full flex items-center justify-center text-white",
+                                  category.color
+                                )}>
+                                  <CategoryIcon name={category.icon} size={18} />
+                                </div>
+                                <span className={cn(
+                                  "absolute -top-1 -right-1 text-[8px] font-bold w-4 h-4 flex items-center justify-center rounded-full border-2 border-white",
+                                  idx === 0 ? "bg-red-500 text-white" : "bg-gray-400 text-white"
+                                )}>
+                                  {idx + 1}
+                                </span>
+                              </div>
                               <div>
-                                <div className="font-medium text-gray-900">{category.name}</div>
+                                <div className="font-medium text-gray-900 leading-tight">{category.name}</div>
                                 <div className="flex items-center gap-2">
                                   <div className="text-xs text-gray-500">{format(parseISO(t.date), 'MM-dd')}</div>
                                   {t.note && (
                                     <div className="text-xs text-gray-400 truncate max-w-[100px]">
-                                      {t.note}
+                                      · {t.note}
                                     </div>
                                   )}
                                 </div>
                               </div>
                             </div>
-                            <div className="text-sm font-bold text-red-600">-{CURRENCY_SYMBOLS[t.currency || 'CNY']}{t.amount.toLocaleString()}</div>
+                            <div className="font-semibold text-red-600">-{CURRENCY_SYMBOLS[t.currency || 'CNY']}{formatAmount(t.amount)}</div>
                           </div>
                         );
                       })}
@@ -1532,43 +1531,51 @@ export default function App() {
 
                 {/* Top Incomes */}
                 <div className="bg-white rounded-2xl p-4 shadow-sm">
-                  <div className="flex items-center gap-2 mb-4">
+                  <div className="flex items-center gap-2 mb-3">
                     <div className="w-8 h-8 bg-green-50 text-green-500 rounded-full flex items-center justify-center">
                       <ArrowUpCircle size={18} />
                     </div>
-                    <span className="font-bold text-gray-800">收入排行 <span className="text-[10px] text-gray-400 font-normal ml-1">Top 5</span></span>
+                    <span className="font-bold text-gray-800">收入排行</span>
                   </div>
                   
                   {topRankings.incomes.length > 0 ? (
-                    <div className="space-y-3">
+                    <div className="space-y-1">
                       {topRankings.incomes.map((t, idx) => {
                         const category = CATEGORIES.find(c => c.id === t.category) || CATEGORIES[CATEGORIES.length - 1];
                         return (
                           <div 
                             key={t.id} 
-                            className="flex items-center justify-between active:bg-gray-50 p-1 rounded-lg transition-colors cursor-pointer"
+                            className="flex items-center justify-between active:bg-gray-50 py-2 -mx-1 px-1 rounded-xl transition-colors cursor-pointer"
                             onClick={() => setViewingTransaction(t)}
                           >
                             <div className="flex items-center gap-3">
-                              <span className={cn(
-                                "text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full",
-                                idx === 0 ? "bg-green-500 text-white" : "bg-gray-100 text-gray-400"
-                              )}>
-                                {idx + 1}
-                              </span>
+                              <div className="relative">
+                                <div className={cn(
+                                  "w-10 h-10 rounded-full flex items-center justify-center text-white",
+                                  category.color
+                                )}>
+                                  <CategoryIcon name={category.icon} size={18} />
+                                </div>
+                                <span className={cn(
+                                  "absolute -top-1 -right-1 text-[8px] font-bold w-4 h-4 flex items-center justify-center rounded-full border-2 border-white",
+                                  idx === 0 ? "bg-green-500 text-white" : "bg-gray-400 text-white"
+                                )}>
+                                  {idx + 1}
+                                </span>
+                              </div>
                               <div>
-                                <div className="font-medium text-gray-900">{category.name}</div>
+                                <div className="font-medium text-gray-900 leading-tight">{category.name}</div>
                                 <div className="flex items-center gap-2">
                                   <div className="text-xs text-gray-500">{format(parseISO(t.date), 'MM-dd')}</div>
                                   {t.note && (
                                     <div className="text-xs text-gray-400 truncate max-w-[100px]">
-                                      {t.note}
+                                      · {t.note}
                                     </div>
                                   )}
                                 </div>
                               </div>
                             </div>
-                            <div className="text-sm font-bold text-green-600">+{CURRENCY_SYMBOLS[t.currency || 'CNY']}{t.amount.toLocaleString()}</div>
+                            <div className="font-semibold text-green-600">+{CURRENCY_SYMBOLS[t.currency || 'CNY']}{formatAmount(t.amount)}</div>
                           </div>
                         );
                       })}
@@ -1590,98 +1597,66 @@ export default function App() {
               </div>
             ) : (
               <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-50">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center">
                       <History size={18} />
                     </div>
-                    <span className="font-bold text-gray-800">交易列表 <span className="text-[10px] text-gray-400 font-normal ml-1">History</span></span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-gray-400 font-bold">每页</span>
-                    <select 
-                      value={pageSize}
-                      onChange={(e) => {
-                        setPageSize(parseInt(e.target.value));
-                        setHistoryPage(1);
-                      }}
-                      className="text-[10px] font-bold text-blue-600 bg-blue-50 border-none rounded-lg px-2 py-1 appearance-none cursor-pointer focus:ring-0 focus:outline-none"
-                    >
-                      {[5, 10, 20, 50].map(size => <option key={size} value={size}>{size}</option>)}
-                    </select>
+                    <span className="font-bold text-gray-800">交易列表</span>
                   </div>
                 </div>
 
                 {historyView === 'day' ? (
-                  filteredHistory.slice((historyPage - 1) * pageSize, historyPage * pageSize).map(t => (
-                    <TransactionItem 
-                      key={t.id} 
-                      transaction={t} 
-                      onEdit={(trans) => setViewingTransaction(trans)}
-                    />
-                  ))
+                  <div className="space-y-0.5">
+                    {filteredHistory.map(t => (
+                      <TransactionItem 
+                        key={t.id} 
+                        transaction={t} 
+                        onEdit={(trans) => setViewingTransaction(trans)}
+                      />
+                    ))}
+                  </div>
                 ) : (
-                  groupedHistory?.slice((historyPage - 1) * pageSize, historyPage * pageSize).map(group => {
-                    const category = CATEGORIES.find(c => c.id === group.category) || CATEGORIES[CATEGORIES.length - 1];
-                    const count = filteredHistory.filter(t => t.category === group.category && t.type === group.type).length;
-                    return (
-                      <div 
-                        key={`${group.type}-${group.category}`} 
-                        className="flex items-center justify-between py-2.5 border-b border-gray-100 last:border-0 active:bg-gray-50 cursor-pointer"
-                        onClick={() => {
-                          if (count > 1) {
-                            setDetailFilter({ categoryId: group.category, type: group.type });
-                          } else {
-                            const t = filteredHistory.find(t => t.category === group.category && t.type === group.type);
-                            if (t) setViewingTransaction(t);
-                          }
-                        }}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className={cn(
-                            "w-10 h-10 rounded-full flex items-center justify-center",
-                            group.type === 'income' ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
-                          )}>
-                            <CategoryIcon name={category.icon} size={18} />
-                          </div>
-                          <div>
-                            <div className="font-medium text-gray-900">{category.name}</div>
-                            <div className="text-xs text-gray-400">
-                              {count} 笔记录
+                  <div className="space-y-0.5">
+                    {groupedHistory?.map(group => {
+                      const category = CATEGORIES.find(c => c.id === group.category) || CATEGORIES[CATEGORIES.length - 1];
+                      const count = filteredHistory.filter(t => t.category === group.category && t.type === group.type).length;
+                      return (
+                        <div 
+                          key={`${group.type}-${group.category}`} 
+                          className="flex items-center justify-between py-1.5 active:bg-gray-50 cursor-pointer"
+                          onClick={() => {
+                            if (count > 1) {
+                              setDetailFilter({ categoryId: group.category, type: group.type });
+                            } else {
+                              const t = filteredHistory.find(t => t.category === group.category && t.type === group.type);
+                              if (t) setViewingTransaction(t);
+                            }
+                          }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={cn(
+                              "w-10 h-10 rounded-full flex items-center justify-center",
+                              group.type === 'income' ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
+                            )}>
+                              <CategoryIcon name={category.icon} size={18} />
+                            </div>
+                            <div>
+                              <div className="font-medium text-gray-900">{category.name}</div>
+                              <div className="text-xs text-gray-400">
+                                {count} 笔记录
+                              </div>
                             </div>
                           </div>
+                          <div className={cn(
+                            "font-semibold",
+                            group.type === 'income' ? "text-green-600" : "text-red-600"
+                          )}>
+                            {group.type === 'income' ? '+' : '-'}{CURRENCY_SYMBOLS[group.currency]}{formatAmount(group.amount)}
+                          </div>
                         </div>
-                        <div className={cn(
-                          "font-semibold",
-                          group.type === 'income' ? "text-green-600" : "text-red-600"
-                        )}>
-                          {group.type === 'income' ? '+' : '-'}{CURRENCY_SYMBOLS[group.currency]}{formatAmount(group.amount)}
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-
-                {/* Pagination Controls */}
-                {Math.ceil((historyView === 'day' ? filteredHistory.length : groupedHistory?.length || 0) / pageSize) > 1 && (
-                  <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-50">
-                    <button 
-                      disabled={historyPage === 1}
-                      onClick={() => setHistoryPage(p => p - 1)}
-                      className="text-xs font-medium text-blue-600 disabled:text-gray-300 flex items-center gap-1"
-                    >
-                      <ChevronLeft size={14} /> 上一页
-                    </button>
-                    <span className="text-[10px] font-bold text-gray-400">
-                      第 {historyPage} / {Math.ceil((historyView === 'day' ? filteredHistory.length : groupedHistory?.length || 0) / pageSize)} 页
-                    </span>
-                    <button 
-                      disabled={historyPage >= Math.ceil((historyView === 'day' ? filteredHistory.length : groupedHistory?.length || 0) / pageSize)}
-                      onClick={() => setHistoryPage(p => p + 1)}
-                      className="text-xs font-medium text-blue-600 disabled:text-gray-300 flex items-center gap-1"
-                    >
-                      下一页 <ChevronRight size={14} />
-                    </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -1691,13 +1666,32 @@ export default function App() {
         {activeTab === 'trends' && (
           <div className="space-y-6 pb-32">
             <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <CalendarIcon size={16} className="text-blue-500" />
                   <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">趋势周期与范围</span>
                 </div>
-                <div className="flex bg-gray-100 p-1 rounded-lg">
-                  {(['day', 'month', 'year'] as const).map(v => (
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => {
+                      const now = new Date();
+                      if (trendView === 'day') {
+                        setTrendStartDate(startOfMonth(now));
+                        setTrendEndDate(now);
+                      } else if (trendView === 'month') {
+                        setTrendStartDate(startOfYear(now));
+                        setTrendEndDate(endOfMonth(now));
+                      } else {
+                        setTrendStartDate(startOfYear(subYears(now, 4)));
+                        setTrendEndDate(endOfYear(now));
+                      }
+                    }}
+                    className="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 rounded-lg text-[10px] font-bold text-blue-600 transition-all active:scale-95"
+                  >
+                    恢复默认
+                  </button>
+                  <div className="flex bg-gray-100 p-1 rounded-lg">
+                    {(['day', 'month', 'year'] as const).map(v => (
                     <button
                       key={v}
                       onClick={() => {
@@ -1724,8 +1718,9 @@ export default function App() {
                   ))}
                 </div>
               </div>
+            </div>
               
-              <div className="grid grid-cols-2 gap-3 pt-3 border-t border-gray-50 mt-2">
+              <div className="grid grid-cols-2 gap-3">
                 <div 
                   className="h-10 flex bg-gray-50 rounded-xl px-3 items-center justify-center gap-1 focus-within:ring-1 focus-within:ring-blue-100 transition-all overflow-hidden cursor-pointer"
                   onClick={(e) => {
@@ -1861,7 +1856,7 @@ export default function App() {
 
 
             <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center">
                     <BarChart3 size={18} />
@@ -1920,7 +1915,7 @@ export default function App() {
 
             <div className="space-y-6">
               <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-                <div className="flex items-center gap-2 mb-6">
+                <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center">
                     <TrendingUp size={18} className="rotate-180" />
                   </div>
@@ -1973,7 +1968,7 @@ export default function App() {
               </div>
 
               <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-                <div className="flex items-center gap-2 mb-6">
+                <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center">
                     <PieChartIcon size={18} />
                   </div>
@@ -2014,7 +2009,7 @@ export default function App() {
               </div>
 
               <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-                <div className="flex items-center gap-2 mb-6">
+                <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 bg-green-50 text-green-500 rounded-full flex items-center justify-center">
                     <TrendingUp size={18} />
                   </div>
@@ -2067,7 +2062,7 @@ export default function App() {
               </div>
 
               <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-                <div className="flex items-center gap-2 mb-6">
+                <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 bg-green-50 text-green-500 rounded-full flex items-center justify-center">
                     <PieChartIcon size={18} />
                   </div>
@@ -2108,7 +2103,7 @@ export default function App() {
               </div>
 
               <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-                <div className="flex items-center gap-2 mb-6">
+                <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center">
                     <History size={18} />
                   </div>
@@ -2130,30 +2125,37 @@ export default function App() {
                     })()}
                   </div>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-1">
                   {subcategoryAverages.length > 0 ? (
                     subcategoryAverages.map((item, idx) => {
                       const category = CATEGORIES.find(c => c.id === item.categoryId);
                       return (
-                        <div key={idx} className="flex items-center justify-between group">
+                        <div 
+                          key={idx} 
+                          className="flex items-center justify-between group cursor-pointer active:bg-gray-50 py-1.5 -mx-1 px-1 rounded-xl transition-colors"
+                          onClick={() => {
+                            if (item.count > 1) {
+                              setDetailFilter({ categoryId: item.categoryId, type: item.type });
+                            } else {
+                              const t = trendFilteredTransactions.find(t => t.category === item.categoryId && t.type === item.type);
+                              if (t) setViewingTransaction(t);
+                            }
+                          }}
+                        >
                           <div className="flex items-center gap-3">
                             <div className={cn(
-                              "w-8 h-8 rounded-full flex items-center justify-center text-white",
+                              "w-10 h-10 rounded-full flex items-center justify-center text-white",
                               category?.color || 'bg-gray-400'
                             )}>
-                              <CategoryIcon name={category?.icon || 'HelpCircle'} size={14} />
+                              <CategoryIcon name={category?.icon || 'HelpCircle'} size={18} />
                             </div>
-                            <div>
-                              <div className="font-medium text-gray-900 flex items-center gap-1">
+                            <div className="flex flex-col">
+                              <div className="font-medium text-gray-900 leading-tight">
                                 {category?.name}
-                                {item.note && (
-                                  <>
-                                    <span className="text-gray-300 mx-0.5">/</span>
-                                    <span className="text-gray-400 text-xs font-normal">{item.note}</span>
-                                  </>
-                                )}
                               </div>
-                              <div className="text-xs text-gray-500">总额: ¥{formatAmount(item.total)}</div>
+                              <div className="text-xs text-gray-500">
+                                共 {CURRENCY_SYMBOLS['CNY']}{formatAmount(item.total)} · {item.count} 笔记录
+                              </div>
                             </div>
                           </div>
                           <div className="text-right">
@@ -2161,7 +2163,7 @@ export default function App() {
                               "font-semibold",
                               item.type === 'income' ? "text-green-600" : "text-red-600"
                             )}>
-                              ¥{formatAmount(item.average)}
+                              {item.type === 'income' ? '+' : '-'}{CURRENCY_SYMBOLS['CNY']}{formatAmount(item.average)}
                             </div>
                           </div>
                         </div>
@@ -2183,7 +2185,7 @@ export default function App() {
           <div className="space-y-6 pb-32">
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
               <div className="p-4">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-bold text-gray-900">每日记账提醒</h3>
                   <button 
                     onClick={() => {
@@ -2260,7 +2262,7 @@ export default function App() {
 
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
               <div className="p-4">
-                <div className="flex items-center gap-3 mb-6">
+                <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 bg-orange-50 text-orange-600 rounded-lg flex items-center justify-center">
                     <Wallet size={20} />
                   </div>
@@ -2269,11 +2271,11 @@ export default function App() {
                     <p className="text-[10px] text-gray-400">管理多币种账单及实时汇率</p>
                   </div>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-1">
                   {currencyConfigs.map(config => (
                     <div key={config.code} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center font-bold text-gray-700 text-xs">
+                        <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center font-bold text-gray-700 text-xs">
                           {config.symbol}
                         </div>
                         <div>
@@ -2319,8 +2321,8 @@ export default function App() {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
-              <div className="p-3.5 border-b border-gray-50 flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors" onClick={() => exportData()}>
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm space-y-1 p-1">
+              <div className="p-4 flex items-center justify-between hover:bg-gray-50 rounded-xl cursor-pointer transition-colors" onClick={() => exportData()}>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center">
                     <Download size={18} />
@@ -2340,7 +2342,7 @@ export default function App() {
               
               {isTauri ? (
                 <div 
-                  className="p-4 border-b border-gray-50 flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors"
+                  className="p-4 flex items-center justify-between hover:bg-gray-50 rounded-xl cursor-pointer transition-colors"
                   onClick={() => importData()}
                 >
                   <div className="flex items-center gap-3">
@@ -2352,7 +2354,7 @@ export default function App() {
                   <ChevronRight size={18} className="text-gray-300" />
                 </div>
               ) : (
-                <label className="p-4 border-b border-gray-50 flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors">
+                <label className="p-4 flex items-center justify-between hover:bg-gray-50 rounded-xl cursor-pointer transition-colors">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-green-50 text-green-600 rounded-lg flex items-center justify-center">
                       <Upload size={18} />
@@ -2364,7 +2366,7 @@ export default function App() {
                 </label>
               )}
 
-              <div className="p-4 flex items-center justify-between hover:bg-red-50 cursor-pointer transition-colors group" onClick={() => {
+              <div className="p-4 flex items-center justify-between hover:bg-red-50 rounded-xl cursor-pointer transition-colors group" onClick={() => {
                 if (window.confirm("确定要清空所有记录吗？此操作不可撤销。")) {
                   setTransactions([]);
                   notify("iMoney", "所有记录已清空！");
