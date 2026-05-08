@@ -1119,7 +1119,7 @@ export default function App() {
   return (
     <div className="h-[100dvh] bg-gray-50 flex flex-col max-w-md mx-auto shadow-2xl relative overflow-hidden font-sans overscroll-none">
       {/* Header */}
-      <header className="bg-white px-6 pt-safe pb-6 border-b border-gray-100 shrink-0 z-40">
+      <header className="bg-white px-4 pt-safe pb-3 border-b border-gray-100 shrink-0 z-40">
         <div className="flex justify-between items-end">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">iMoney</h1>
@@ -1136,7 +1136,7 @@ export default function App() {
           </div>
         </div>
         
-        <div className="grid grid-cols-3 gap-3 mt-6">
+        <div className="grid grid-cols-3 gap-4 mt-2">
           <div className="bg-green-50/50 p-3.5 rounded-2xl flex flex-col gap-1 shadow-sm border border-green-100/30 overflow-hidden">
             <div className="flex items-center gap-1.5">
               <ArrowUpCircle className="text-green-600 shrink-0" size={14} />
@@ -1173,7 +1173,7 @@ export default function App() {
       {/* Content Area */}
       <main ref={mainRef} className="flex-1 overflow-y-auto px-6 py-4 scrollbar-hide overscroll-contain">
         {activeTab === 'history' && (
-          <div className="space-y-6 pb-32">
+          <div className="space-y-4 pb-32">
             <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
@@ -1328,7 +1328,7 @@ export default function App() {
             </div>
 
             {/* Period Summary Cards */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-4">
               <div className="bg-white p-3 rounded-2xl flex flex-col gap-1 shadow-sm border border-gray-50 overflow-hidden">
                 <div className="flex items-center gap-1.5">
                   <ArrowUpCircle className="text-green-600 shrink-0" size={14} />
@@ -1664,7 +1664,7 @@ export default function App() {
           </div>
         )}
         {activeTab === 'trends' && (
-          <div className="space-y-6 pb-32">
+          <div className="space-y-4 pb-32">
             <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
@@ -1720,7 +1720,7 @@ export default function App() {
               </div>
             </div>
               
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 <div 
                   className="h-10 flex bg-gray-50 rounded-xl px-3 items-center justify-center gap-1 focus-within:ring-1 focus-within:ring-blue-100 transition-all overflow-hidden cursor-pointer"
                   onClick={(e) => {
@@ -1913,7 +1913,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4">
               <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center">
@@ -2182,7 +2182,7 @@ export default function App() {
         )}
 
         {activeTab === 'settings' && (
-          <div className="space-y-6 pb-32">
+          <div className="space-y-4 pb-32">
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
               <div className="p-4">
                 <div className="flex items-center justify-between mb-3">
