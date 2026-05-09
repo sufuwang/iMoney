@@ -43,7 +43,9 @@ import {
   Receipt,
   Recycle,
   Trophy,
-  PiggyBank
+  PiggyBank,
+  ReceiptText,
+  CircleUser
 } from 'lucide-react';
 import { 
   format, 
@@ -187,7 +189,7 @@ const TransactionItem: React.FC<{
   return (
     <div 
       onClick={() => onEdit(transaction)}
-      className="flex items-center justify-between py-1.5 active:bg-gray-50 transition-colors cursor-pointer"
+      className="flex items-center justify-between py-2 active:bg-gray-50 transition-colors cursor-pointer -mx-1 px-1 rounded-2xl last:pb-0 last:mb-0"
     >
       <div className="flex items-center gap-3">
         <div className={cn(
@@ -1119,7 +1121,7 @@ export default function App() {
   return (
     <div className="h-[100dvh] bg-gray-50 flex flex-col max-w-md mx-auto shadow-2xl relative overflow-hidden font-sans overscroll-none">
       {/* Header */}
-      <header className="bg-white px-4 pt-safe pb-3 border-b border-gray-100 shrink-0 z-40">
+      <header className="bg-white/80 backdrop-blur-md px-4 pt-safe pb-3 border-b border-gray-100/50 shrink-0 z-40">
         <div className="flex justify-between items-end">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">iMoney</h1>
@@ -1136,36 +1138,44 @@ export default function App() {
           </div>
         </div>
         
-        <div className="grid grid-cols-3 gap-4 mt-2">
-          <div className="bg-green-50/50 p-3.5 rounded-2xl flex flex-col gap-1 shadow-sm border border-green-100/30 overflow-hidden">
-            <div className="flex items-center gap-1.5">
-              <ArrowUpCircle className="text-green-600 shrink-0" size={14} />
-              <div className="text-[10px] text-green-600/70 font-bold uppercase tracking-wider">本年收入</div>
+        <div className="bg-gray-50/50 rounded-2xl py-3.5 px-0 border border-gray-100 shadow-sm grid grid-cols-3 gap-0 mt-3">
+          <div className="flex flex-col items-center justify-center">
+            <div className="flex items-center gap-1 mb-1 text-gray-400">
+              <ArrowUpCircle size={10} className="text-green-500/70" />
+              <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">本年收入</div>
             </div>
-            <AutoShrinkText 
-              text={`¥${formatHeaderAmount(stats.income)}`} 
-              className="text-sm font-bold text-green-700 leading-tight" 
-            />
+            <div className="flex items-baseline gap-0.5 text-green-600">
+              <span className="text-[10px] font-bold">¥</span>
+              <AutoShrinkText 
+                text={formatHeaderAmount(stats.income)} 
+                className="text-base font-bold leading-none" 
+              />
+            </div>
           </div>
-          <div className="bg-red-50/50 p-3.5 rounded-2xl flex flex-col gap-1 shadow-sm border border-red-100/30 overflow-hidden">
-            <div className="flex items-center gap-1.5">
-              <ArrowDownCircle className="text-red-600 shrink-0" size={14} />
-              <div className="text-[10px] text-red-600/70 font-bold uppercase tracking-wider">本年支出</div>
+          <div className="flex flex-col items-center justify-center px-1">
+            <div className="flex items-center gap-1 mb-1 text-gray-400">
+              <ArrowDownCircle size={10} className="text-red-500/70" />
+              <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">本年支出</div>
             </div>
-            <AutoShrinkText 
-              text={`¥${formatHeaderAmount(stats.expense)}`} 
-              className="text-sm font-bold text-red-700 leading-tight" 
-            />
+            <div className="flex items-baseline gap-0.5 text-red-600">
+              <span className="text-[10px] font-bold">¥</span>
+              <AutoShrinkText 
+                text={formatHeaderAmount(stats.expense)} 
+                className="text-base font-bold leading-none" 
+              />
+            </div>
           </div>
-          <div className="bg-blue-50/50 p-3.5 rounded-2xl flex flex-col gap-1 shadow-sm border border-blue-100/30 overflow-hidden">
-            <div className="flex items-center gap-1.5">
-              <TrendingUp className="text-blue-600 shrink-0" size={14} />
-              <div className="text-[10px] text-blue-600/70 font-bold uppercase tracking-wider">本年储蓄率</div>
+          <div className="flex flex-col items-center justify-center">
+            <div className="flex items-center gap-1 mb-1 text-gray-400">
+              <TrendingUp size={10} className="text-blue-500/70" />
+              <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">本年储蓄率</div>
             </div>
-            <AutoShrinkText 
-              text={`${stats.income > 0 ? (Math.trunc(((stats.income - stats.expense) / stats.income) * 100 * 100) / 100).toFixed(2) : "0.00"}%`} 
-              className="text-sm font-bold text-blue-700 leading-tight" 
-            />
+            <div className="flex items-baseline gap-0.5 text-blue-600">
+              <AutoShrinkText 
+                text={`${stats.income > 0 ? (Math.trunc(((stats.income - stats.expense) / stats.income) * 100 * 100) / 100).toFixed(2) : "0.00"}%`} 
+                className="text-base font-bold leading-none" 
+              />
+            </div>
           </div>
         </div>
       </header>
@@ -1174,11 +1184,11 @@ export default function App() {
       <main ref={mainRef} className="flex-1 overflow-y-auto px-6 py-4 scrollbar-hide overscroll-contain">
         {activeTab === 'history' && (
           <div className="space-y-4 pb-32">
-            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+            <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-50">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <CalendarIcon size={16} className="text-blue-500" />
-                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">时间筛选</span>
+                   <CalendarIcon size={16} className="text-blue-500" />
+                   <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">明细区间选择</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <button 
@@ -1327,55 +1337,65 @@ export default function App() {
               </div>
             </div>
 
-            {/* Period Summary Cards */}
-            <div className="grid grid-cols-3 gap-4">
-              <div className="bg-white p-3 rounded-2xl flex flex-col gap-1 shadow-sm border border-gray-50 overflow-hidden">
-                <div className="flex items-center gap-1.5">
-                  <ArrowUpCircle className="text-green-600 shrink-0" size={14} />
-                  <div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">收入</div>
+            {/* Period Summary Card */}
+            <div className="bg-white rounded-2xl py-3.5 px-0 border border-gray-50 shadow-sm grid grid-cols-3 gap-0">
+              <div className="flex flex-col items-center justify-center">
+                <div className="flex items-center gap-1 mb-1.5 text-gray-400">
+                  <ArrowUpCircle size={10} className="text-green-500/70" />
+                  <div className="text-[10px] font-bold uppercase tracking-widest">收入</div>
                 </div>
-                <AutoShrinkText 
-                  text={`¥${formatAmount(historyStats.income)}`} 
-                  className="text-sm font-bold text-green-600 leading-tight" 
-                />
+                <div className="flex items-baseline gap-0.5 text-green-600">
+                  <span className="text-[10px] font-bold">¥</span>
+                  <AutoShrinkText 
+                    text={formatAmount(historyStats.income)} 
+                    className="text-base font-bold leading-none" 
+                  />
+                </div>
               </div>
-              
-              <div className="bg-white p-3 rounded-2xl flex flex-col gap-1 shadow-sm border border-gray-50 overflow-hidden">
-                <div className="flex items-center gap-1.5">
-                  <ArrowDownCircle className="text-red-600 shrink-0" size={14} />
-                  <div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">支出</div>
+              <div className="flex flex-col items-center justify-center">
+                <div className="flex items-center gap-1 mb-1.5 text-gray-400">
+                  <ArrowDownCircle size={10} className="text-red-500/70" />
+                  <div className="text-[10px] font-bold uppercase tracking-widest">支出</div>
                 </div>
-                <AutoShrinkText 
-                  text={`¥${formatAmount(historyStats.expense)}`} 
-                  className="text-sm font-bold text-red-600 leading-tight" 
-                />
+                <div className="flex items-baseline gap-0.5 text-red-600">
+                  <span className="text-[10px] font-bold">¥</span>
+                  <AutoShrinkText 
+                    text={formatAmount(historyStats.expense)} 
+                    className="text-base font-bold leading-none" 
+                  />
+                </div>
               </div>
-              
-              <div className="bg-white p-3 rounded-2xl flex flex-col gap-1 shadow-sm border border-gray-50 overflow-hidden">
-                <div className="flex items-center gap-1.5">
-                  <TrendingUp className="text-blue-600 shrink-0" size={14} />
-                  <div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">结余</div>
+              <div className="flex flex-col items-center justify-center">
+                <div className="flex items-center gap-1 mb-1.5 text-gray-400">
+                  <TrendingUp size={10} className="text-blue-500/70" />
+                  <div className="text-[10px] font-bold uppercase tracking-widest">结余</div>
                 </div>
-                <AutoShrinkText 
-                  text={`¥${formatAmount(historyStats.balance)}`} 
-                  className="text-sm font-bold text-blue-500 leading-tight" 
-                />
+                <div className={cn(
+                  "flex items-baseline gap-0.5",
+                  historyStats.balance >= 0 ? "text-green-600" : "text-red-600"
+                )}>
+                  <span className="text-[10px] font-bold">¥</span>
+                  <AutoShrinkText 
+                    text={formatAmount(historyStats.balance)} 
+                    className="text-base font-bold leading-none" 
+                  />
+                </div>
               </div>
             </div>
             
             {/* Category Statistics */}
             <div className="grid grid-cols-1 gap-4">
               {/* Expense Category Stats */}
-              <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+              <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-50">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center">
                     <Folder size={18} />
                   </div>
-                  <span className="font-bold text-gray-800">支出分类统计</span>
+                  <span className="font-bold text-gray-800">支出结构分析</span>
                 </div>
                 
                 {historyCategoryStats.expenses.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-1">
                     {historyCategoryStats.expenses.map(({ categoryId, amount }) => {
                       const category = CATEGORIES.find(c => c.id === categoryId) || CATEGORIES[CATEGORIES.length - 1];
                       const percentage = historyStats.expense > 0 ? (amount / historyStats.expense) * 100 : 0;
@@ -1383,7 +1403,7 @@ export default function App() {
                       return (
                         <div 
                           key={categoryId} 
-                          className="space-y-1.5 cursor-pointer active:opacity-70"
+                          className="space-y-1.5 cursor-pointer active:bg-gray-50 py-2 -mx-1 px-1 rounded-xl transition-colors last:pb-0 last:mb-0"
                           onClick={() => {
                             if (count > 1) {
                               setDetailFilter({ categoryId, type: 'expense' });
@@ -1418,16 +1438,16 @@ export default function App() {
               </div>
 
               {/* Income Category Stats */}
-              <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+              <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-50">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 bg-green-50 text-green-500 rounded-full flex items-center justify-center">
                     <Folder size={18} />
                   </div>
-                  <span className="font-bold text-gray-800">收入分类统计</span>
+                  <span className="font-bold text-gray-800">收入来源构成</span>
                 </div>
                 
                 {historyCategoryStats.incomes.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-1">
                     {historyCategoryStats.incomes.map(({ categoryId, amount }) => {
                       const category = CATEGORIES.find(c => c.id === categoryId) || CATEGORIES[CATEGORIES.length - 1];
                       const percentage = historyStats.income > 0 ? (amount / historyStats.income) * 100 : 0;
@@ -1435,7 +1455,7 @@ export default function App() {
                       return (
                         <div 
                           key={categoryId} 
-                          className="space-y-1.5 cursor-pointer active:opacity-70"
+                          className="space-y-1.5 cursor-pointer active:bg-gray-50 py-2 -mx-1 px-1 rounded-xl transition-colors last:pb-0 last:mb-0"
                           onClick={() => {
                             if (count > 1) {
                               setDetailFilter({ categoryId, type: 'income' });
@@ -1474,12 +1494,12 @@ export default function App() {
             <div className="space-y-4">
               <div className="grid grid-cols-1 gap-4">
                 {/* Top Expenses */}
-                <div className="bg-white rounded-2xl p-4 shadow-sm">
+                <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-50">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center">
                       <ArrowDownCircle size={18} />
                     </div>
-                    <span className="font-bold text-gray-800">支出排行</span>
+                    <span className="font-bold text-gray-800">支出金额榜单</span>
                   </div>
                   
                   {topRankings.expenses.length > 0 ? (
@@ -1489,7 +1509,7 @@ export default function App() {
                         return (
                           <div 
                             key={t.id} 
-                            className="flex items-center justify-between active:bg-gray-50 py-2 -mx-1 px-1 rounded-xl transition-colors cursor-pointer"
+                            className="flex items-center justify-between active:bg-gray-50 py-2 -mx-1 px-1 rounded-xl transition-colors cursor-pointer last:pb-0 last:mb-0"
                             onClick={() => setViewingTransaction(t)}
                           >
                             <div className="flex items-center gap-3">
@@ -1530,12 +1550,12 @@ export default function App() {
                 </div>
 
                 {/* Top Incomes */}
-                <div className="bg-white rounded-2xl p-4 shadow-sm">
+                <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-50">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-8 h-8 bg-green-50 text-green-500 rounded-full flex items-center justify-center">
                       <ArrowUpCircle size={18} />
                     </div>
-                    <span className="font-bold text-gray-800">收入排行</span>
+                    <span className="font-bold text-gray-800">收益流水榜单</span>
                   </div>
                   
                   {topRankings.incomes.length > 0 ? (
@@ -1545,7 +1565,7 @@ export default function App() {
                         return (
                           <div 
                             key={t.id} 
-                            className="flex items-center justify-between active:bg-gray-50 py-2 -mx-1 px-1 rounded-xl transition-colors cursor-pointer"
+                            className="flex items-center justify-between active:bg-gray-50 py-2 -mx-1 px-1 rounded-xl transition-colors cursor-pointer last:pb-0 last:mb-0"
                             onClick={() => setViewingTransaction(t)}
                           >
                             <div className="flex items-center gap-3">
@@ -1596,18 +1616,18 @@ export default function App() {
                 <p className="text-gray-400 text-sm">该时间段内没有记录</p>
               </div>
             ) : (
-              <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+              <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-50">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center">
                       <History size={18} />
                     </div>
-                    <span className="font-bold text-gray-800">交易列表</span>
+                    <span className="font-bold text-gray-800">流水明细清单</span>
                   </div>
                 </div>
 
                 {historyView === 'day' ? (
-                  <div className="space-y-0.5">
+                  <div className="space-y-1">
                     {filteredHistory.map(t => (
                       <TransactionItem 
                         key={t.id} 
@@ -1617,14 +1637,14 @@ export default function App() {
                     ))}
                   </div>
                 ) : (
-                  <div className="space-y-0.5">
+                  <div className="space-y-1">
                     {groupedHistory?.map(group => {
                       const category = CATEGORIES.find(c => c.id === group.category) || CATEGORIES[CATEGORIES.length - 1];
                       const count = filteredHistory.filter(t => t.category === group.category && t.type === group.type).length;
                       return (
                         <div 
                           key={`${group.type}-${group.category}`} 
-                          className="flex items-center justify-between py-1.5 active:bg-gray-50 cursor-pointer"
+                          className="flex items-center justify-between py-2 active:bg-gray-50 cursor-pointer -mx-1 px-1 rounded-xl transition-colors last:pb-0 last:mb-0"
                           onClick={() => {
                             if (count > 1) {
                               setDetailFilter({ categoryId: group.category, type: group.type });
@@ -1665,11 +1685,11 @@ export default function App() {
         )}
         {activeTab === 'trends' && (
           <div className="space-y-4 pb-32">
-            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+            <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-50">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <CalendarIcon size={16} className="text-blue-500" />
-                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">趋势周期与范围</span>
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">统计区间配置</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <button 
@@ -1855,13 +1875,13 @@ export default function App() {
             </div>
 
 
-            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+            <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-50">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center">
                     <BarChart3 size={18} />
                   </div>
-                  <span className="font-bold text-gray-800">收支趋势对比</span>
+                  <span className="font-bold text-gray-800">收支走势对比</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1">
@@ -1914,12 +1934,12 @@ export default function App() {
             </div>
 
             <div className="space-y-4">
-              <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+              <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-50">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center">
                     <TrendingUp size={18} className="rotate-180" />
                   </div>
-                  <span className="font-bold text-gray-800">支出分类趋势</span>
+                  <span className="font-bold text-gray-800">分类支出动态</span>
                 </div>
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
@@ -1967,12 +1987,12 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+              <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-50">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center">
                     <PieChartIcon size={18} />
                   </div>
-                  <span className="font-bold text-gray-800">支出分类占比</span>
+                  <span className="font-bold text-gray-800">支出构成比例</span>
                 </div>
                 <div className="h-64">
                   {expensePieData.length > 0 ? (
@@ -2008,12 +2028,12 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+              <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-50">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 bg-green-50 text-green-500 rounded-full flex items-center justify-center">
                     <TrendingUp size={18} />
                   </div>
-                  <span className="font-bold text-gray-800">收入分类趋势</span>
+                  <span className="font-bold text-gray-800">分类收入动态</span>
                 </div>
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
@@ -2061,12 +2081,12 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+              <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-50">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 bg-green-50 text-green-500 rounded-full flex items-center justify-center">
                     <PieChartIcon size={18} />
                   </div>
-                  <span className="font-bold text-gray-800">收入分类占比</span>
+                  <span className="font-bold text-gray-800">收入来源比例</span>
                 </div>
                 <div className="h-64">
                   {incomePieData.length > 0 ? (
@@ -2102,12 +2122,12 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+              <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-50">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center">
                     <History size={18} />
                   </div>
-                  <span className="font-bold text-gray-800">子分类平均值</span>
+                  <span className="font-bold text-gray-800">周期均值分析</span>
                   <div className="ml-auto text-[10px] text-gray-400 font-bold uppercase tracking-wider">
                     {(() => {
                       const start = trendStartDate < trendEndDate ? trendStartDate : trendEndDate;
@@ -2132,7 +2152,7 @@ export default function App() {
                       return (
                         <div 
                           key={idx} 
-                          className="flex items-center justify-between group cursor-pointer active:bg-gray-50 py-1.5 -mx-1 px-1 rounded-xl transition-colors"
+                          className="flex items-center justify-between group cursor-pointer active:bg-gray-50 py-2 -mx-1 px-1 rounded-xl transition-colors last:pb-0"
                           onClick={() => {
                             if (item.count > 1) {
                               setDetailFilter({ categoryId: item.categoryId, type: item.type });
@@ -2184,9 +2204,9 @@ export default function App() {
         {activeTab === 'settings' && (
           <div className="space-y-4 pb-32">
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
-              <div className="p-4">
+              <div className="p-3.5">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-bold text-gray-900">每日记账提醒</h3>
+                  <h3 className="text-sm font-bold text-gray-900">记账提醒服务</h3>
                   <button 
                     onClick={() => {
                       if (!reminderEnabled && isTauri) {
@@ -2261,13 +2281,13 @@ export default function App() {
             </div>
 
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
-              <div className="p-4">
+              <div className="p-3.5">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 bg-orange-50 text-orange-600 rounded-lg flex items-center justify-center">
                     <Wallet size={20} />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-gray-900">币种与汇率管理</h3>
+                    <h3 className="text-sm font-bold text-gray-900">多币种汇率管理</h3>
                     <p className="text-[10px] text-gray-400">管理多币种账单及实时汇率</p>
                   </div>
                 </div>
@@ -2322,7 +2342,7 @@ export default function App() {
             </div>
 
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm space-y-1 p-1">
-              <div className="p-4 flex items-center justify-between hover:bg-gray-50 rounded-xl cursor-pointer transition-colors" onClick={() => exportData()}>
+              <div className="p-3.5 flex items-center justify-between hover:bg-gray-50 rounded-xl cursor-pointer transition-colors" onClick={() => exportData()}>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center">
                     <Download size={18} />
@@ -2342,7 +2362,7 @@ export default function App() {
               
               {isTauri ? (
                 <div 
-                  className="p-4 flex items-center justify-between hover:bg-gray-50 rounded-xl cursor-pointer transition-colors"
+                  className="p-3.5 flex items-center justify-between hover:bg-gray-50 rounded-xl cursor-pointer transition-colors"
                   onClick={() => importData()}
                 >
                   <div className="flex items-center gap-3">
@@ -2354,7 +2374,7 @@ export default function App() {
                   <ChevronRight size={18} className="text-gray-300" />
                 </div>
               ) : (
-                <label className="p-4 flex items-center justify-between hover:bg-gray-50 rounded-xl cursor-pointer transition-colors">
+                <label className="p-3.5 flex items-center justify-between hover:bg-gray-50 rounded-xl cursor-pointer transition-colors">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-green-50 text-green-600 rounded-lg flex items-center justify-center">
                       <Upload size={18} />
@@ -2366,7 +2386,7 @@ export default function App() {
                 </label>
               )}
 
-              <div className="p-4 flex items-center justify-between hover:bg-red-50 rounded-xl cursor-pointer transition-colors group" onClick={() => {
+              <div className="p-3.5 flex items-center justify-between hover:bg-red-50 rounded-xl cursor-pointer transition-colors group" onClick={() => {
                 if (window.confirm("确定要清空所有记录吗？此操作不可撤销。")) {
                   setTransactions([]);
                   notify("iMoney", "所有记录已清空！");
@@ -2407,9 +2427,9 @@ export default function App() {
 
       {/* Tab Bar */}
       <nav className="bg-white/90 backdrop-blur-xl border-t border-gray-100 flex justify-around items-center px-4 pb-safe pt-2 w-full shrink-0 z-50">
-        <TabButton active={activeTab === 'history'} icon={LayoutDashboard} label="概览" onClick={() => setActiveTab('history')} />
-        <TabButton active={activeTab === 'trends'} icon={BarChart3} label="趋势" onClick={() => setActiveTab('trends')} />
-        <TabButton active={activeTab === 'settings'} icon={SettingsIcon} label="设置" onClick={() => setActiveTab('settings')} />
+        <TabButton active={activeTab === 'history'} icon={ReceiptText} label="明细" onClick={() => setActiveTab('history')} />
+        <TabButton active={activeTab === 'trends'} icon={PieChartIcon} label="统计" onClick={() => setActiveTab('trends')} />
+        <TabButton active={activeTab === 'settings'} icon={CircleUser} label="我的" onClick={() => setActiveTab('settings')} />
       </nav>
 
       {/* Add/Edit Transaction Modal */}
@@ -2468,7 +2488,7 @@ export default function App() {
             </header>
 
             <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6 scrollbar-hide overscroll-contain">
-              <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-5 text-center border border-gray-100 shadow-sm transition-all focus-within:ring-2 focus-within:ring-blue-50">
+              <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-3.5 text-center border border-gray-100 shadow-sm transition-all focus-within:ring-2 focus-within:ring-blue-50">
                 <div className="flex items-center justify-center gap-2 mb-3 relative">
                   <CalendarIcon size={12} className="text-blue-500" />
                   <input 
@@ -2567,7 +2587,7 @@ export default function App() {
                     placeholder="写点备注吧..."
                     value={newNote}
                     onChange={(e) => setNewNote(e.target.value)}
-                    className="w-full bg-gray-50 p-4 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all border border-transparent focus:bg-white"
+                    className="w-full bg-gray-50 p-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all border border-transparent focus:bg-white"
                   />
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300">
                     <Edit2 size={16} />
@@ -2696,7 +2716,7 @@ export default function App() {
                 </div>
               </div>
               
-              <div className="bg-gray-50 rounded-2xl p-6 space-y-4">
+              <div className="bg-gray-50 rounded-2xl p-3.5 space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">交易时间</span>
                   <span className="text-sm font-medium text-gray-700">{format(parseISO(viewingTransaction.date), 'yyyy-MM-dd HH:mm')}</span>
@@ -2720,18 +2740,18 @@ export default function App() {
             </div>
             
             <footer className="px-6 pt-4 pb-safe border-t border-gray-50 bg-white shrink-0">
-              <button 
-                onClick={() => {
-                  if (window.confirm("确定要删除这条记录吗？")) {
-                    deleteTransaction(viewingTransaction.id);
-                    setViewingTransaction(null);
-                  }
-                }}
-                className="w-full flex items-center justify-center gap-2 text-red-500 font-bold py-4 rounded-2xl bg-red-50 active:scale-95 transition-all"
-              >
-                <Trash2 size={20} />
-                <span>删除记录</span>
-              </button>
+                <button 
+                  onClick={() => {
+                    if (window.confirm("确定要删除这条记录吗？")) {
+                      deleteTransaction(viewingTransaction.id);
+                      setViewingTransaction(null);
+                    }
+                  }}
+                  className="w-full flex items-center justify-center gap-2 text-red-500 font-bold py-4 rounded-xl bg-red-50 active:scale-95 transition-all"
+                >
+                  <Trash2 size={20} />
+                  <span>删除记录</span>
+                </button>
             </footer>
           </motion.div>
         )}
