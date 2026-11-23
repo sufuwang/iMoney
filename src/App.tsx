@@ -54,13 +54,24 @@ export default function App() {
     const line = points.map((point, index) => `${index ? 'L' : 'M'}${point.x},${point.y}`).join(' ');
     return { line, area: `${line} L300,40 L0,40 Z` };
   }, [transactions, settings.currencyConfigs]);
+  // 常用备注：从历史记录动态统计，优先近三个月高频，其次全量频次与最近使用时间
   const recentNotes = useMemo(() => {
-    const counts = new Map<string, number>();
+    const recentFrom = dayjs().subtract(90, 'day');
+    const stats = new Map<string, { count: number; recent: number; last: number }>();
     transactions.forEach((row) => {
       const note = row.note.trim();
-      if (note) counts.set(note, (counts.get(note) ?? 0) + 1);
+      if (!note) return;
+      const date = dayjs(row.date);
+      const current = stats.get(note) ?? { count: 0, recent: 0, last: 0 };
+      current.count += 1;
+      if (!date.isBefore(recentFrom)) current.recent += 1;
+      current.last = Math.max(current.last, date.valueOf());
+      stats.set(note, current);
     });
-    return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([note]) => note);
+    return [...stats.entries()]
+      .sort((a, b) => b[1].recent - a[1].recent || b[1].count - a[1].count || b[1].last - a[1].last)
+      .slice(0, 6)
+      .map(([note]) => note);
   }, [transactions]);
 
   const openAdd = () => { setEditing(null); setModalOpen(true); };
@@ -141,6 +152,9 @@ export default function App() {
         token: {
           colorPrimary: '#4f46e5',
           borderRadius: 6,
+          borderRadiusLG: 6,
+          borderRadiusSM: 6,
+          borderRadiusXS: 6,
           colorBgLayout: '#f2f4f8',
           colorText: '#1a1d29',
           fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif",

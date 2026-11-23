@@ -82,7 +82,7 @@ export default function TransactionModal({
       open={open}
       onClose={onCancel}
       placement={isMobile ? 'bottom' : 'right'}
-      height={isMobile ? '96vh' : undefined}
+      height={isMobile ? '80vh' : undefined}
       width={isMobile ? undefined : 520}
       destroyOnHidden
       className="entry-drawer"
@@ -112,7 +112,15 @@ export default function TransactionModal({
           label="金额"
           rules={[{ required: true, message: '请输入金额' }, { type: 'number', min: 0.01, message: '金额需大于 0' }]}
         >
-          <InputNumber prefix="¥" min={0.01} precision={2} step={0.01} style={{ width: '100%' }} />
+          <InputNumber
+            prefix="¥"
+            min={0.01}
+            precision={2}
+            step={0.01}
+            inputMode="decimal"
+            pattern="[0-9]*[.,]?[0-9]*"
+            style={{ width: '100%' }}
+          />
         </Form.Item>
 
         <div className="form-row">
@@ -120,7 +128,7 @@ export default function TransactionModal({
             <Select
               style={{ width: '100%' }}
               options={currencies.filter((item) => item.enabled).map((item) => ({
-                label: `${item.symbol} ${item.name}`,
+                label: `${item.symbol ?? ''} ${item.name ?? item.code}`.trim(),
                 value: item.code,
               }))}
             />

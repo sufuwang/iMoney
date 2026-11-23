@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import {
   Avatar,
   Button,
@@ -7,14 +7,13 @@ import {
   Collapse,
   DatePicker,
   Empty,
-  Input,
   List,
   Row,
   Segmented,
   Space,
   Typography,
 } from 'antd';
-import { LeftOutlined, RightOutlined, SearchOutlined } from '@ant-design/icons';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { CATEGORY_MAP, VIEW_LABELS } from '../constants';
 import {
@@ -29,6 +28,8 @@ import {
 import type { AppSettings, Transaction, ViewMode } from '../types';
 import CategoryAvatar from '../components/CategoryAvatar';
 import MetricStrip from '../components/MetricStrip';
+
+const WEEKDAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
 
 interface Props {
   transactions: Transaction[];
@@ -45,7 +46,6 @@ export default function HistoryView({
   onViewTransaction,
   onViewCategory,
 }: Props) {
-  const [search, setSearch] = useState('');
   const mode = settings.historyView;
   const anchor = dayjs(settings.historyDate);
   const [start, end] = useMemo(() => rangeFor(mode, anchor), [mode, settings.historyDate]);
@@ -60,18 +60,9 @@ export default function HistoryView({
     [rows, settings.currencyConfigs],
   );
 
-  const filteredRows = useMemo(() => {
-    const keyword = search.trim().toLowerCase();
-    if (!keyword) return rows;
-    return rows.filter((row) => {
-      const name = CATEGORY_MAP[row.category]?.name ?? row.category;
-      return `${row.note} ${name}`.toLowerCase().includes(keyword);
-    });
-  }, [rows, search]);
-
   const groups = useMemo(
-    () => (mode === 'day' ? [] : groupByDate(filteredRows, mode)),
-    [filteredRows, mode],
+    () => (mode === 'day' ? [] : groupByDate(rows, mode)),
+    [rows, mode],
   );
 
   const unit: 'day' | 'month' | 'year' = mode === 'day' ? 'day' : mode === 'month' ? 'month' : 'year';
@@ -79,24 +70,25 @@ export default function HistoryView({
 
   const renderTransactions = (data: Transaction[]) => (
     <List
+      className="txn-list"
+      size="small"
       dataSource={data}
       locale={{ emptyText: <Empty description="暂无记录" image={Empty.PRESENTED_IMAGE_SIMPLE} /> }}
-      renderItem={(row) => (
-        <List.Item className="txn-item" onClick={() => onViewTransaction(row)}>
-          <div className="txn-left">
-            <CategoryAvatar categoryId={row.category} size={38} />
-            <div className="txn-text">
-              <div className="txn-name">{row.note || CATEGORY_MAP[row.category]?.name || row.category}</div>
-              <div className="txn-desc">
-                {CATEGORY_MAP[row.category]?.name ?? row.category} · {dayjs(row.date).format('MM-DD HH:mm')}
-              </div>
-            </div>
-          </div>
-          <strong className={row.type === 'income' ? 'txn-amount income' : 'txn-amount expense'}>
-            {row.type === 'income' ? '+' : '-'}{formatMoney(baseAmount(row, settings.currencyConfigs))}
-          </strong>
-        </List.Item>
-      )}
+      renderItem={(row) => {
+        const category = CATEGORY_MAP[row.category];
+        return (
+          <List.Item className="txn-item clickable-list-item" onClick={() => onViewTransaction(row)}>
+            <List.Item.Meta
+              avatar={<CategoryAvatar categoryId={row.category} size={38} />}
+              title={<span className="txn-name">{row.note || category?.name || row.category}</span>}
+              description={`${category?.name ?? row.category} · ${dayjs(row.date).format('MM-DD')}`}
+            />
+            <strong className={row.type === 'income' ? 'txn-amount income' : 'txn-amount expense'}>
+              {row.type === 'income' ? '+' : '-'}{formatMoney(baseAmount(row, settings.currencyConfigs))}
+            </strong>
+          </List.Item>
+        );
+      }}
     />
   );
 
@@ -210,33 +202,44 @@ export default function HistoryView({
         <Col xs={24} md={12}>{renderRanking('income')}</Col>
       </Row>
 
-      <Card size="small" title="流水明细" extra={<Typography.Text type="secondary">{filteredRows.length} 笔</Typography.Text>}>
-        <Input
-          prefix={<SearchOutlined />}
-          placeholder="搜索备注或分类"
-          allowClear
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          style={{ marginBottom: 8 }}
-        />
+      <Card
+        size="small"
+        title="流水明细"
+        extra={<Typography.Text type="secondary">{rows.length} 笔</Typography.Text>}
+        styles={{ body: { padding: '6px 16px 10px' } }}
+      >
         {groups.length > 0 ? (
           <Collapse
+            key={mode}
             ghost
-            items={groups.map((group) => ({
-              key: group.key,
-              label: (
-                <Space>
-                  <strong>{group.label}</strong>
-                  <Typography.Text type="secondary">
-                    {formatMoney(summarize(group.rows, settings.currencyConfigs).balance)}
-                  </Typography.Text>
-                </Space>
-              ),
-              children: renderTransactions(group.rows),
-            }))}
+            className="txn-groups"
+            expandIconPosition="end"
+            defaultActiveKey={groups[0] ? [groups[0].key] : []}
+            items={groups.map((group) => {
+              const groupSummary = summarize(group.rows, settings.currencyConfigs);
+              const date = dayjs(group.key);
+              return {
+                key: group.key,
+                label: (
+                  <div className="txn-group-head">
+                    <div className="txn-group-date">
+                      <strong>{mode === 'year' ? date.format('YYYY年M月') : date.format('M月D日')}</strong>
+                      {mode !== 'year' && <span>{WEEKDAYS[date.day()]}</span>}
+                    </div>
+                    <div className="txn-group-meta">
+                      <span>{group.rows.length} 笔</span>
+                      <b className={groupSummary.balance >= 0 ? 'income' : 'expense'}>
+                        {groupSummary.balance < 0 ? '-' : ''}{formatMoney(Math.abs(groupSummary.balance))}
+                      </b>
+                    </div>
+                  </div>
+                ),
+                children: renderTransactions(group.rows),
+              };
+            })}
           />
         ) : (
-          renderTransactions(filteredRows)
+          renderTransactions(rows)
         )}
       </Card>
     </Space>
