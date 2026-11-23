@@ -1,20 +1,27 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# iMoney
 
-# Run and deploy your AI Studio app
+基于 React + Ant Design 的本地个人记账应用，移动端优先（iPhone 安全区适配、底部导航、底部抽屉），纯前端运行于浏览器。
 
-This contains everything you need to run your app locally.
+## 功能
 
-View your app in AI Studio: https://ai.studio/apps/bde474c5-e3e0-43ee-adc7-920e63bef30a
+- **明细**：按日 / 月 / 年查看收支，分类结构、金额榜单、卡片式流水与关键词搜索。
+- **统计**：收支走势、分类动态、构成比例、周期均值分析，支持自定义区间与图例筛选。
+- **健康**：财务健康指数与四维评分（储蓄能力、收入稳定、支出分散、记账习惯）、储蓄率趋势、月度收支对比。
+- **我的**：每日记账提醒、多币种汇率管理、JSON 备份导入导出、清空记录。
+- 记账弹窗支持常用备注快捷输入；数据保存在 `localStorage`，首次启动载入 `src/data/seed.json` 示例数据。
 
-## Run Locally
+## 本地运行
 
-**Prerequisites:**  Node.js
+```bash
+npm install
+npm run dev
+```
 
+浏览器访问 http://localhost:3000 。
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## 校验
+
+```bash
+npm run lint
+npm run build
+```

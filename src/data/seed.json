@@ -1,0 +1,2441 @@
+[
+  {
+    "id": "1ca216d9-ba4f-4bda-a69e-451cc62dd83b",
+    "type": "expense",
+    "amount": 420.97,
+    "currency": "CNY",
+    "category": "other_expense",
+    "note": "请hry吃中午饭",
+    "date": "2026-08-30T00:00:00.000Z"
+  },
+  {
+    "id": "1a18b3a9-8f92-478e-ac35-becf35eccbef",
+    "type": "expense",
+    "amount": 14.78,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车充电",
+    "date": "2026-08-30T00:00:00.000Z"
+  },
+  {
+    "id": "0aa1f78f-6ac7-46cc-8807-ab80385ae885",
+    "type": "expense",
+    "amount": 104,
+    "currency": "CNY",
+    "category": "housing",
+    "note": "桐堂搬家至建科公司",
+    "date": "2026-08-29T00:00:00.000Z"
+  },
+  {
+    "id": "13c154ba-094a-4046-841a-c31d224b3d54",
+    "type": "expense",
+    "amount": 10.82,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车充电",
+    "date": "2026-08-28T00:00:00.000Z"
+  },
+  {
+    "id": "eb410f1a-7303-4c9d-bbfa-c09efd21706d",
+    "type": "expense",
+    "amount": 32,
+    "currency": "CNY",
+    "category": "food",
+    "note": "巴味仙",
+    "date": "2026-08-28T00:00:00.000Z"
+  },
+  {
+    "id": "373a709b-e917-4f13-b1e2-0295ce093de6",
+    "type": "expense",
+    "amount": 57.9,
+    "currency": "CNY",
+    "category": "other_expense",
+    "note": "建科公司伴手礼",
+    "date": "2026-08-28T00:00:00.000Z"
+  },
+  {
+    "id": "c5141e0b-2a08-4a5a-9f7b-3a0fdf61adae",
+    "type": "expense",
+    "amount": 10,
+    "currency": "CNY",
+    "category": "housing",
+    "note": "桐堂电费",
+    "date": "2026-08-28T00:00:00.000Z"
+  },
+  {
+    "id": "e913ced4-0d65-47ca-a0e8-38573f9804b9",
+    "type": "expense",
+    "amount": 110.24,
+    "currency": "CNY",
+    "category": "other_expense",
+    "note": "与zqy吃晚饭",
+    "date": "2026-08-27T00:00:00.000Z"
+  },
+  {
+    "id": "06d9142c-96fd-499b-b592-1f9e21989cd4",
+    "type": "expense",
+    "amount": 11.46,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车充电",
+    "date": "2026-08-27T00:00:00.000Z"
+  },
+  {
+    "id": "373041ba-f5ab-4b2b-8b98-97c6826d9e6c",
+    "type": "expense",
+    "amount": 133.8,
+    "currency": "CNY",
+    "category": "other_expense",
+    "note": "与zqy在in99吃饭",
+    "date": "2026-08-26T00:00:00.000Z"
+  },
+  {
+    "id": "a65b3aac-f08c-4711-b473-4ce26bedc141",
+    "type": "expense",
+    "amount": 12.98,
+    "currency": "CNY",
+    "category": "food",
+    "note": "水果",
+    "date": "2026-08-24T00:00:00.000Z"
+  },
+  {
+    "id": "d4e55238-0778-49f3-9e8b-aca5bcc6759c",
+    "type": "expense",
+    "amount": 15.12,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车充电",
+    "date": "2026-08-24T00:00:00.000Z"
+  },
+  {
+    "id": "732cefe9-0213-43a4-8d31-faac5316137a",
+    "type": "expense",
+    "amount": 740,
+    "currency": "CNY",
+    "category": "other_expense",
+    "note": "hry：潼南加油、洗车、蓉鼎记吃饭",
+    "date": "2026-08-23T00:00:00.000Z"
+  },
+  {
+    "id": "608d4b96-0c8c-484b-862a-3424e15f75f4",
+    "type": "expense",
+    "amount": 5.5,
+    "currency": "CNY",
+    "category": "other_expense",
+    "note": "hry买豆瓣酱",
+    "date": "2026-08-20T00:00:00.000Z"
+  },
+  {
+    "id": "901d7eb7-f7e7-4bb3-85ab-78d9715af5fd",
+    "type": "income",
+    "amount": 9984,
+    "currency": "CNY",
+    "category": "other_income",
+    "note": "新能源汽车置换补贴",
+    "date": "2026-08-20T00:00:00.000Z"
+  },
+  {
+    "id": "862ea17b-3a4f-4288-b4e8-4841454420b5",
+    "type": "expense",
+    "amount": 17.41,
+    "currency": "CNY",
+    "category": "other_expense",
+    "note": "hry买漏勺",
+    "date": "2026-08-20T00:00:00.000Z"
+  },
+  {
+    "id": "5c647810-cf3a-4335-b95e-d39ca47d0311",
+    "type": "expense",
+    "amount": 4.6,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "单车",
+    "date": "2026-08-20T00:00:00.000Z"
+  },
+  {
+    "id": "813b91b5-ba3e-4f59-886e-a9df2ad54572",
+    "type": "expense",
+    "amount": 5,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "停车费",
+    "date": "2026-08-18T00:00:00.000Z"
+  },
+  {
+    "id": "33bc1729-0776-4eb8-ae37-11e8253f61ab",
+    "type": "expense",
+    "amount": 20,
+    "currency": "CNY",
+    "category": "housing",
+    "note": "桐堂电费",
+    "date": "2026-08-17T00:00:00.000Z"
+  },
+  {
+    "id": "6a109f23-cae0-4e18-825a-7c58f9242429",
+    "type": "expense",
+    "amount": 3.6,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-08-17T00:00:00.000Z"
+  },
+  {
+    "id": "57458da9-5d35-4c2f-8dcc-cebad883bbac",
+    "type": "expense",
+    "amount": 64.49,
+    "currency": "CNY",
+    "category": "food",
+    "note": "买菜",
+    "date": "2026-08-16T00:00:00.000Z"
+  },
+  {
+    "id": "40f69273-d0b9-45fa-9cb5-0d56aa9cb7e6",
+    "type": "expense",
+    "amount": 6.5,
+    "currency": "CNY",
+    "category": "shopping",
+    "note": "怡宝",
+    "date": "2026-08-15T00:00:00.000Z"
+  },
+  {
+    "id": "1a493575-4066-4708-8ee8-e3c056d9222f",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-08-14T00:00:00.000Z"
+  },
+  {
+    "id": "a0828050-0455-4a6d-9404-9d2a88a6a4d7",
+    "type": "expense",
+    "amount": 330,
+    "currency": "CNY",
+    "category": "other_expense",
+    "note": "给dtt红包",
+    "date": "2026-08-14T00:00:00.000Z"
+  },
+  {
+    "id": "e2d654f7-051f-44df-bfdd-2cc7b304a0cc",
+    "type": "expense",
+    "amount": 16.58,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车充电",
+    "date": "2026-08-14T00:00:00.000Z"
+  },
+  {
+    "id": "63697f5c-f639-4577-96c7-d735a79d6c60",
+    "type": "expense",
+    "amount": 20,
+    "currency": "CNY",
+    "category": "housing",
+    "note": "桐堂电费",
+    "date": "2026-08-13T00:00:00.000Z"
+  },
+  {
+    "id": "5458dd33-b90e-4c11-ad12-a36efcb5a145",
+    "type": "expense",
+    "amount": 112,
+    "currency": "CNY",
+    "category": "food",
+    "note": "川菜",
+    "date": "2026-08-11T00:00:00.000Z"
+  },
+  {
+    "id": "d57fc970-5aa6-4c87-978c-7d66f0d58ee1",
+    "type": "expense",
+    "amount": 57.5,
+    "currency": "CNY",
+    "category": "food",
+    "note": "凉面和拌饭",
+    "date": "2026-08-10T00:00:00.000Z"
+  },
+  {
+    "id": "ac268212-f9eb-4e83-8f30-79398ce13f01",
+    "type": "expense",
+    "amount": 6.39,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-08-10T00:00:00.000Z"
+  },
+  {
+    "id": "3ff8e59b-5c31-437b-af2b-35a50054f789",
+    "type": "expense",
+    "amount": 20,
+    "currency": "CNY",
+    "category": "family",
+    "note": "wkx 科二红包",
+    "date": "2026-08-10T00:00:00.000Z"
+  },
+  {
+    "id": "a98af968-8dcf-40cb-8684-88f42aafa698",
+    "type": "expense",
+    "amount": 562.6,
+    "currency": "CNY",
+    "category": "housing",
+    "note": "西安房贷",
+    "date": "2026-08-10T00:00:00.000Z"
+  },
+  {
+    "id": "a3cc6c42-d2d8-4f2f-89b8-38a1970d1c8e",
+    "type": "expense",
+    "amount": 4.5,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁",
+    "date": "2026-08-09T00:00:00.000Z"
+  },
+  {
+    "id": "d16325a4-138e-4001-92d2-cae01589a3f4",
+    "type": "expense",
+    "amount": 10.4,
+    "currency": "CNY",
+    "category": "food",
+    "note": "凉菜",
+    "date": "2026-08-08T00:00:00.000Z"
+  },
+  {
+    "id": "beced2b9-b352-494f-bfd3-68cd7daf202b",
+    "type": "expense",
+    "amount": 115.22,
+    "currency": "CNY",
+    "category": "food",
+    "note": "水果",
+    "date": "2026-08-07T00:00:00.000Z"
+  },
+  {
+    "id": "b3f3f5c7-5b4d-46c9-b767-baf5480660ab",
+    "type": "expense",
+    "amount": 9.13,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车充电",
+    "date": "2026-08-07T00:00:00.000Z"
+  },
+  {
+    "id": "ce1d9e71-d2fc-4daa-8a09-8ec6385b578d",
+    "type": "expense",
+    "amount": 20,
+    "currency": "CNY",
+    "category": "housing",
+    "note": "桐堂电费",
+    "date": "2026-08-06T00:00:00.000Z"
+  },
+  {
+    "id": "46fb8b67-66e1-4648-8891-e3a276e1dad5",
+    "type": "expense",
+    "amount": 16.05,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车充电",
+    "date": "2026-08-03T00:00:00.000Z"
+  },
+  {
+    "id": "fc52ff30-5c69-4c99-818a-6fe538ec5047",
+    "type": "expense",
+    "amount": 421.17,
+    "currency": "CNY",
+    "category": "family",
+    "note": "亲属卡",
+    "date": "2026-07-31T00:00:00.000Z"
+  },
+  {
+    "id": "adf24971-b4ca-47f0-be7c-832810d05259",
+    "type": "expense",
+    "amount": 10,
+    "currency": "CNY",
+    "category": "housing",
+    "note": "桐堂电费",
+    "date": "2026-08-02T00:00:00.000Z"
+  },
+  {
+    "id": "c5ec1d20-98f8-498f-84b1-665c697502a9",
+    "type": "expense",
+    "amount": 179.59,
+    "currency": "CNY",
+    "category": "food",
+    "note": "柴火鸡",
+    "date": "2026-08-01T00:00:00.000Z"
+  },
+  {
+    "id": "4cb22de1-fc9d-44cc-9455-fec402891da2",
+    "type": "expense",
+    "amount": 47.9,
+    "currency": "CNY",
+    "category": "shopping",
+    "note": "洞洞鞋",
+    "date": "2026-08-01T00:00:00.000Z"
+  },
+  {
+    "id": "6eb0da8a-d87d-4d3c-81e1-06d5a0154c84",
+    "type": "expense",
+    "amount": 185.14,
+    "currency": "CNY",
+    "category": "other_expense",
+    "note": "华阳休闲",
+    "date": "2026-08-01T00:00:00.000Z"
+  },
+  {
+    "id": "a5583efe-6da3-4c35-84cb-77063f6ef9cf",
+    "type": "income",
+    "amount": 5400,
+    "currency": "CNY",
+    "category": "provident_fund",
+    "note": "",
+    "date": "2026-08-01T00:00:00.000Z"
+  },
+  {
+    "id": "5b9b56be-bbd5-46bc-89cc-382e49d68507",
+    "type": "expense",
+    "amount": 11.89,
+    "currency": "CNY",
+    "category": "food",
+    "note": "水果切",
+    "date": "2026-07-31T00:00:00.000Z"
+  },
+  {
+    "id": "1c1fe53b-61ba-4bdd-8dc0-f7c1086e9c65",
+    "type": "income",
+    "amount": 10369.57,
+    "currency": "CNY",
+    "category": "salary",
+    "note": "7月份工资，5、6月份绩效",
+    "date": "2026-07-31T00:00:00.000Z"
+  },
+  {
+    "id": "3d3ff21f-5083-49ae-8bc2-10c3d55c073b",
+    "type": "expense",
+    "amount": 16,
+    "currency": "CNY",
+    "category": "food",
+    "note": "八味仙",
+    "date": "2026-07-29T00:00:00.000Z"
+  },
+  {
+    "id": "b9906391-53ba-46a3-adb1-a9d0a3c58f23",
+    "type": "expense",
+    "amount": 57,
+    "currency": "CNY",
+    "category": "food",
+    "note": "零食",
+    "date": "2026-07-29T00:00:00.000Z"
+  },
+  {
+    "id": "10c15755-3836-4acb-ae42-d02ecdac0423",
+    "type": "expense",
+    "amount": 10,
+    "currency": "CNY",
+    "category": "food",
+    "note": "倪家锅盔",
+    "date": "2026-07-28T00:00:00.000Z"
+  },
+  {
+    "id": "e033205a-b53f-4094-8eb2-06de85ec8f98",
+    "type": "expense",
+    "amount": 313,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "返回成都动车",
+    "date": "2026-07-28T00:00:00.000Z"
+  },
+  {
+    "id": "01cc88ad-1fcc-45a6-b9cd-2d2519532d75",
+    "type": "expense",
+    "amount": 9.9,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "烟火巷子停车费",
+    "date": "2026-07-28T00:00:00.000Z"
+  },
+  {
+    "id": "4bef4218-8082-4dbf-a839-b19a1f341556",
+    "type": "expense",
+    "amount": 10000,
+    "currency": "CNY",
+    "category": "other_expense",
+    "note": "葬礼",
+    "date": "2026-07-26T00:00:00.000Z"
+  },
+  {
+    "id": "0c60e8df-0d5a-45f2-bb3c-d110efac5aea",
+    "type": "expense",
+    "amount": 7.05,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "打车至隆发",
+    "date": "2026-07-22T00:00:00.000Z"
+  },
+  {
+    "id": "a7a42966-bbee-4b44-bab9-4843ac864137",
+    "type": "expense",
+    "amount": 15.96,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "前往成都东的打车费",
+    "date": "2026-07-22T00:00:00.000Z"
+  },
+  {
+    "id": "482672a6-002a-4694-b353-5e3a6791a28a",
+    "type": "expense",
+    "amount": 600,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "成都返回西安的车票",
+    "date": "2026-07-22T00:00:00.000Z"
+  },
+  {
+    "id": "1a00ffaa-4767-409b-96ba-4bd7e481b16a",
+    "type": "expense",
+    "amount": 14.75,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车充电",
+    "date": "2026-07-22T00:00:00.000Z"
+  },
+  {
+    "id": "6a11e8f2-3303-4bba-a9b5-56bfad664fce",
+    "type": "expense",
+    "amount": 23,
+    "currency": "CNY",
+    "category": "food",
+    "note": "买菜",
+    "date": "2026-07-21T00:00:00.000Z"
+  },
+  {
+    "id": "8f7626c0-e7a7-42f6-86a1-1e1bb1b2643a",
+    "type": "expense",
+    "amount": 30,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车胶条补胎",
+    "date": "2026-07-20T00:00:00.000Z"
+  },
+  {
+    "id": "57dda8b5-e7c0-45a1-bcee-308424222314",
+    "type": "expense",
+    "amount": 63.38,
+    "currency": "CNY",
+    "category": "food",
+    "note": "买菜",
+    "date": "2026-07-19T00:00:00.000Z"
+  },
+  {
+    "id": "5fe3f6c5-5bc2-4171-b2ec-4f543e93d25f",
+    "type": "expense",
+    "amount": 30,
+    "currency": "CNY",
+    "category": "housing",
+    "note": "桐堂电费",
+    "date": "2026-07-19T00:00:00.000Z"
+  },
+  {
+    "id": "765174d3-5f1d-4a5a-90af-63cdf049af9d",
+    "type": "expense",
+    "amount": 6,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "会展停车费",
+    "date": "2026-07-18T00:00:00.000Z"
+  },
+  {
+    "id": "a27b7252-4ae9-465b-a5c0-0a6708b4cd6c",
+    "type": "expense",
+    "amount": 196,
+    "currency": "CNY",
+    "category": "food",
+    "note": "乔一乔干锅",
+    "date": "2026-07-18T00:00:00.000Z"
+  },
+  {
+    "id": "b08f74d4-3379-4969-8c58-7dc0b005f4a5",
+    "type": "expense",
+    "amount": 11.57,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车充电",
+    "date": "2026-07-18T00:00:00.000Z"
+  },
+  {
+    "id": "2943beb8-c525-42bb-91d6-da83b5ddf326",
+    "type": "expense",
+    "amount": 13.99,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车充电",
+    "date": "2026-07-16T00:00:00.000Z"
+  },
+  {
+    "id": "c7afa1cf-2503-46d3-b9cf-21018e819c82",
+    "type": "expense",
+    "amount": 20.96,
+    "currency": "CNY",
+    "category": "shopping",
+    "note": "X",
+    "date": "2026-07-15T00:00:00.000Z"
+  },
+  {
+    "id": "def9c4ad-3bd5-495d-9715-dfa059b3e168",
+    "type": "expense",
+    "amount": 158,
+    "currency": "CNY",
+    "category": "food",
+    "note": "滨寿司三人",
+    "date": "2026-07-12T00:00:00.000Z"
+  },
+  {
+    "id": "497f4c93-658c-4492-a64f-0112325c529e",
+    "type": "expense",
+    "amount": 10.2,
+    "currency": "CNY",
+    "category": "food",
+    "note": "买菜",
+    "date": "2026-07-12T00:00:00.000Z"
+  },
+  {
+    "id": "d9dec146-3827-44e1-9fb1-a27309e29794",
+    "type": "expense",
+    "amount": 30,
+    "currency": "CNY",
+    "category": "housing",
+    "note": "桐堂电费",
+    "date": "2026-07-12T00:00:00.000Z"
+  },
+  {
+    "id": "5c2fd108-a727-4774-a265-ca974d7cbdac",
+    "type": "expense",
+    "amount": 18,
+    "currency": "CNY",
+    "category": "food",
+    "note": "凉面",
+    "date": "2026-07-11T00:00:00.000Z"
+  },
+  {
+    "id": "c01739fd-2e75-4665-973b-8ca2dbdd8bb5",
+    "type": "expense",
+    "amount": 16.57,
+    "currency": "CNY",
+    "category": "food",
+    "note": "烧烤买菜",
+    "date": "2026-07-11T00:00:00.000Z"
+  },
+  {
+    "id": "5ab38015-4d8f-4be2-bc32-b745f9b2503d",
+    "type": "expense",
+    "amount": 11.66,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车充电",
+    "date": "2026-07-11T00:00:00.000Z"
+  },
+  {
+    "id": "3fc7b040-5dba-4ccd-bc25-8a33a644edec",
+    "type": "expense",
+    "amount": 562.6,
+    "currency": "CNY",
+    "category": "housing",
+    "note": "西安房贷还款",
+    "date": "2026-07-10T00:00:00.000Z"
+  },
+  {
+    "id": "98810ca4-542a-4ca8-823d-2ef0bd71c49b",
+    "type": "expense",
+    "amount": 1377.81,
+    "currency": "CNY",
+    "category": "other_expense",
+    "note": "零跑商业险",
+    "date": "2026-07-09T00:00:00.000Z"
+  },
+  {
+    "id": "64e8d782-e03f-4dde-804e-05a6e5a03be7",
+    "type": "expense",
+    "amount": 950,
+    "currency": "CNY",
+    "category": "other_expense",
+    "note": "零跑交强险",
+    "date": "2026-07-09T00:00:00.000Z"
+  },
+  {
+    "id": "61446d85-a7f8-405d-9130-22f8ea9d279e",
+    "type": "expense",
+    "amount": 5522.12,
+    "currency": "CNY",
+    "category": "other_expense",
+    "note": "零跑购置税",
+    "date": "2026-07-09T00:00:00.000Z"
+  },
+  {
+    "id": "aa1fe239-c624-405a-822a-5f48eef533f7",
+    "type": "expense",
+    "amount": 115,
+    "currency": "CNY",
+    "category": "food",
+    "note": "宾寿司",
+    "date": "2026-07-09T00:00:00.000Z"
+  },
+  {
+    "id": "c1bebf02-eec2-4947-a802-7bd8c8240ad6",
+    "type": "expense",
+    "amount": 16.08,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车充电",
+    "date": "2026-07-08T00:00:00.000Z"
+  },
+  {
+    "id": "9e79314b-5a6b-457d-896b-41a3ee68ab35",
+    "type": "expense",
+    "amount": 87.38,
+    "currency": "CNY",
+    "category": "other_expense",
+    "note": "交子大道休闲",
+    "date": "2026-07-08T00:00:00.000Z"
+  },
+  {
+    "id": "6893f57d-5cc1-45de-97e1-17b4e5970c73",
+    "type": "expense",
+    "amount": 20,
+    "currency": "CNY",
+    "category": "housing",
+    "note": "桐堂电费",
+    "date": "2026-07-08T00:00:00.000Z"
+  },
+  {
+    "id": "1d25b585-ddfe-4c29-ac0b-2611e687ebaa",
+    "type": "expense",
+    "amount": 58.5,
+    "currency": "CNY",
+    "category": "food",
+    "note": "蜀道建科咖啡",
+    "date": "2026-07-07T00:00:00.000Z"
+  },
+  {
+    "id": "cf6c6518-fed9-4c83-b4c0-7bdbb83eacd7",
+    "type": "expense",
+    "amount": 18.7,
+    "currency": "CNY",
+    "category": "other_expense",
+    "note": "顺丰寄身份证",
+    "date": "2026-07-07T00:00:00.000Z"
+  },
+  {
+    "id": "4421410d-2c45-4e22-af76-f238d4e09ae1",
+    "type": "expense",
+    "amount": 2,
+    "currency": "CNY",
+    "category": "food",
+    "note": "早饭",
+    "date": "2026-07-07T00:00:00.000Z"
+  },
+  {
+    "id": "80ebfc53-478f-47c3-b2a6-806ef72b0bfa",
+    "type": "expense",
+    "amount": 13.46,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车充电",
+    "date": "2026-07-06T00:00:00.000Z"
+  },
+  {
+    "id": "b215e478-b619-4bc4-8600-6e60c6c77bf3",
+    "type": "expense",
+    "amount": 40,
+    "currency": "CNY",
+    "category": "shopping",
+    "note": "零食有鸣",
+    "date": "2026-07-05T00:00:00.000Z"
+  },
+  {
+    "id": "ae22974a-6ded-4d2c-a226-e1f81176ad92",
+    "type": "expense",
+    "amount": 20,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "东安湖接驳车",
+    "date": "2026-07-05T00:00:00.000Z"
+  },
+  {
+    "id": "be3f5e47-7deb-4bbf-82c1-97c046e30fa1",
+    "type": "expense",
+    "amount": 8.61,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车充电",
+    "date": "2026-07-05T00:00:00.000Z"
+  },
+  {
+    "id": "533e6e2c-6209-40c7-9bc8-67e37ad731a9",
+    "type": "expense",
+    "amount": 33,
+    "currency": "CNY",
+    "category": "food",
+    "note": "东安湖晚饭",
+    "date": "2026-07-05T00:00:00.000Z"
+  },
+  {
+    "id": "9aa5b149-22ca-4de7-876f-aa3c2555008d",
+    "type": "expense",
+    "amount": 5,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "东安湖停车费",
+    "date": "2026-07-05T00:00:00.000Z"
+  },
+  {
+    "id": "66eafd03-2a61-43d8-8740-1164ede16abe",
+    "type": "expense",
+    "amount": 149,
+    "currency": "CNY",
+    "category": "food",
+    "note": "海鲜",
+    "date": "2026-07-04T00:00:00.000Z"
+  },
+  {
+    "id": "1bb61f5b-bf69-433f-888b-12721669b67b",
+    "type": "expense",
+    "amount": 22.5,
+    "currency": "CNY",
+    "category": "food",
+    "note": "煎饼",
+    "date": "2026-07-03T00:00:00.000Z"
+  },
+  {
+    "id": "51fa26db-fd0f-45db-a010-221f03a1b4e0",
+    "type": "expense",
+    "amount": 558.24,
+    "currency": "CNY",
+    "category": "family",
+    "note": "亲属卡",
+    "date": "2026-06-30T00:00:00.000Z"
+  },
+  {
+    "id": "63eadb57-1093-402c-aed7-db74f11aa85c",
+    "type": "expense",
+    "amount": 17.57,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车充电",
+    "date": "2026-07-02T00:00:00.000Z"
+  },
+  {
+    "id": "b9b0d1fa-88f2-40cc-ac70-fb5cabd94233",
+    "type": "income",
+    "amount": 3600,
+    "currency": "CNY",
+    "category": "provident_fund",
+    "note": "三季度公积金提取",
+    "date": "2026-07-01T00:00:00.000Z"
+  },
+  {
+    "id": "f7e67c3f-dc39-450a-9a17-834cd0dc3e74",
+    "type": "income",
+    "amount": 6335.77,
+    "currency": "CNY",
+    "category": "salary",
+    "note": "6月份工资",
+    "date": "2026-06-30T00:00:00.000Z"
+  },
+  {
+    "id": "ff2d538c-cc53-4bca-b999-9d604d843043",
+    "type": "expense",
+    "amount": 5,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "华西体检停车费",
+    "date": "2026-06-30T00:00:00.000Z"
+  },
+  {
+    "id": "e1c26251-c14c-4544-8b61-90f0d8caae79",
+    "type": "expense",
+    "amount": 5.42,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车充电",
+    "date": "2026-06-29T00:00:00.000Z"
+  },
+  {
+    "id": "8e95cc04-ad5d-496d-bc86-8246af5bed3a",
+    "type": "expense",
+    "amount": 32,
+    "currency": "CNY",
+    "category": "food",
+    "note": "凉面",
+    "date": "2026-06-29T00:00:00.000Z"
+  },
+  {
+    "id": "b1bf71c5-1d36-4709-a671-0b036a51b513",
+    "type": "expense",
+    "amount": 4338.96,
+    "currency": "CNY",
+    "category": "housing",
+    "note": "桐堂7-9月份房租",
+    "date": "2026-06-29T00:00:00.000Z"
+  },
+  {
+    "id": "071d5438-88ef-41c5-a419-d49fad9aef46",
+    "type": "expense",
+    "amount": 36.18,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "代驾",
+    "date": "2026-06-28T00:00:00.000Z"
+  },
+  {
+    "id": "343c8fb1-ae85-43e2-b191-19b8cf7bffbd",
+    "type": "expense",
+    "amount": 29.9,
+    "currency": "CNY",
+    "category": "food",
+    "note": "韩非庭买调料",
+    "date": "2026-06-28T00:00:00.000Z"
+  },
+  {
+    "id": "af72d814-1c61-40d2-834b-852e77dd0e8b",
+    "type": "expense",
+    "amount": 5,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "海鲜市场停车费",
+    "date": "2026-06-28T00:00:00.000Z"
+  },
+  {
+    "id": "2329eea3-e804-439a-841d-baccefec8803",
+    "type": "expense",
+    "amount": 263.5,
+    "currency": "CNY",
+    "category": "food",
+    "note": "泰餐",
+    "date": "2026-06-27T00:00:00.000Z"
+  },
+  {
+    "id": "b5e8a399-a18d-4b69-8bbf-950ee402f816",
+    "type": "expense",
+    "amount": 9.71,
+    "currency": "CNY",
+    "category": "shopping",
+    "note": "搓澡巾",
+    "date": "2026-06-27T00:00:00.000Z"
+  },
+  {
+    "id": "97babfeb-a93a-4607-86c0-3b6e12122a43",
+    "type": "expense",
+    "amount": 120,
+    "currency": "CNY",
+    "category": "other_expense",
+    "note": "洗澡",
+    "date": "2026-06-27T00:00:00.000Z"
+  },
+  {
+    "id": "398c10bf-c07c-4f6e-a896-f7aad04997d9",
+    "type": "expense",
+    "amount": 47.5,
+    "currency": "CNY",
+    "category": "communication",
+    "note": "联通话费",
+    "date": "2026-06-27T00:00:00.000Z"
+  },
+  {
+    "id": "25effa80-f7cf-445e-8ebd-786538ec75a6",
+    "type": "expense",
+    "amount": 11.21,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车充电",
+    "date": "2026-06-27T00:00:00.000Z"
+  },
+  {
+    "id": "1d8dcaff-7c49-47fe-a8f8-08431f6ff6a1",
+    "type": "expense",
+    "amount": 47,
+    "currency": "CNY",
+    "category": "food",
+    "note": "瑞幸咖啡郑博文",
+    "date": "2026-06-27T00:00:00.000Z"
+  },
+  {
+    "id": "64d1cffd-23c8-45ba-855b-b0659ec51d6b",
+    "type": "expense",
+    "amount": 35,
+    "currency": "CNY",
+    "category": "food",
+    "note": "绵阳米粉",
+    "date": "2026-06-26T00:00:00.000Z"
+  },
+  {
+    "id": "33ff3809-372c-43c4-b159-965dae3490dc",
+    "type": "expense",
+    "amount": 9.64,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车充电",
+    "date": "2026-06-24T00:00:00.000Z"
+  },
+  {
+    "id": "0a75a318-a95f-4a07-8f52-308ac67f0c84",
+    "type": "expense",
+    "amount": 30,
+    "currency": "CNY",
+    "category": "travel",
+    "note": "峨眉山停车费",
+    "date": "2026-06-23T00:00:00.000Z"
+  },
+  {
+    "id": "809a9303-1fee-4948-8d3d-7f5bc4809ac8",
+    "type": "expense",
+    "amount": 196.42,
+    "currency": "CNY",
+    "category": "family",
+    "note": "成都东站酒店",
+    "date": "2026-06-23T00:00:00.000Z"
+  },
+  {
+    "id": "04d9d62b-b05d-45ba-ade9-3a00f114da28",
+    "type": "expense",
+    "amount": 541,
+    "currency": "CNY",
+    "category": "food",
+    "note": "闲庭聚餐",
+    "date": "2026-06-22T00:00:00.000Z"
+  },
+  {
+    "id": "824e42bb-4937-4e2f-b5a7-4e0b6d046b7c",
+    "type": "expense",
+    "amount": 8.1,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-06-22T00:00:00.000Z"
+  },
+  {
+    "id": "a8669cdb-cccb-4572-aeba-74b3db17e593",
+    "type": "expense",
+    "amount": 32.84,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "打车",
+    "date": "2026-06-22T00:00:00.000Z"
+  },
+  {
+    "id": "ffad58be-bf4c-4133-ba1d-3e527e2d9941",
+    "type": "expense",
+    "amount": 398.12,
+    "currency": "CNY",
+    "category": "family",
+    "note": "宿泊酒店",
+    "date": "2026-06-21T00:00:00.000Z"
+  },
+  {
+    "id": "43162e6b-2ad6-4474-9cbd-ebf69f5a50a3",
+    "type": "expense",
+    "amount": 460,
+    "currency": "CNY",
+    "category": "family",
+    "note": "宽窄巷子",
+    "date": "2026-06-21T00:00:00.000Z"
+  },
+  {
+    "id": "aa4ad59c-52f4-4cd9-82c8-ec16edcaa8a8",
+    "type": "expense",
+    "amount": 50,
+    "currency": "CNY",
+    "category": "other_expense",
+    "note": "奥迪洗车",
+    "date": "2026-06-21T00:00:00.000Z"
+  },
+  {
+    "id": "177889e1-9036-40fb-bb7b-5937678b3052",
+    "type": "expense",
+    "amount": 94,
+    "currency": "CNY",
+    "category": "family",
+    "note": "wkx买短袖",
+    "date": "2026-06-20T00:00:00.000Z"
+  },
+  {
+    "id": "3dd0e9ac-03f2-47b6-89a0-d1b397c5be24",
+    "type": "expense",
+    "amount": 12,
+    "currency": "CNY",
+    "category": "travel",
+    "note": "广元停车费",
+    "date": "2026-06-20T00:00:00.000Z"
+  },
+  {
+    "id": "9aabe93e-200e-4d53-b1cd-a2b418259d6b",
+    "type": "expense",
+    "amount": 7.78,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "打车",
+    "date": "2026-06-19T00:00:00.000Z"
+  },
+  {
+    "id": "c8663045-da94-403e-baed-9c3afa5c1cf6",
+    "type": "expense",
+    "amount": 12.6,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-06-18T00:00:00.000Z"
+  },
+  {
+    "id": "bbc2d04f-b09d-402f-98f9-1800f4cc605d",
+    "type": "expense",
+    "amount": 170,
+    "currency": "CNY",
+    "category": "food",
+    "note": "宽来火锅",
+    "date": "2026-06-18T00:00:00.000Z"
+  },
+  {
+    "id": "e8361984-30d9-4e89-abad-30087edcff65",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-06-17T00:00:00.000Z"
+  },
+  {
+    "id": "2921ba50-db68-4f1b-a753-c33692d4af93",
+    "type": "expense",
+    "amount": 36.8,
+    "currency": "CNY",
+    "category": "food",
+    "note": "晚饭牛肉粉",
+    "date": "2026-06-16T00:00:00.000Z"
+  },
+  {
+    "id": "7f3ce27a-0ddb-4c0e-8a57-d3ea982a4af6",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-06-16T00:00:00.000Z"
+  },
+  {
+    "id": "760cd8ce-f811-4d21-a88b-bc3ff68ebefa",
+    "type": "expense",
+    "amount": 44,
+    "currency": "CNY",
+    "category": "food",
+    "note": "晚饭",
+    "date": "2026-06-15T00:00:00.000Z"
+  },
+  {
+    "id": "e4f04195-15fa-4e8d-8506-7d59bba179fb",
+    "type": "expense",
+    "amount": 8.1,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-06-15T00:00:00.000Z"
+  },
+  {
+    "id": "34fa1756-5891-4acd-8a4c-d52e5d76772c",
+    "type": "expense",
+    "amount": 115.5,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "成都到广元的动车票",
+    "date": "2026-06-16T00:00:00.000Z"
+  },
+  {
+    "id": "eb15b173-3381-4cf2-ac25-6d72b7da0677",
+    "type": "expense",
+    "amount": 9,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁",
+    "date": "2026-06-14T00:00:00.000Z"
+  },
+  {
+    "id": "757440d5-2b1e-4d1d-9ff4-f9b5dba464ed",
+    "type": "expense",
+    "amount": 10,
+    "currency": "CNY",
+    "category": "housing",
+    "note": "桐堂电费",
+    "date": "2026-06-14T00:00:00.000Z"
+  },
+  {
+    "id": "e09c2101-335f-46e1-896b-a36f29633adb",
+    "type": "expense",
+    "amount": 9.03,
+    "currency": "CNY",
+    "category": "other_expense",
+    "note": "裤子退货运费",
+    "date": "2026-06-13T00:00:00.000Z"
+  },
+  {
+    "id": "67864ffa-7c49-435f-8691-a37be00f6b17",
+    "type": "expense",
+    "amount": 20.2,
+    "currency": "CNY",
+    "category": "food",
+    "note": "买菜",
+    "date": "2026-06-13T00:00:00.000Z"
+  },
+  {
+    "id": "9eb1b404-08e2-4223-9d5c-9df2e060a7e5",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-06-12T00:00:00.000Z"
+  },
+  {
+    "id": "8614d5ca-8cdf-4fc5-b209-b47396670c97",
+    "type": "expense",
+    "amount": 70,
+    "currency": "CNY",
+    "category": "food",
+    "note": "烧烤",
+    "date": "2026-06-12T00:00:00.000Z"
+  },
+  {
+    "id": "355941f4-f20e-4274-aa9e-766b49353f56",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-06-11T00:00:00.000Z"
+  },
+  {
+    "id": "e91d6fcb-a846-46ca-b284-f2d570403715",
+    "type": "expense",
+    "amount": 7,
+    "currency": "CNY",
+    "category": "food",
+    "note": "花生",
+    "date": "2026-06-10T00:00:00.000Z"
+  },
+  {
+    "id": "5226005e-3ba7-4cfe-ab78-2668f540c44b",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-06-10T00:00:00.000Z"
+  },
+  {
+    "id": "c2c9208f-28ab-4b68-9946-d9c07cc34048",
+    "type": "expense",
+    "amount": 562.6,
+    "currency": "CNY",
+    "category": "housing",
+    "note": "西安房贷还款",
+    "date": "2026-06-10T00:00:00.000Z"
+  },
+  {
+    "id": "81cfbd08-d275-498f-9208-771d99a2d723",
+    "type": "expense",
+    "amount": 10,
+    "currency": "CNY",
+    "category": "food",
+    "note": "早饭",
+    "date": "2026-06-10T00:00:00.000Z"
+  },
+  {
+    "id": "7536cfc3-b7cc-4bce-ae08-a54eca37c53b",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-06-09T00:00:00.000Z"
+  },
+  {
+    "id": "71df2e3c-7ffc-46c7-8901-afa9bcec4a88",
+    "type": "expense",
+    "amount": 38.8,
+    "currency": "CNY",
+    "category": "food",
+    "note": "乌鸡米线",
+    "date": "2026-06-09T00:00:00.000Z"
+  },
+  {
+    "id": "b2af53b4-4946-4811-80cf-39b8089fbb4a",
+    "type": "expense",
+    "amount": 3.5,
+    "currency": "CNY",
+    "category": "shopping",
+    "note": "冰淇淋",
+    "date": "2026-06-08T00:00:00.000Z"
+  },
+  {
+    "id": "31d613ff-eb1a-4152-9ac5-b0798f64a1a8",
+    "type": "expense",
+    "amount": 16,
+    "currency": "CNY",
+    "category": "food",
+    "note": "巴味仙",
+    "date": "2026-06-08T00:00:00.000Z"
+  },
+  {
+    "id": "c876a50d-663c-4bb1-878a-0afaa81675ca",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-06-08T00:00:00.000Z"
+  },
+  {
+    "id": "2987d538-b3be-423c-8721-b7d3e3c71eee",
+    "type": "expense",
+    "amount": 15,
+    "currency": "CNY",
+    "category": "shopping",
+    "note": "蜀道建科咖啡",
+    "date": "2026-06-08T00:00:00.000Z"
+  },
+  {
+    "id": "474f1ad7-e9cf-4e66-9ae6-61ada1484612",
+    "type": "expense",
+    "amount": 157.22,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "蜀道建科面试打车费",
+    "date": "2026-06-08T00:00:00.000Z"
+  },
+  {
+    "id": "2a25fabb-bbfd-47b8-8332-c56bdf35b608",
+    "type": "expense",
+    "amount": 9.9,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁",
+    "date": "2026-06-07T00:00:00.000Z"
+  },
+  {
+    "id": "44477107-0b36-4187-aff2-3ce0c0af1831",
+    "type": "expense",
+    "amount": 10,
+    "currency": "CNY",
+    "category": "housing",
+    "note": "桐堂电费",
+    "date": "2026-06-07T00:00:00.000Z"
+  },
+  {
+    "id": "8dcf708e-46fb-4a01-bc74-b50dfc888b10",
+    "type": "expense",
+    "amount": 50,
+    "currency": "CNY",
+    "category": "other_expense",
+    "note": "给黄跃飞洗车",
+    "date": "2026-06-06T00:00:00.000Z"
+  },
+  {
+    "id": "8bd2e5d2-806b-45bb-a1b7-77bf440f70d0",
+    "type": "expense",
+    "amount": 25.49,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "高德打车",
+    "date": "2026-06-06T00:00:00.000Z"
+  },
+  {
+    "id": "e986fc5c-e5a1-49ea-b603-8ba62605105f",
+    "type": "expense",
+    "amount": 2.47,
+    "currency": "CNY",
+    "category": "shopping",
+    "note": "typec转接头",
+    "date": "2026-06-05T00:00:00.000Z"
+  },
+  {
+    "id": "34a9b2bd-2a62-4eda-82ec-9bc520d2513c",
+    "type": "expense",
+    "amount": 11.65,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "高德打车",
+    "date": "2026-06-04T00:00:00.000Z"
+  },
+  {
+    "id": "90978265-702c-420c-b569-1e422ad3c013",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-06-04T00:00:00.000Z"
+  },
+  {
+    "id": "96f0106c-a7a9-4fb2-aec4-4be8a02b2638",
+    "type": "expense",
+    "amount": 43.24,
+    "currency": "CNY",
+    "category": "food",
+    "note": "干锅",
+    "date": "2026-06-04T00:00:00.000Z"
+  },
+  {
+    "id": "421c0f07-c932-4b54-a1d4-219d393f2f9b",
+    "type": "expense",
+    "amount": 16.5,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "美团单车骑行卡",
+    "date": "2026-06-04T00:00:00.000Z"
+  },
+  {
+    "id": "4ac39a9b-8266-4e2a-a7d1-36ee2199d295",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-06-03T00:00:00.000Z"
+  },
+  {
+    "id": "f6e44069-616c-4307-beb7-3f03ef06b44f",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-06-02T00:00:00.000Z"
+  },
+  {
+    "id": "9a96a753-9f40-4fe7-8bf4-387c7a6ad853",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-06-01T00:00:00.000Z"
+  },
+  {
+    "id": "6291adaf-2d97-4c14-af87-83053eda2155",
+    "type": "expense",
+    "amount": 31,
+    "currency": "CNY",
+    "category": "food",
+    "note": "晚饭",
+    "date": "2026-06-01T00:00:00.000Z"
+  },
+  {
+    "id": "fd9ea5e8-a63f-4db9-b28c-b9760d124b2a",
+    "type": "expense",
+    "amount": 1119.96,
+    "currency": "CNY",
+    "category": "family",
+    "note": "亲属卡",
+    "date": "2026-05-31T00:00:00.000Z"
+  },
+  {
+    "id": "76a734eb-4552-46d3-96de-efcda92e1c00",
+    "type": "expense",
+    "amount": 200,
+    "currency": "CNY",
+    "category": "shopping",
+    "note": "短袖外套",
+    "date": "2026-06-01T00:00:00.000Z"
+  },
+  {
+    "id": "c8b5f27b-c60d-419a-ab3e-ce1666801f14",
+    "type": "expense",
+    "amount": 200,
+    "currency": "CNY",
+    "category": "entertainment",
+    "note": "按摩",
+    "date": "2026-06-01T00:00:00.000Z"
+  },
+  {
+    "id": "dea70d3d-96ee-4105-920f-766e928779b3",
+    "type": "expense",
+    "amount": 300,
+    "currency": "CNY",
+    "category": "entertainment",
+    "note": "城际酒店",
+    "date": "2026-05-30T00:00:00.000Z"
+  },
+  {
+    "id": "b7b9afa4-dd82-4ca1-84a3-1407a77ba993",
+    "type": "income",
+    "amount": 6335.77,
+    "currency": "CNY",
+    "category": "salary",
+    "note": "工资",
+    "date": "2026-05-29T00:00:00.000Z"
+  },
+  {
+    "id": "54d8dd57-4cba-4224-b70a-ef4b714a6691",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-05-28T00:00:00.000Z"
+  },
+  {
+    "id": "8d599dff-b013-47ff-bc6b-b2fc76e503c0",
+    "type": "expense",
+    "amount": 60,
+    "currency": "CNY",
+    "category": "food",
+    "note": "路边烧烤",
+    "date": "2026-05-27T00:00:00.000Z"
+  },
+  {
+    "id": "460a9c4d-3437-4e86-b499-92ea69640be8",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-05-27T00:00:00.000Z"
+  },
+  {
+    "id": "6286102d-4419-4b2b-9ac4-6ae1482ea9f5",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-05-26T00:00:00.000Z"
+  },
+  {
+    "id": "33f30229-2b05-474c-8e76-ae6a6bc3f523",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-05-25T00:00:00.000Z"
+  },
+  {
+    "id": "7df55f1f-45bd-4edd-8f21-29c4e6f90903",
+    "type": "expense",
+    "amount": 8,
+    "currency": "CNY",
+    "category": "food",
+    "note": "晚饭",
+    "date": "2026-05-24T00:00:00.000Z"
+  },
+  {
+    "id": "33ff0cc8-8258-4bcf-8fb3-22e80428a044",
+    "type": "expense",
+    "amount": 19.9,
+    "currency": "CNY",
+    "category": "shopping",
+    "note": "水果",
+    "date": "2026-05-24T00:00:00.000Z"
+  },
+  {
+    "id": "eb2e556c-0fb9-4710-87e0-99d1a12ff323",
+    "type": "expense",
+    "amount": 800,
+    "currency": "CNY",
+    "category": "food",
+    "note": "宽来火锅充值",
+    "date": "2026-05-24T00:00:00.000Z"
+  },
+  {
+    "id": "f169b987-6c7b-4b1d-b5f0-c2ffd997454d",
+    "type": "expense",
+    "amount": 248.75,
+    "currency": "CNY",
+    "category": "other_expense",
+    "note": "华阳波尔曼",
+    "date": "2026-05-24T00:00:00.000Z"
+  },
+  {
+    "id": "81acfd82-3acf-4dd4-9cac-6320b14d99b5",
+    "type": "expense",
+    "amount": 185,
+    "currency": "CNY",
+    "category": "other_expense",
+    "note": "与黄一同去黄龙溪古镇",
+    "date": "2026-05-23T00:00:00.000Z"
+  },
+  {
+    "id": "08618ae5-30ed-40f1-a3dc-57f49de02276",
+    "type": "expense",
+    "amount": 1000,
+    "currency": "CNY",
+    "category": "entertainment",
+    "note": "王力宏7月份演唱会门票",
+    "date": "2026-05-23T00:00:00.000Z"
+  },
+  {
+    "id": "16b5327f-4816-4e2d-8611-4b9336b8b58c",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-05-22T00:00:00.000Z"
+  },
+  {
+    "id": "074c71b6-695a-4681-aeec-d058814e2c3a",
+    "type": "expense",
+    "amount": 27.9,
+    "currency": "CNY",
+    "category": "shopping",
+    "note": "厕所除臭剂",
+    "date": "2026-05-22T00:00:00.000Z"
+  },
+  {
+    "id": "7c4e5880-e005-4b2b-8495-bf695d3f1582",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-05-21T00:00:00.000Z"
+  },
+  {
+    "id": "2910dca4-0d9e-4fa3-9b6b-684dc759e135",
+    "type": "expense",
+    "amount": 22.8,
+    "currency": "CNY",
+    "category": "shopping",
+    "note": "洗面奶",
+    "date": "2026-05-21T00:00:00.000Z"
+  },
+  {
+    "id": "4bc609ce-866a-4203-9b5e-fdd94bb7bda9",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-05-20T00:00:00.000Z"
+  },
+  {
+    "id": "6dfeb708-442c-4fe8-9fe0-bc930c0121a0",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-05-19T00:00:00.000Z"
+  },
+  {
+    "id": "34108259-d4c9-4e47-90e4-f56432d90138",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-05-18T00:00:00.000Z"
+  },
+  {
+    "id": "060a4539-396f-4a23-9ad2-de0dc6602122",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁",
+    "date": "2026-05-16T00:00:00.000Z"
+  },
+  {
+    "id": "ab39ff78-68c0-46a6-b54f-88e323f7a1be",
+    "type": "expense",
+    "amount": 67.9,
+    "currency": "CNY",
+    "category": "entertainment",
+    "note": "电影《阿嬷的情书》",
+    "date": "2026-05-16T00:00:00.000Z"
+  },
+  {
+    "id": "b0275003-ea52-4e1a-a682-07dbaed42eb3",
+    "type": "expense",
+    "amount": 99.8,
+    "currency": "CNY",
+    "category": "food",
+    "note": "KFC",
+    "date": "2026-05-16T00:00:00.000Z"
+  },
+  {
+    "id": "bdefe9fb-0a4c-4a7a-baef-e7edbe08a51c",
+    "type": "expense",
+    "amount": 30,
+    "currency": "CNY",
+    "category": "housing",
+    "note": "桐堂电费",
+    "date": "2026-05-15T00:00:00.000Z"
+  },
+  {
+    "id": "d596c518-3bbc-41e6-9e33-d6746bb985dc",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-05-15T00:00:00.000Z"
+  },
+  {
+    "id": "9d657a89-c0ab-47ae-b941-93a5f9b14e01",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-05-14T00:00:00.000Z"
+  },
+  {
+    "id": "1c3e3e89-f374-40d8-894b-97284db97423",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-05-13T00:00:00.000Z"
+  },
+  {
+    "id": "0741e081-6abe-4643-8306-3ca32906c2b0",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-05-12T00:00:00.000Z"
+  },
+  {
+    "id": "25b4249d-0e78-48ad-8ce4-fdc12ef152e5",
+    "type": "expense",
+    "amount": 14.26,
+    "currency": "CNY",
+    "category": "shopping",
+    "note": "软考电子资源",
+    "date": "2026-05-12T00:00:00.000Z"
+  },
+  {
+    "id": "dc8c2cc2-dae4-4664-8bc8-5757b8205d9b",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-05-11T00:00:00.000Z"
+  },
+  {
+    "id": "11fd7484-be10-4e49-b4cb-8bbb0e72be5c",
+    "type": "expense",
+    "amount": 19.13,
+    "currency": "CNY",
+    "category": "food",
+    "note": "买菜",
+    "date": "2026-05-10T00:00:00.000Z"
+  },
+  {
+    "id": "60ac082a-0a6d-475b-8f94-694ff2dd37d5",
+    "type": "expense",
+    "amount": 562.6,
+    "currency": "CNY",
+    "category": "housing",
+    "note": "西安房贷还款",
+    "date": "2026-05-10T00:00:00.000Z"
+  },
+  {
+    "id": "01713294-2107-412d-9ed3-cf748fe4726e",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-05-09T00:00:00.000Z"
+  },
+  {
+    "id": "538fe969-af36-4062-9f22-3f8f80001f90",
+    "type": "income",
+    "amount": 1482.12,
+    "currency": "CNY",
+    "category": "refund",
+    "note": "桐堂2025年住房押金",
+    "date": "2026-05-08T00:00:00.000Z"
+  },
+  {
+    "id": "23b804bb-4683-482b-bcb7-22811584e22d",
+    "type": "expense",
+    "amount": 367,
+    "currency": "CNY",
+    "category": "travel",
+    "note": "警官学院全季",
+    "date": "2026-05-09T00:00:00.000Z"
+  },
+  {
+    "id": "2948ce75-f79e-473b-9970-d9bfb073dc9c",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-05-08T00:00:00.000Z"
+  },
+  {
+    "id": "457aeb6b-e877-47f9-b038-dfe1dc52b087",
+    "type": "expense",
+    "amount": 7.2,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-05-07T00:00:00.000Z"
+  },
+  {
+    "id": "3ab6222d-9c7e-4ac0-92f4-a822b9cd7cf6",
+    "type": "expense",
+    "amount": 36.8,
+    "currency": "CNY",
+    "category": "food",
+    "note": "牛肉粉晚饭",
+    "date": "2026-05-07T00:00:00.000Z"
+  },
+  {
+    "id": "2f8c3da6-f0ee-4080-afc6-9697000af6fa",
+    "type": "expense",
+    "amount": 8.1,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁通勤",
+    "date": "2026-05-06T00:00:00.000Z"
+  },
+  {
+    "id": "3aa241f3-fed0-45f5-bda3-786beaa0c945",
+    "type": "expense",
+    "amount": 4,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "地铁",
+    "date": "2026-05-05T00:00:00.000Z"
+  },
+  {
+    "id": "1c626ed0-6f0b-48c4-aa5a-95b24d93fe12",
+    "type": "expense",
+    "amount": 16.8,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "骑行卡",
+    "date": "2026-05-05T00:00:00.000Z"
+  },
+  {
+    "id": "b0b76d78-c2eb-4996-8370-fc006aba9af2",
+    "type": "expense",
+    "amount": 19.95,
+    "currency": "CNY",
+    "category": "communication",
+    "note": "联通卡",
+    "date": "2026-05-04T00:00:00.000Z"
+  },
+  {
+    "id": "9737181c-4427-4c79-ab9f-1c663700543d",
+    "type": "expense",
+    "amount": 14,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "前往引镇站",
+    "date": "2026-05-03T00:00:00.000Z"
+  },
+  {
+    "id": "1336133e-b191-4fc4-839c-e684c51b6214",
+    "type": "income",
+    "amount": 38.4,
+    "currency": "CNY",
+    "category": "refund",
+    "note": "长安通退卡",
+    "date": "2026-05-03T00:00:00.000Z"
+  },
+  {
+    "id": "9d483efe-cbbc-4c09-97e4-a4f1aea1fc43",
+    "type": "expense",
+    "amount": 141,
+    "currency": "CNY",
+    "category": "food",
+    "note": "烧烤晚饭",
+    "date": "2026-05-02T00:00:00.000Z"
+  },
+  {
+    "id": "bf5b18ae-c232-486c-9575-aef6df07fdd9",
+    "type": "expense",
+    "amount": 338.3,
+    "currency": "CNY",
+    "category": "travel",
+    "note": "李家村酒店",
+    "date": "2026-05-02T00:00:00.000Z"
+  },
+  {
+    "id": "0fe6ab00-b336-4b6b-b5fa-2afa9d9c7b6c",
+    "type": "expense",
+    "amount": 97,
+    "currency": "CNY",
+    "category": "food",
+    "note": "午饭老白家",
+    "date": "2026-05-02T00:00:00.000Z"
+  },
+  {
+    "id": "21a9bfcf-2a34-4ec7-93e7-0bef887bdd0f",
+    "type": "expense",
+    "amount": 5,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "西安地铁",
+    "date": "2026-05-02T00:00:00.000Z"
+  },
+  {
+    "id": "db35f89f-b2d6-4835-b498-5e4b8a1f8501",
+    "type": "expense",
+    "amount": 40,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "长安通押金和充值",
+    "date": "2026-05-02T00:00:00.000Z"
+  },
+  {
+    "id": "2a3ac10e-740f-4762-8315-5ec319b1cc75",
+    "type": "expense",
+    "amount": 80,
+    "currency": "CNY",
+    "category": "food",
+    "note": "早饭羊杂汤",
+    "date": "2026-05-02T00:00:00.000Z"
+  },
+  {
+    "id": "ba0c202b-b9f0-4405-8366-12d9470329a7",
+    "type": "expense",
+    "amount": 132.9,
+    "currency": "CNY",
+    "category": "travel",
+    "note": "杨凌酒店",
+    "date": "2026-05-01T00:00:00.000Z"
+  },
+  {
+    "id": "bf0ef3a8-92c4-4ba2-8e69-07e80b4ad449",
+    "type": "expense",
+    "amount": 27.91,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车充电",
+    "date": "2026-05-01T00:00:00.000Z"
+  },
+  {
+    "id": "1b6afb33-7315-4fe5-ba8a-472de2ca3e6a",
+    "type": "expense",
+    "amount": 12.99,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车充电",
+    "date": "2026-05-01T00:00:00.000Z"
+  },
+  {
+    "id": "a7e0054d-e101-4257-b318-628018289b69",
+    "type": "expense",
+    "amount": 1301.65,
+    "currency": "CNY",
+    "category": "housing",
+    "note": "桐堂租房押金",
+    "date": "2026-05-01T00:00:00.000Z"
+  },
+  {
+    "id": "47ac8ae1-353d-472c-80fe-e898c1528086",
+    "type": "expense",
+    "amount": 2603.3,
+    "currency": "CNY",
+    "category": "housing",
+    "note": "桐堂5-6月份房租",
+    "date": "2026-05-01T00:00:00.000Z"
+  },
+  {
+    "id": "0186920c-4b01-4250-8fb4-6474a54a13fc",
+    "type": "expense",
+    "amount": 289.34,
+    "currency": "CNY",
+    "category": "housing",
+    "note": "桐堂5-6月份物业费",
+    "date": "2026-05-01T00:00:00.000Z"
+  },
+  {
+    "id": "456fb0d6-3cc5-44b2-8aaa-8c6c5cece504",
+    "type": "expense",
+    "amount": 200,
+    "currency": "CNY",
+    "category": "housing",
+    "note": "桐堂水费押金",
+    "date": "2026-05-01T00:00:00.000Z"
+  },
+  {
+    "id": "d33f4c09-98be-41c2-9b73-137ec335bd4a",
+    "type": "expense",
+    "amount": 187,
+    "currency": "CNY",
+    "category": "shopping",
+    "note": "山姆零食",
+    "date": "2026-05-01T00:00:00.000Z"
+  },
+  {
+    "id": "35a7f5da-73d2-4879-8580-28509b893a8e",
+    "type": "expense",
+    "amount": 1211.08,
+    "currency": "CNY",
+    "category": "family",
+    "note": "亲属卡",
+    "date": "2026-04-30T00:00:00.000Z"
+  },
+  {
+    "id": "ada9ccbc-803b-4993-b544-07d401749cbd",
+    "type": "expense",
+    "amount": 12.15,
+    "currency": "CNY",
+    "category": "transport",
+    "note": "电车充电",
+    "date": "2026-04-30T00:00:00.000Z"
+  },
+  {
+    "id": "8ead0188-d15b-4230-b4ef-15f527227133",
+    "type": "expense",
+    "amount": 56,
+    "currency": "CNY",
+    "category": "food",
+    "note": "烧烤",
+    "date": "2026-04-30T00:00:00.000Z"
+  },
+  {
+    "id": "9c9aaa52-3f3b-4292-adf9-6d4b00e8a601",
+    "type": "expense",
+    "amount": 27,
+    "currency": "CNY",
+    "category": "shopping",
+    "note": "买西瓜给夏海波",
+    "date": "2026-04-30T00:00:00.000Z"
+  },
+  {
+    "id": "5ca36e9a-b572-4ec7-bde1-130e05ce295f",
+    "type": "expense",
+    "amount": 29,
+    "currency": "CNY",
+    "category": "shopping",
+    "note": "花",
+    "date": "2026-04-29T00:00:00.000Z"
+  },
+  {
+    "id": "1d7dc54f-2736-4523-bab3-2b11499b1db9",
+    "type": "expense",
+    "amount": 81,
+    "currency": "CNY",
+    "category": "transport",
+    "date": "2026-04-29T06:13:26.366Z",
+    "note": "西安前往广安的车票"
+  },
+  {
+    "id": "1e65709d-bd85-4272-ad18-c4cb3ca5439a",
+    "type": "expense",
+    "amount": 16,
+    "currency": "CNY",
+    "category": "food",
+    "date": "2026-04-28T12:03:04.881Z",
+    "note": "巴味仙晚饭"
+  },
+  {
+    "id": "509e4f48-10e5-445b-8f9e-c12ce5668a5f",
+    "type": "expense",
+    "amount": 5.5,
+    "currency": "CNY",
+    "category": "food",
+    "date": "2026-04-27T00:00:00.000Z",
+    "note": "买菜"
+  },
+  {
+    "id": "f102ed7b-17f9-431b-8b4c-bacec980ce6b",
+    "type": "income",
+    "amount": 9009.94,
+    "currency": "CNY",
+    "category": "salary",
+    "date": "2026-04-27T11:04:05.367Z",
+    "note": "4月份工资"
+  },
+  {
+    "id": "7af85767-c75f-4311-a304-323ff8995da7",
+    "type": "expense",
+    "amount": 4,
+    "currency": "CNY",
+    "category": "transport",
+    "date": "2026-04-26T05:56:35.230Z",
+    "note": "伊藤停车"
+  },
+  {
+    "id": "7df83e63-e2a8-4aec-9a2d-b941e2c0b744",
+    "type": "expense",
+    "amount": 11.96,
+    "currency": "CNY",
+    "category": "transport",
+    "date": "2026-04-25T16:54:18.688Z",
+    "note": "电车充电"
+  },
+  {
+    "id": "9308698c-bd0e-436c-8ff4-9bbf20f80d62",
+    "type": "expense",
+    "amount": 17.3,
+    "currency": "CNY",
+    "category": "food",
+    "date": "2026-04-24T13:27:41.823Z",
+    "note": "买菜"
+  },
+  {
+    "id": "7b6b36e5-ee21-42cd-9d62-7a774082a5b6",
+    "type": "expense",
+    "amount": 10.97,
+    "currency": "CNY",
+    "category": "transport",
+    "date": "2026-04-23T15:04:04.984Z",
+    "note": "电车充电"
+  },
+  {
+    "id": "40d885de-7adb-4c7c-a310-7415e3315c92",
+    "type": "expense",
+    "amount": 10,
+    "currency": "CNY",
+    "category": "housing",
+    "date": "2026-04-22T12:51:58.307Z",
+    "note": "桐堂电费"
+  },
+  {
+    "id": "37b9f960-3724-413c-99d4-69788a296457",
+    "type": "expense",
+    "amount": 27,
+    "currency": "CNY",
+    "category": "food",
+    "date": "2026-04-22T10:48:41.979Z",
+    "note": "巴味仙晚饭"
+  },
+  {
+    "id": "b4e44195-76b6-4f22-9342-377a2318f892",
+    "type": "expense",
+    "amount": 3.2,
+    "currency": "CNY",
+    "category": "food",
+    "date": "2026-04-21T00:00:00.000Z",
+    "note": "交子大道买菜"
+  },
+  {
+    "id": "ae42499b-7062-49d1-a713-8805a87be32d",
+    "type": "expense",
+    "amount": 35,
+    "currency": "CNY",
+    "category": "other_expense",
+    "date": "2026-04-19T08:16:38.513Z",
+    "note": "剪发"
+  },
+  {
+    "id": "08d41176-4ad5-482e-90a5-f3dae74cd439",
+    "type": "expense",
+    "amount": 13.56,
+    "currency": "CNY",
+    "category": "transport",
+    "date": "2026-04-18T15:14:47.255Z",
+    "note": "电车充电"
+  },
+  {
+    "id": "5e43725c-d2b4-4dd3-a8ae-4c3d019cf10d",
+    "type": "expense",
+    "amount": 25,
+    "currency": "CNY",
+    "category": "food",
+    "date": "2026-04-18T14:19:06.317Z",
+    "note": "滋味烤鱼薯条"
+  },
+  {
+    "id": "74ff0384-fc08-4f0e-9167-8ba7e46fc0d0",
+    "type": "expense",
+    "amount": 10,
+    "currency": "CNY",
+    "category": "transport",
+    "date": "2026-04-18T05:10:19.859Z",
+    "note": "平乐古镇停车费"
+  },
+  {
+    "id": "6bfe557d-a782-4298-bb3d-a5a6edd11b8e",
+    "type": "expense",
+    "amount": 62,
+    "currency": "CNY",
+    "category": "food",
+    "date": "2026-04-18T04:49:43.682Z",
+    "note": "平乐古镇奶汤面"
+  },
+  {
+    "id": "5fdf12cb-3404-410b-af0e-5d1b8b396917",
+    "type": "expense",
+    "amount": 14.27,
+    "currency": "CNY",
+    "category": "transport",
+    "date": "2026-04-18T04:49:14.095Z",
+    "note": "邛崃电车充电"
+  },
+  {
+    "id": "11bf878a-ae99-47a8-aa59-24d21a6c93b9",
+    "type": "expense",
+    "amount": 10,
+    "currency": "CNY",
+    "category": "transport",
+    "date": "2026-04-18T03:30:39.487Z",
+    "note": "成都到邛崃平乐古镇高速费"
+  },
+  {
+    "id": "4a5bc194-1fc2-4ffd-a2a5-15f5b27704a7",
+    "type": "expense",
+    "amount": 12.74,
+    "currency": "CNY",
+    "category": "transport",
+    "date": "2026-04-17T15:24:34.909Z",
+    "note": "电车充电"
+  },
+  {
+    "id": "02b77cdd-9592-4a95-a4ed-1d632a76f161",
+    "type": "expense",
+    "amount": 102.5,
+    "currency": "CNY",
+    "category": "shopping",
+    "date": "2026-04-17T07:55:06.707Z",
+    "note": "condom"
+  },
+  {
+    "id": "700e227a-8f74-4b8c-988a-4993e625cd3f",
+    "type": "expense",
+    "amount": 72,
+    "currency": "CNY",
+    "category": "food",
+    "date": "2026-04-16T10:08:30.580Z",
+    "note": "魔方冒烤鸭"
+  },
+  {
+    "id": "18ad8233-c58c-4dcd-8815-cd69a2e3b62b",
+    "type": "expense",
+    "amount": 45.6,
+    "currency": "CNY",
+    "category": "shopping",
+    "date": "2026-04-15T01:42:06.433Z",
+    "note": "蚊帐"
+  },
+  {
+    "id": "af37ca40-120e-4127-8f12-64b85b4f034a",
+    "type": "expense",
+    "amount": 7.13,
+    "currency": "CNY",
+    "category": "housing",
+    "date": "2026-04-13T07:27:42.811Z",
+    "note": "桐堂滞纳费"
+  },
+  {
+    "id": "070516d4-874a-436b-93e0-7e180e0f1ac8",
+    "type": "expense",
+    "amount": 8.36,
+    "currency": "CNY",
+    "category": "transport",
+    "date": "2026-04-11T15:01:35.167Z",
+    "note": "电车充电"
+  },
+  {
+    "id": "7d3fedb1-4fca-4bbc-bb70-285f4bc1eaac",
+    "type": "expense",
+    "amount": 85,
+    "currency": "CNY",
+    "category": "food",
+    "date": "2026-04-11T11:58:14.064Z",
+    "note": "三星堆景点烧烤"
+  },
+  {
+    "id": "0c45a222-055a-4227-8a77-fb0d4cf0aac7",
+    "type": "expense",
+    "amount": 18.13,
+    "currency": "CNY",
+    "category": "transport",
+    "date": "2026-04-11T06:50:37.951Z",
+    "note": "电车充电"
+  },
+  {
+    "id": "6cb08186-0aae-4abc-b6fe-96a62b329a0e",
+    "type": "expense",
+    "amount": 150,
+    "currency": "CNY",
+    "category": "food",
+    "date": "2026-04-10T12:59:32.394Z",
+    "note": "宽来火锅"
+  },
+  {
+    "id": "1e137173-7acb-477d-9c75-0c47ee722e8d",
+    "type": "expense",
+    "amount": 562.6,
+    "currency": "CNY",
+    "category": "housing",
+    "date": "2026-04-10T00:00:00.000Z",
+    "note": "西安房贷还款"
+  },
+  {
+    "id": "49deae55-97ce-41f4-88c7-08eafff3871e",
+    "type": "expense",
+    "amount": 12.79,
+    "currency": "CNY",
+    "category": "transport",
+    "date": "2026-04-09T15:16:22.754Z",
+    "note": "电车充电"
+  },
+  {
+    "id": "2acc8757-4c34-4ebb-b1d0-42c0ed9b18e0",
+    "type": "expense",
+    "amount": 20,
+    "currency": "CNY",
+    "category": "transport",
+    "date": "2026-04-06T00:00:00.000Z",
+    "note": "成都万象城停车费"
+  },
+  {
+    "id": "636bbf7b-c9f5-41a4-a8e8-4d48304107a1",
+    "type": "expense",
+    "amount": 13.99,
+    "currency": "CNY",
+    "category": "transport",
+    "date": "2026-04-05T14:57:50.768Z",
+    "note": "电车充电"
+  },
+  {
+    "id": "6c81b72e-c2a1-403c-a0a8-a4431e4954aa",
+    "type": "expense",
+    "amount": 150,
+    "currency": "CNY",
+    "category": "other_expense",
+    "date": "2026-04-05T14:57:18.179Z",
+    "note": "天真蓝证件照"
+  },
+  {
+    "id": "9da0d6da-1639-47ec-b98d-076b82c7af4c",
+    "type": "expense",
+    "amount": 250,
+    "currency": "CNY",
+    "category": "travel",
+    "date": "2026-04-05T00:00:00.000Z",
+    "note": "德阳清明一日游"
+  },
+  {
+    "id": "20e12a10-5f54-43e3-8ae6-872e249c6d98",
+    "type": "expense",
+    "amount": 15.67,
+    "currency": "CNY",
+    "category": "transport",
+    "date": "2026-04-05T08:28:14.223Z",
+    "note": "电车充电"
+  },
+  {
+    "id": "bfa1cd9a-24c2-4a3f-8064-8ca17b6a90d9",
+    "type": "expense",
+    "amount": 166,
+    "currency": "CNY",
+    "category": "food",
+    "date": "2026-04-05T04:36:30.598Z",
+    "note": "德阳泰国菜"
+  },
+  {
+    "id": "6cf78a1a-158a-4edf-aca5-8fc633e8f799",
+    "type": "expense",
+    "amount": 18.63,
+    "currency": "CNY",
+    "category": "transport",
+    "date": "2026-04-04T13:14:54.359Z",
+    "note": "电车充电"
+  },
+  {
+    "id": "3811f1c7-6bb2-4f04-9d10-7a95ec27fa97",
+    "type": "expense",
+    "amount": 29.93,
+    "currency": "CNY",
+    "category": "communication",
+    "date": "2026-04-04T00:00:00.000Z",
+    "note": "电信卡话费"
+  },
+  {
+    "id": "9dc1e324-d8f2-4eb4-8861-1a7b36045ab4",
+    "type": "expense",
+    "amount": 34,
+    "currency": "CNY",
+    "category": "food",
+    "date": "2026-04-04T08:19:30.744Z",
+    "note": "巴味仙午饭"
+  },
+  {
+    "id": "dd4c71a4-039c-4c05-8e22-65f234d7b4b0",
+    "type": "expense",
+    "amount": 18.53,
+    "currency": "CNY",
+    "category": "transport",
+    "date": "2026-04-04T08:19:14.382Z",
+    "note": "电车充电"
+  },
+  {
+    "id": "09c81dc3-d618-4421-8daa-6847dbbd0042",
+    "type": "expense",
+    "amount": 20,
+    "currency": "CNY",
+    "category": "housing",
+    "date": "2026-04-03T15:47:15.765Z",
+    "note": "桐堂燃气费"
+  },
+  {
+    "id": "6c445098-a4eb-4651-8ba9-2f617708b680",
+    "type": "expense",
+    "amount": 10,
+    "currency": "CNY",
+    "category": "housing",
+    "date": "2026-04-03T15:47:04.125Z",
+    "note": "桐堂电费"
+  },
+  {
+    "id": "c2a47788-2942-40ab-844c-188c4b459972",
+    "type": "expense",
+    "amount": 4.82,
+    "currency": "CNY",
+    "category": "transport",
+    "date": "2026-04-03T15:46:45.947Z",
+    "note": "电车充电"
+  },
+  {
+    "id": "bcb440ad-9275-40e0-a7a4-2fc2076960c5",
+    "type": "expense",
+    "amount": 10,
+    "currency": "CNY",
+    "category": "transport",
+    "date": "2026-04-03T00:00:00.000Z",
+    "note": "麓湖停车费"
+  },
+  {
+    "id": "b3e209be-a021-47bd-9e6f-4229d38f199b",
+    "type": "expense",
+    "amount": 15.99,
+    "currency": "CNY",
+    "category": "transport",
+    "date": "2026-04-03T06:21:39.347Z",
+    "note": "电车充电"
+  },
+  {
+    "id": "b3e8b730-4a74-49ce-978b-2a189f2dee16",
+    "type": "income",
+    "amount": 3600,
+    "currency": "CNY",
+    "category": "provident_fund",
+    "date": "2026-04-01T01:07:22.939Z",
+    "note": "二季度公积金提取"
+  },
+  {
+    "id": "b1445f48-bf0c-4ade-977c-99013467ddd9",
+    "type": "expense",
+    "amount": 1282.12,
+    "currency": "CNY",
+    "category": "housing",
+    "date": "2026-03-31T16:01:41.616Z",
+    "note": "桐堂4月份房租"
+  },
+  {
+    "id": "1407d0d7-0295-4d9a-875c-48d8877493f3",
+    "type": "expense",
+    "amount": 144.67,
+    "currency": "CNY",
+    "category": "housing",
+    "date": "2026-03-31T16:01:21.659Z",
+    "note": "桐堂4月份物业费"
+  }
+]
