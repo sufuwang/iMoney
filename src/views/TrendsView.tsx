@@ -1,4 +1,4 @@
-import { useMemo, useState, type CSSProperties } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { Button, Card, Col, DatePicker, Empty, Row, Segmented, Space, Statistic, Typography } from 'antd';
 import {
   Area,
@@ -303,9 +303,49 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
   const days = Math.max(1, end.diff(start, 'day') + 1);
   const months = Math.max(1, end.diff(start, 'month') + 1);
   const years = Math.max(1, end.diff(start, 'year') + 1);
+  const averageStats = [
+    { label: '日均结余', value: summary.balance / days },
+    { label: '月均结余', value: summary.balance / months },
+    { label: '年均结余', value: summary.balance / years },
+  ];
+  // 金额过长时自动缩小字号，保证单行显示
+  const averageStatsRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const root = averageStatsRef.current;
+    if (!root) return;
+
+    let lastWidth = -1;
+    const fit = () => {
+      const width = root.clientWidth;
+      if (!width || width === lastWidth) return;
+      lastWidth = width;
+      const nodes = [...root.querySelectorAll<HTMLElement>('.ant-statistic-content')];
+      if (!nodes.length) return;
+      nodes.forEach((node) => node.style.setProperty('--stat-size', '19px'));
+      let size = 19;
+      nodes.forEach((node) => {
+        const available = node.clientWidth;
+        if (!available || node.scrollWidth <= available) return;
+        size = Math.min(size, Math.floor((19 * available) / node.scrollWidth) - 1);
+      });
+      size = Math.max(10, size);
+      const apply = () => nodes.forEach((node) => node.style.setProperty('--stat-size', `${size}px`));
+      apply();
+      while (size > 10 && nodes.some((node) => node.scrollWidth > node.clientWidth)) {
+        size -= 1;
+        apply();
+      }
+    };
+
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, [summary.balance, days, months, years]);
 
   return (
-    <Space direction="vertical" size={16} style={{ width: '100%' }}>
+    <Space direction="vertical" size={16} style={{ width: '100%' }} className="trends-page">
       <Card size="small" styles={{ body: { padding: 12 } }}>
         <Segmented
           block
@@ -404,11 +444,15 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
       </Row>
 
       <Card size="small" title="周期均值分析">
-        <Row gutter={[16, 12]}>
-          <Col xs={8}><Statistic title="日均结余" value={summary.balance / days} precision={2} prefix="¥" /></Col>
-          <Col xs={8}><Statistic title="月均结余" value={summary.balance / months} precision={2} prefix="¥" /></Col>
-          <Col xs={8}><Statistic title="年均结余" value={summary.balance / years} precision={2} prefix="¥" /></Col>
-        </Row>
+        <div ref={averageStatsRef}>
+          <Row gutter={[16, 12]} className="period-average">
+            {averageStats.map((item) => (
+              <Col key={item.label} xs={8}>
+                <Statistic title={item.label} value={item.value} precision={2} prefix="¥" />
+              </Col>
+            ))}
+          </Row>
+        </div>
         <div className="section-divider" />
         <Row gutter={[16, 16]}>
           <Col xs={24} lg={12}>

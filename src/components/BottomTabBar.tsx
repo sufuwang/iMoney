@@ -3,7 +3,6 @@ import {
   BarChartOutlined,
   FundOutlined,
   HeartOutlined,
-  PlusOutlined,
   UnorderedListOutlined,
 } from '@ant-design/icons';
 import type { TabKey } from '../types';
@@ -18,10 +17,9 @@ const ITEMS: { key: TabKey; label: string; icon: ReactNode }[] = [
 interface Props {
   active: TabKey;
   onChange: (key: TabKey) => void;
-  onAdd: () => void;
 }
 
-export default function BottomTabBar({ active, onChange, onAdd }: Props) {
+export default function BottomTabBar({ active, onChange }: Props) {
   const renderItem = (item: (typeof ITEMS)[number]) => (
     <button
       key={item.key}
@@ -37,13 +35,7 @@ export default function BottomTabBar({ active, onChange, onAdd }: Props) {
   return (
     <nav className="bottom-tabbar">
       <div className="tabbar-inner">
-        {renderItem(ITEMS[0])}
-        {renderItem(ITEMS[1])}
-        <button type="button" className="tabbar-add" onClick={onAdd} aria-label="记一笔">
-          <PlusOutlined />
-        </button>
-        {renderItem(ITEMS[2])}
-        {renderItem(ITEMS[3])}
+        {ITEMS.map(renderItem)}
       </div>
     </nav>
   );

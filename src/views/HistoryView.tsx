@@ -157,7 +157,7 @@ export default function HistoryView({
   };
 
   return (
-    <Space direction="vertical" size={12} style={{ width: '100%' }}>
+    <Space direction="vertical" size={12} style={{ width: '100%' }} className="history-page">
       <Card size="small" styles={{ body: { padding: 12 } }}>
         <Segmented
           block
@@ -216,7 +216,6 @@ export default function HistoryView({
             ghost
             className="txn-groups"
             expandIconPosition="end"
-            collapsible="icon"
             items={groups.map((group) => {
               const groupSummary = summarize(group.rows, settings.currencyConfigs);
               const date = dayjs(group.key);

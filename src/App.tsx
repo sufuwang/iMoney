@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ConfigProvider, message } from 'antd';
-import { SettingOutlined } from '@ant-design/icons';
+import {
+  LeftOutlined,
+  PlusOutlined,
+  RightOutlined,
+  SettingOutlined,
+  VerticalAlignTopOutlined,
+} from '@ant-design/icons';
 import zhCN from 'antd/locale/zh_CN';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
@@ -31,6 +37,7 @@ export default function App() {
   });
   const [assets, setAssets] = useState<AssetSnapshot[]>(() => loadAssets());
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [fabOpen, setFabOpen] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [entryMode, setEntryMode] = useState<'transaction' | 'asset'>('transaction');
   const [editing, setEditing] = useState<Transaction | null>(null);
@@ -214,16 +221,50 @@ export default function App() {
           )}
         </main>
 
-        <button
-          type="button"
-          className="settings-fab"
-          aria-label="更多设置"
-          onClick={() => setSettingsOpen(true)}
+        <div
+          className={`fab-group${fabOpen ? '' : ' is-collapsed'}`}
+          role="group"
+          aria-label="快捷操作"
         >
-          <SettingOutlined />
-        </button>
+          <button
+            type="button"
+            className="fab-btn fab-action"
+            aria-label="回到顶部"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          >
+            <VerticalAlignTopOutlined />
+          </button>
+          <span className="fab-divider fab-action" />
+          <button
+            type="button"
+            className="fab-btn fab-action"
+            aria-label="记一笔"
+            onClick={openAdd}
+          >
+            <PlusOutlined />
+          </button>
+          <span className="fab-divider fab-action" />
+          <button
+            type="button"
+            className="fab-btn fab-action"
+            aria-label="更多设置"
+            onClick={() => setSettingsOpen(true)}
+          >
+            <SettingOutlined />
+          </button>
+          <span className="fab-divider fab-action" />
+          <button
+            type="button"
+            className="fab-btn fab-toggle"
+            aria-label={fabOpen ? '收起快捷操作' : '展开快捷操作'}
+            aria-expanded={fabOpen}
+            onClick={() => setFabOpen((prev) => !prev)}
+          >
+            {fabOpen ? <RightOutlined /> : <LeftOutlined />}
+          </button>
+        </div>
 
-        <BottomTabBar active={activeTab} onChange={setActiveTab} onAdd={openAdd} />
+        <BottomTabBar active={activeTab} onChange={setActiveTab} />
       </div>
 
       <TransactionModal
