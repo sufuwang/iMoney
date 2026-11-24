@@ -1,5 +1,5 @@
-import { DEFAULT_CURRENCY_CONFIGS, DEFAULT_SETTINGS, STORAGE_KEYS } from '../constants';
-import type { AppSettings, CurrencyConfig, Transaction, ViewMode } from '../types';
+import { ASSET_TYPES, DEFAULT_CURRENCY_CONFIGS, DEFAULT_SETTINGS, STORAGE_KEYS } from '../constants';
+import type { AppSettings, AssetSnapshot, AssetType, CurrencyConfig, Transaction, ViewMode } from '../types';
 
 function read<T>(key: string): T | null {
   try {
@@ -39,6 +39,48 @@ function normalizeCurrencies(value: unknown): CurrencyConfig[] {
     if (!result.some((entry) => entry.code === item.code)) result.push({ ...item });
   });
   return result;
+}
+
+function normalizeAssets(value: unknown): AssetSnapshot[] {
+  if (!Array.isArray(value)) return [];
+  const byKey = new Map<string, AssetSnapshot>();
+  const push = (month: string, type: AssetType, amount: unknown, id?: string, currency?: string) => {
+    if (typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0) return;
+    byKey.set(`${month}-${type}`, {
+      id: id ?? crypto.randomUUID(), month, type, currency: currency ?? 'CNY', amount,
+    });
+  };
+
+  value.forEach((item) => {
+    if (!item || typeof item !== 'object') return;
+    const row = item as Partial<AssetSnapshot> & { funds?: number; stocks?: number };
+    if (typeof row.month !== 'string' || !/^\d{4}-(0[1-9]|1[0-2])$/.test(row.month)) return;
+    if (row.type && ASSET_TYPES.some((type) => type.value === row.type)) {
+      push(
+        row.month,
+        row.type,
+        row.amount,
+        typeof row.id === 'string' ? row.id : undefined,
+        typeof row.currency === 'string' ? row.currency : 'CNY',
+      );
+      return;
+    }
+    push(row.month, 'active_fund', row.funds);
+    push(row.month, 'nasdaq', row.stocks);
+  });
+
+  return [...byKey.values()].sort(
+    (a, b) => a.month.localeCompare(b.month) || a.type.localeCompare(b.type),
+  );
+}
+
+export function loadAssets(fallback: AssetSnapshot[] = []): AssetSnapshot[] {
+  const saved = read<unknown>(STORAGE_KEYS.assets);
+  return Array.isArray(saved) ? normalizeAssets(saved) : fallback;
+}
+
+export function saveAssets(assets: AssetSnapshot[]) {
+  localStorage.setItem(STORAGE_KEYS.assets, JSON.stringify(assets));
 }
 
 export function loadTransactions(fallback: Transaction[]): Transaction[] {
@@ -90,14 +132,10 @@ export function loadSettings(latestDate?: string): AppSettings {
     currencyConfigs: normalizeCurrencies(parseArray('imoney_currency_configs', DEFAULT_SETTINGS.currencyConfigs)),
     hiddenTrendCategories: parseArray('imoney_hidden_trend_categories', []),
     hiddenPieCategories: parseArray('imoney_hidden_pie_categories', []),
-    reminderEnabled: readRaw('imoney_reminder_enabled') === 'true',
-    reminderTime: readRaw('imoney_reminder_time') ?? DEFAULT_SETTINGS.reminderTime,
-    reminderMessage: readRaw('imoney_reminder_message') ?? DEFAULT_SETTINGS.reminderMessage,
     historyView: (readRaw('imoney_history_view') as ViewMode) ?? DEFAULT_SETTINGS.historyView,
     trendView: (readRaw('imoney_trend_view') as ViewMode) ?? DEFAULT_SETTINGS.trendView,
     historyDate: readRaw('imoney_history_date') ?? latestDate ?? DEFAULT_SETTINGS.historyDate,
     lastBackupTime: readRaw('imoney_last_backup_time'),
-    lastReminderDate: readRaw('imoney_last_reminder_date'),
   };
 }
 

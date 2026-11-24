@@ -1,6 +1,6 @@
 export type TransactionType = 'expense' | 'income';
 export type ViewMode = 'day' | 'month' | 'year';
-export type TabKey = 'history' | 'trends' | 'health' | 'settings';
+export type TabKey = 'history' | 'trends' | 'health' | 'investment';
 
 export interface Transaction {
   id: string;
@@ -28,10 +28,17 @@ export interface CurrencyConfig {
   enabled: boolean;
 }
 
+export type AssetType = 'active_fund' | 'nasdaq' | 'sp500';
+
+export interface AssetSnapshot {
+  id: string;
+  month: string;
+  type: AssetType;
+  currency: string;
+  amount: number;
+}
+
 export interface AppSettings {
-  reminderEnabled: boolean;
-  reminderTime: string;
-  reminderMessage: string;
   currencyConfigs: CurrencyConfig[];
   hiddenTrendCategories: string[];
   hiddenPieCategories: string[];
@@ -39,7 +46,6 @@ export interface AppSettings {
   historyDate: string;
   trendView: ViewMode;
   lastBackupTime: string | null;
-  lastReminderDate: string | null;
 }
 
 export interface CategoryStat {

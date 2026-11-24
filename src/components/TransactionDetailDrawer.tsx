@@ -1,11 +1,12 @@
-import { Button, Descriptions, Drawer, Space, Typography } from 'antd';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Button, Descriptions, Drawer, Space, Tag, Typography } from 'antd';
+import { DeleteOutlined, EditOutlined, ProfileOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { CATEGORY_MAP } from '../constants';
 import useIsMobile from '../hooks/useIsMobile';
 import { baseAmount, formatMoney } from '../lib/finance';
 import type { CurrencyConfig, Transaction } from '../types';
 import CategoryAvatar from './CategoryAvatar';
+import DrawerHead from './DrawerHead';
 
 interface Props {
   transaction: Transaction | null;
@@ -27,9 +28,28 @@ export default function TransactionDetailDrawer({
 
   return (
     <Drawer
-      title="记录详情"
+      className="app-drawer"
+      title={
+        <DrawerHead
+          icon={<ProfileOutlined />}
+          title="记录详情"
+          subtitle={
+            transaction
+              ? `${category?.name ?? '未分类'} · ${dayjs(transaction.date).format('YYYY-MM-DD')}`
+              : '查看这笔记录的详细信息'
+          }
+          extra={
+            transaction ? (
+              <Tag color={transaction.type === 'income' ? 'green' : 'red'}>
+                {transaction.type === 'income' ? '收入' : '支出'}
+              </Tag>
+            ) : undefined
+          }
+        />
+      }
       open={Boolean(transaction)}
       onClose={onClose}
+      closable={{ placement: 'end' }}
       placement={isMobile ? 'bottom' : 'right'}
       height={isMobile ? '78vh' : undefined}
       width={isMobile ? undefined : 420}

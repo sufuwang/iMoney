@@ -8,8 +8,11 @@ dayjs.locale('zh-cn');
 const rateOf = (currency: string, configs: CurrencyConfig[]) =>
   configs.find((item) => item.code === currency)?.rate ?? 1;
 
+export const convertToBase = (amount: number, currency: string, configs: CurrencyConfig[]) =>
+  amount * rateOf(currency, configs);
+
 export const baseAmount = (transaction: Transaction, configs: CurrencyConfig[]) =>
-  transaction.amount * rateOf(transaction.currency, configs);
+  convertToBase(transaction.amount, transaction.currency, configs);
 
 export const formatMoney = (value: number, digits = 2) =>
   `¥${value.toLocaleString('zh-CN', { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
@@ -126,7 +129,7 @@ export function trendData(
       if (row.type === 'income' && 'income' in point) {
         point.income = Number(point.income) + baseAmount(row, configs);
       }
-      if (row.type === 'expense' && row.category in point) {
+      if (row.category in point) {
         point[row.category] = Number(point[row.category]) + baseAmount(row, configs);
       }
     });

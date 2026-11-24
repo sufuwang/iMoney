@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
 import {
   BarChartOutlined,
+  FundOutlined,
   HeartOutlined,
   PlusOutlined,
-  SettingOutlined,
   UnorderedListOutlined,
 } from '@ant-design/icons';
 import type { TabKey } from '../types';
@@ -12,7 +12,7 @@ const ITEMS: { key: TabKey; label: string; icon: ReactNode }[] = [
   { key: 'history', label: '明细', icon: <UnorderedListOutlined /> },
   { key: 'trends', label: '统计', icon: <BarChartOutlined /> },
   { key: 'health', label: '健康', icon: <HeartOutlined /> },
-  { key: 'settings', label: '我的', icon: <SettingOutlined /> },
+  { key: 'investment', label: '投资', icon: <FundOutlined /> },
 ];
 
 interface Props {

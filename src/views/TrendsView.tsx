@@ -191,13 +191,82 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
       category: item.category,
       total,
     }));
+    const topCategories = new Set(
+      [...data].sort((a, b) => b.value - a.value).slice(0, 3).map((item) => item.category),
+    );
+    const renderPieLabel = (props: unknown) => {
+      const point = props as {
+        name?: string | number;
+        value?: number;
+        midAngle?: number;
+        cx?: number;
+        cy?: number;
+        outerRadius?: number;
+        payload?: { category?: string };
+      };
+      if (!topCategories.size || !topCategories.has(point.payload?.category ?? '') || point.midAngle === undefined) {
+        return null;
+      }
+      const angle = (point.midAngle * Math.PI) / 180;
+      const radius = (point.outerRadius ?? 0) + 10;
+      const x = (point.cx ?? 0) + Math.cos(angle) * radius;
+      const y = (point.cy ?? 0) - Math.sin(angle) * radius;
+      const percent = total > 0 ? (((Number(point.value ?? 0) / total) * 100)).toFixed(1) : '0.0';
+      return (
+        <text
+          x={x}
+          y={y}
+          textAnchor={Math.cos(angle) >= 0 ? 'start' : 'end'}
+          dominantBaseline="middle"
+          fontSize={10}
+          fontWeight={600}
+          fill="#4b5563"
+        >
+          {point.name} {percent}%
+        </text>
+      );
+    };
     return (
-      <Card size="small" title={type === 'expense' ? '支出构成比例' : '收入来源比例'}>
-        {data.length === 0 ? (
+      <Card
+        size="small"
+        title={type === 'expense' ? '支出构成比例' : '收入来源比例'}
+        extra={
+          stats.some((item) => hidden.includes(item.category)) ? (
+            <Button type="link" size="small" onClick={() => onSettings({ hiddenPieCategories: [] })}>全选</Button>
+          ) : undefined
+        }
+      >
+        {stats.length === 0 ? (
           <Empty description="暂无数据" image={Empty.PRESENTED_IMAGE_SIMPLE} />
         ) : (
-          <Row gutter={12} align="middle">
-            <Col xs={24} sm={14}>
+          <>
+            <div className="chart-legend">
+              {stats.map((item, index) => {
+                const checked = !hidden.includes(item.category);
+                return (
+                  <button
+                    key={item.category}
+                    type="button"
+                    className={`chart-legend-item${checked ? ' is-active' : ''}`}
+                    style={{ '--legend-color': item.color || CHART_COLORS[index % CHART_COLORS.length] } as CSSProperties}
+                    aria-pressed={checked}
+                    onClick={() =>
+                      onSettings({
+                        hiddenPieCategories: checked
+                          ? [...hidden, item.category]
+                          : hidden.filter((value) => value !== item.category),
+                      })
+                    }
+                  >
+                    <span className="chart-legend-mark" />
+                    <span className="chart-legend-label">{item.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {data.length === 0 ? (
+              <Empty description="已隐藏全部分类" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            ) : (
               <div className="pie-container">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -208,6 +277,8 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
                       innerRadius="55%"
                       outerRadius="82%"
                       paddingAngle={2}
+                      label={renderPieLabel}
+                      labelLine={false}
                       isAnimationActive={false}
                       onClick={(entry) => {
                         const category = (entry as { category?: string }).category;
@@ -220,30 +291,8 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-            </Col>
-            <Col xs={24} sm={10}>
-              <Space direction="vertical" size={4} style={{ width: '100%' }}>
-                {data.map((item) => (
-                  <button
-                    key={`${item.name}-${item.category}`}
-                    type="button"
-                    className="pie-legend-item"
-                    onClick={() =>
-                      onSettings({
-                        hiddenPieCategories: hidden.includes(item.category)
-                          ? hidden.filter((value) => value !== item.category)
-                          : [...hidden, item.category],
-                      })
-                    }
-                  >
-                    <span className="chart-tooltip-dot" style={{ background: item.color }} />
-                    <span className="pie-legend-name">{item.name}</span>
-                    <span>{total > 0 ? ((item.value / total) * 100).toFixed(1) : '0.0'}%</span>
-                  </button>
-                ))}
-              </Space>
-            </Col>
-          </Row>
+            )}
+          </>
         )}
       </Card>
     );
@@ -271,6 +320,7 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
               format={settings.trendView === 'day' ? 'YYYY-MM-DD' : settings.trendView === 'month' ? 'YYYY-MM' : 'YYYY'}
               value={start}
               allowClear={false}
+              inputReadOnly
               placement="bottomLeft"
               onChange={(value) => value && setStart(value)}
             />
@@ -280,6 +330,7 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
               format={settings.trendView === 'day' ? 'YYYY-MM-DD' : settings.trendView === 'month' ? 'YYYY-MM' : 'YYYY'}
               value={end}
               allowClear={false}
+              inputReadOnly
               placement="bottomLeft"
               onChange={(value) => value && setEnd(value)}
             />
@@ -292,6 +343,7 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
               format={settings.trendView === 'day' ? 'YYYY-MM-DD' : settings.trendView === 'month' ? 'YYYY-MM' : 'YYYY'}
               value={[start, end]}
               allowClear={false}
+              inputReadOnly
               placement="bottomLeft"
               style={{ flex: 1, minWidth: 0 }}
               onChange={(values) => {

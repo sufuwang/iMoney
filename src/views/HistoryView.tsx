@@ -77,7 +77,7 @@ export default function HistoryView({
       renderItem={(row) => {
         const category = CATEGORY_MAP[row.category];
         return (
-          <List.Item className="txn-item clickable-list-item" onClick={() => onViewTransaction(row)}>
+          <List.Item className="txn-item" onClick={() => onViewTransaction(row)}>
             <List.Item.Meta
               avatar={<CategoryAvatar categoryId={row.category} size={38} />}
               title={<span className="txn-name">{row.note || category?.name || row.category}</span>}
@@ -137,6 +137,7 @@ export default function HistoryView({
           <Empty description="暂无数据" image={Empty.PRESENTED_IMAGE_SIMPLE} />
         ) : (
           <List
+            className="rank-list"
             size="small"
             dataSource={ranked}
             renderItem={(row, index) => (
@@ -172,6 +173,7 @@ export default function HistoryView({
             picker={mode === 'day' ? 'date' : mode === 'month' ? 'month' : 'year'}
             value={anchor}
             allowClear={false}
+            inputReadOnly
             format={mode === 'day' ? 'YYYY-MM-DD' : mode === 'month' ? 'YYYY-MM' : 'YYYY'}
             onChange={(value) => value && onSettings({ historyDate: value.toISOString() })}
           />
@@ -214,7 +216,7 @@ export default function HistoryView({
             ghost
             className="txn-groups"
             expandIconPosition="end"
-            defaultActiveKey={groups[0] ? [groups[0].key] : []}
+            collapsible="icon"
             items={groups.map((group) => {
               const groupSummary = summarize(group.rows, settings.currencyConfigs);
               const date = dayjs(group.key);

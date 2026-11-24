@@ -12,6 +12,7 @@ import {
   GiftOutlined,
   HeartOutlined,
   HomeOutlined,
+  LineChartOutlined,
   MedicineBoxOutlined,
   MobileOutlined,
   MoneyCollectOutlined,
@@ -27,7 +28,8 @@ import {
   VideoCameraOutlined,
   WalletOutlined,
 } from '@ant-design/icons';
-import { CATEGORY_MAP } from '../constants';
+import { ASSET_TYPES, CATEGORY_MAP } from '../constants';
+import type { AssetType } from '../types';
 
 type IconComponent = ComponentType<{ style?: CSSProperties }>;
 
@@ -56,15 +58,25 @@ const ICONS: Record<string, IconComponent> = {
   lottery: TrophyOutlined,
   parttime: ClockCircleOutlined,
   otherincome: PlusCircleOutlined,
+  asset_fund: FundOutlined,
+  asset_nasdaq: RiseOutlined,
+  asset_sp500: LineChartOutlined,
 };
 
 const LEGACY_ICONS: Record<string, IconComponent> = {
   Dollar: DollarOutlined,
 };
 
+export function iconByName(name: string): IconComponent {
+  return ICONS[name] ?? LEGACY_ICONS[name] ?? MoreOutlined;
+}
+
 export function categoryIcon(categoryId: string): IconComponent {
-  const icon = CATEGORY_MAP[categoryId]?.icon ?? '';
-  return ICONS[icon] ?? LEGACY_ICONS[icon] ?? MoreOutlined;
+  return iconByName(CATEGORY_MAP[categoryId]?.icon ?? '');
+}
+
+export function assetTypeIcon(type: AssetType): IconComponent {
+  return iconByName(ASSET_TYPES.find((item) => item.value === type)?.icon ?? '');
 }
 
 interface Props {

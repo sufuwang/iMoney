@@ -1,19 +1,23 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ConfigProvider, message } from 'antd';
+import { SettingOutlined } from '@ant-design/icons';
 import zhCN from 'antd/locale/zh_CN';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 import BottomTabBar from './components/BottomTabBar';
 import CategoryDetailDrawer from './components/CategoryDetailDrawer';
+import SettingsDrawer from './components/SettingsDrawer';
 import TransactionDetailDrawer from './components/TransactionDetailDrawer';
 import TransactionModal from './components/TransactionModal';
 import { useFinanceStore, parseTransactions } from './hooks/useFinanceStore';
+import { parseAssets } from './lib/assets';
 import { formatMoney, inRange, summarize } from './lib/finance';
-import { notify, saveTextFile } from './lib/platform';
-import type { TabKey, Transaction } from './types';
+import { saveTextFile } from './lib/platform';
+import { loadAssets, saveAssets } from './lib/storage';
+import type { AssetSnapshot, TabKey, Transaction } from './types';
 import HealthView from './views/HealthView';
 import HistoryView from './views/HistoryView';
-import SettingsView from './views/SettingsView';
+import InvestmentView from './views/InvestmentView';
 import TrendsView from './views/TrendsView';
 
 export default function App() {
@@ -21,11 +25,14 @@ export default function App() {
   const { transactions, settings, updateSettings } = store;
   const [activeTab, setActiveTab] = useState<TabKey>(() => {
     const tab = new URLSearchParams(window.location.search).get('tab');
-    return tab === 'history' || tab === 'trends' || tab === 'health' || tab === 'settings'
+    return tab === 'history' || tab === 'trends' || tab === 'health' || tab === 'investment'
       ? tab
       : 'history';
   });
+  const [assets, setAssets] = useState<AssetSnapshot[]>(() => loadAssets());
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [entryMode, setEntryMode] = useState<'transaction' | 'asset'>('transaction');
   const [editing, setEditing] = useState<Transaction | null>(null);
   const [viewing, setViewing] = useState<Transaction | null>(null);
   const [categoryDetail, setCategoryDetail] = useState<{ id: string; rows: Transaction[] } | null>(null);
@@ -38,22 +45,6 @@ export default function App() {
     () => summarize(yearRows, settings.currencyConfigs),
     [yearRows, settings.currencyConfigs],
   );
-  const sparkline = useMemo(() => {
-    const values = Array.from({ length: 6 }, (_, index) => {
-      const month = dayjs().startOf('month').subtract(5 - index, 'month');
-      const rows = inRange(transactions, month.startOf('month'), month.endOf('month'));
-      return summarize(rows, settings.currencyConfigs).expense;
-    });
-    const max = Math.max(...values);
-    const min = Math.min(...values);
-    const range = Math.max(max - min, 1);
-    const points = values.map((value, index) => ({
-      x: index * 60,
-      y: 34 - ((value - min) / range) * 26,
-    }));
-    const line = points.map((point, index) => `${index ? 'L' : 'M'}${point.x},${point.y}`).join(' ');
-    return { line, area: `${line} L300,40 L0,40 Z` };
-  }, [transactions, settings.currencyConfigs]);
   // 常用备注：从历史记录动态统计，优先近三个月高频，其次全量频次与最近使用时间
   const recentNotes = useMemo(() => {
     const recentFrom = dayjs().subtract(90, 'day');
@@ -74,7 +65,8 @@ export default function App() {
       .map(([note]) => note);
   }, [transactions]);
 
-  const openAdd = () => { setEditing(null); setModalOpen(true); };
+  const openAdd = () => { setEditing(null); setEntryMode('transaction'); setModalOpen(true); };
+  const openAsset = () => { setEditing(null); setEntryMode('asset'); setModalOpen(true); };
 
   const handleSubmit = (value: Omit<Transaction, 'id'>) => {
     if (editing) {
@@ -96,13 +88,31 @@ export default function App() {
   const handleEdit = (transaction: Transaction) => {
     setViewing(null);
     setEditing(transaction);
+    setEntryMode('transaction');
     setModalOpen(true);
+  };
+
+  const handleSaveAsset = (input: Omit<AssetSnapshot, 'id'>) => {
+    setAssets((prev) => {
+      const exist = prev.some((item) => item.month === input.month && item.type === input.type);
+      const next = exist
+        ? prev.map((item) =>
+            item.month === input.month && item.type === input.type ? { ...item, ...input } : item,
+          )
+        : [...prev, { ...input, id: crypto.randomUUID() }];
+      return next.sort((a, b) => a.month.localeCompare(b.month) || a.type.localeCompare(b.type));
+    });
+  };
+
+  const handleDeleteAsset = (id: string) => {
+    setAssets((prev) => prev.filter((item) => item.id !== id));
+    message.success('资产记录已删除');
   };
 
   const handleExport = async () => {
     const fileName = `imoney_backup_${dayjs().format('YYYYMMDD_HHmmss')}.json`;
     try {
-      const saved = await saveTextFile(fileName, JSON.stringify(transactions, null, 2));
+      const saved = await saveTextFile(fileName, JSON.stringify({ transactions, assets }, null, 2));
       if (!saved) return;
       updateSettings({ lastBackupTime: new Date().toISOString() });
       message.success('备份数据已导出');
@@ -114,12 +124,18 @@ export default function App() {
   const handleImport = (raw: string) => {
     try {
       const rows = parseTransactions(raw);
+      const importedAssets = parseAssets(raw);
       store.replaceTransactions(rows);
-      message.success(`已导入 ${rows.length} 笔记录`);
+      if (importedAssets.length > 0) setAssets(importedAssets);
+      message.success(
+        `已导入 ${rows.length} 笔记录${importedAssets.length ? `、${importedAssets.length} 个月资产` : ''}`,
+      );
     } catch (error) {
       message.error(error instanceof Error ? error.message : '导入失败，请检查备份文件');
     }
   };
+
+  useEffect(() => saveAssets(assets), [assets]);
 
   useEffect(() => {
     const checkBackup = () => {
@@ -129,21 +145,7 @@ export default function App() {
     };
     const timer = window.setInterval(checkBackup, 60_000);
     return () => window.clearInterval(timer);
-  }, [settings.lastBackupTime, transactions]);
-
-  useEffect(() => {
-    if (!settings.reminderEnabled) return;
-    const checkReminder = () => {
-      const now = dayjs();
-      const today = now.format('YYYY-MM-DD');
-      if (now.format('HH:mm') === settings.reminderTime && settings.lastReminderDate !== today) {
-        void notify('iMoney 记账提醒', settings.reminderMessage);
-        updateSettings({ lastReminderDate: today });
-      }
-    };
-    const timer = window.setInterval(checkReminder, 30_000);
-    return () => window.clearInterval(timer);
-  }, [settings.reminderEnabled, settings.reminderTime, settings.reminderMessage, settings.lastReminderDate, updateSettings]);
+  }, [settings.lastBackupTime, transactions, assets]);
 
   return (
     <ConfigProvider
@@ -170,23 +172,10 @@ export default function App() {
               <span>本年结余</span>
               <div className="hero-amount">{formatMoney(yearSummary.balance)}</div>
             </div>
-            <div className="hero-spark">
-              <span className="spark-label">近 6 个月支出趋势</span>
-              <svg viewBox="0 0 300 40" preserveAspectRatio="none" aria-hidden="true">
-                <defs>
-                  <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="rgba(255,255,255,0.28)" />
-                    <stop offset="100%" stopColor="rgba(255,255,255,0)" />
-                  </linearGradient>
-                </defs>
-                <path d={sparkline.area} fill="url(#sparkFill)" />
-                <path d={sparkline.line} fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="1.6" vectorEffect="non-scaling-stroke" />
-              </svg>
-            </div>
             <div className="hero-metrics">
-              <div><span>收入</span><b>{formatMoney(yearSummary.income, 0)}</b></div>
-              <div><span>支出</span><b>{formatMoney(yearSummary.expense, 0)}</b></div>
-              <div><span>储蓄率</span><b>{(yearSummary.savingsRate * 100).toFixed(0)}%</b></div>
+              <div><span>本年收入</span><b>{formatMoney(yearSummary.income, 0)}</b></div>
+              <div><span>本年支出</span><b>{formatMoney(yearSummary.expense, 0)}</b></div>
+              <div><span>本年储蓄率</span><b>{(yearSummary.savingsRate * 100).toFixed(0)}%</b></div>
             </div>
           </div>
         </header>
@@ -215,29 +204,38 @@ export default function App() {
               settings={settings}
             />
           )}
-          {activeTab === 'settings' && (
-            <SettingsView
-              settings={settings}
-              transactionCount={transactions.length}
-              onSettings={updateSettings}
-              onExport={() => void handleExport()}
-              onImport={handleImport}
-              onClear={() => { store.clearTransactions(); message.success('所有记录已清空'); }}
-              onTestReminder={() => void notify('iMoney 记账提醒', settings.reminderMessage)}
+          {activeTab === 'investment' && (
+            <InvestmentView
+              assets={assets}
+              configs={settings.currencyConfigs}
+              onAddAsset={openAsset}
+              onDeleteAsset={handleDeleteAsset}
             />
           )}
         </main>
+
+        <button
+          type="button"
+          className="settings-fab"
+          aria-label="更多设置"
+          onClick={() => setSettingsOpen(true)}
+        >
+          <SettingOutlined />
+        </button>
 
         <BottomTabBar active={activeTab} onChange={setActiveTab} onAdd={openAdd} />
       </div>
 
       <TransactionModal
         open={modalOpen}
+        mode={entryMode}
+        onModeChange={setEntryMode}
         editing={editing}
         currencies={settings.currencyConfigs}
         recentNotes={recentNotes}
         onCancel={() => setModalOpen(false)}
         onSubmit={handleSubmit}
+        onSaveAsset={handleSaveAsset}
       />
       <TransactionDetailDrawer
         transaction={viewing}
@@ -252,6 +250,17 @@ export default function App() {
         currencies={settings.currencyConfigs}
         onClose={() => setCategoryDetail(null)}
         onSelect={(transaction) => { setCategoryDetail(null); setViewing(transaction); }}
+      />
+      <SettingsDrawer
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        settings={settings}
+        transactionCount={transactions.length}
+        assetCount={assets.length}
+        onSettings={updateSettings}
+        onExport={() => void handleExport()}
+        onImport={handleImport}
+        onClear={() => { store.clearTransactions(); message.success('所有记录已清空'); }}
       />
     </ConfigProvider>
   );

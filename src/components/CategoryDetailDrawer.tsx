@@ -1,10 +1,12 @@
 import { Drawer, Empty, List, Tag, Typography } from 'antd';
+import { AppstoreOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { CATEGORY_MAP } from '../constants';
 import useIsMobile from '../hooks/useIsMobile';
 import { baseAmount, formatMoney, summarize } from '../lib/finance';
 import type { CurrencyConfig, Transaction } from '../types';
 import CategoryAvatar from './CategoryAvatar';
+import DrawerHead from './DrawerHead';
 
 interface Props {
   categoryId: string | null;
@@ -21,17 +23,22 @@ export default function CategoryDetailDrawer({ categoryId, rows, currencies, onC
 
   return (
     <Drawer
+      className="app-drawer"
       title={
-        <span className="drawer-title">
-          {categoryId && <CategoryAvatar categoryId={categoryId} size={28} />}
-          {category?.name ?? '分类'}明细
-          <Tag color={summary.balance >= 0 ? 'green' : 'red'}>
-            {formatMoney(Math.abs(summary.balance))}
-          </Tag>
-        </span>
+        <DrawerHead
+          icon={<AppstoreOutlined />}
+          title={`${category?.name ?? '分类'}明细`}
+          subtitle={`${rows.length} 笔记录`}
+          extra={
+            <Tag color={summary.balance >= 0 ? 'green' : 'red'}>
+              {formatMoney(Math.abs(summary.balance))}
+            </Tag>
+          }
+        />
       }
       open={Boolean(categoryId)}
       onClose={onClose}
+      closable={{ placement: 'end' }}
       placement={isMobile ? 'bottom' : 'right'}
       height={isMobile ? '82vh' : undefined}
       width={isMobile ? undefined : 480}

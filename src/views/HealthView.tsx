@@ -55,7 +55,6 @@ export default function HealthView({ transactions, settings }: Props) {
   );
 
   const current = months[months.length - 1];
-  const previous = months[months.length - 2];
 
   const currentRows = useMemo(
     () => inRange(transactions, anchor.startOf('month'), anchor.endOf('month')),
@@ -120,13 +119,6 @@ export default function HealthView({ transactions, settings }: Props) {
   const score = Math.round(dimensions.reduce((sum, item) => sum + item.value, 0) / dimensions.length);
   const scoreColor = score >= 80 ? '#66b694' : score >= 60 ? '#7ba4d0' : '#e08b72';
   const scoreText = score >= 80 ? '非常健康' : score >= 60 ? '状态良好' : score >= 40 ? '需要关注' : '亟需改善';
-
-  const incomeChange = previous.income > 0
-    ? ((current.income - previous.income) / previous.income) * 100
-    : 0;
-  const expenseChange = previous.expense > 0
-    ? ((current.expense - previous.expense) / previous.expense) * 100
-    : 0;
 
   return (
     <Space direction="vertical" size={14} style={{ width: '100%' }}>
@@ -224,48 +216,6 @@ export default function HealthView({ transactions, settings }: Props) {
         )}
       </Card>
 
-      <Card size="small" title="月度对比" extra={<Typography.Text type="secondary">{current.label} vs {previous.label}</Typography.Text>}>
-        <div className="health-compare">
-          <div className="health-compare-item">
-            <span>收入</span>
-            <strong>{formatMoney(current.income, 0)}</strong>
-            <Tag color={incomeChange >= 0 ? 'green' : 'red'} bordered={false}>
-              {incomeChange >= 0 ? '+' : ''}{incomeChange.toFixed(1)}%
-            </Tag>
-          </div>
-          <div className="health-compare-item">
-            <span>支出</span>
-            <strong>{formatMoney(current.expense, 0)}</strong>
-            <Tag color={expenseChange <= 0 ? 'green' : 'red'} bordered={false}>
-              {expenseChange >= 0 ? '+' : ''}{expenseChange.toFixed(1)}%
-            </Tag>
-          </div>
-          <div className="health-compare-item">
-            <span>结余</span>
-            <strong>{formatMoney(current.balance, 0)}</strong>
-            <Tag color={current.balance >= 0 ? 'green' : 'red'} bordered={false}>
-              {current.balance >= 0 ? '盈余' : '赤字'}
-            </Tag>
-          </div>
-        </div>
-        <div className="section-divider" />
-        <div className="health-months">
-          {months.map((item) => (
-            <div key={item.key} className="health-month">
-              <div className="health-month-head">
-                <span>{item.label}</span>
-                <strong>{item.savingsRate.toFixed(0)}%</strong>
-              </div>
-              <Progress
-                percent={item.savingsRate}
-                strokeColor={item.savingsRate >= 30 ? '#66b694' : item.savingsRate >= 10 ? '#7ba4d0' : '#e08b72'}
-                showInfo={false}
-                size="small"
-              />
-            </div>
-          ))}
-        </div>
-      </Card>
     </Space>
   );
 }

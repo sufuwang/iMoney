@@ -1,7 +1,8 @@
-import type { AppSettings, CategoryDef, CurrencyConfig } from './types';
+import type { AppSettings, AssetType, CategoryDef, CurrencyConfig } from './types';
 
 export const STORAGE_KEYS = {
   transactions: 'imoney_transactions',
+  assets: 'imoney_assets',
   settings: 'imoney_settings',
 } as const;
 
@@ -44,6 +45,12 @@ export const DEFAULT_CURRENCY_CONFIGS: CurrencyConfig[] = [
   { code: 'GBP', symbol: '£', name: '英镑', rate: 9.1, enabled: true },
 ];
 
+export const ASSET_TYPES: { value: AssetType; label: string; icon: string; color: string }[] = [
+  { value: 'active_fund', label: '主动基金', icon: 'asset_fund', color: '#7ba4d0' },
+  { value: 'nasdaq', label: '纳指', icon: 'asset_nasdaq', color: '#66b694' },
+  { value: 'sp500', label: '标普', icon: 'asset_sp500', color: '#9d8ed3' },
+];
+
 export const CHART_COLORS = [
   '#7ba4d0', '#66b694', '#e08b72', '#9d8ed3', '#71b8b2',
   '#c887b6', '#d4b46f', '#7f8dc4', '#a9b975', '#d88787',
@@ -53,9 +60,6 @@ export const CHART_COLORS = [
 export const VIEW_LABELS = { day: '按日', month: '按月', year: '按年' } as const;
 
 export const DEFAULT_SETTINGS: AppSettings = {
-  reminderEnabled: false,
-  reminderTime: '20:00',
-  reminderMessage: '记得记一笔账哦！',
   currencyConfigs: DEFAULT_CURRENCY_CONFIGS,
   hiddenTrendCategories: [],
   hiddenPieCategories: [],
@@ -63,5 +67,4 @@ export const DEFAULT_SETTINGS: AppSettings = {
   historyDate: new Date().toISOString(),
   trendView: 'month',
   lastBackupTime: null,
-  lastReminderDate: null,
 };
