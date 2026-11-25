@@ -49,6 +49,7 @@ export function assetRows(snapshots: AssetSnapshot[], configs: CurrencyConfig[])
       .reduce((sum, item) => sum + values.profit[item.value], 0);
     // 投资本金 = 总资产 - 现金（即非现金资产当前金额）
     const investment = total - cash;
+    const costBasis = investment + profit;
     const previousTotal = index > 0 ? sumOf(months[index - 1][1].amount) : 0;
     return {
       month,
@@ -57,7 +58,7 @@ export function assetRows(snapshots: AssetSnapshot[], configs: CurrencyConfig[])
       total,
       profit,
       investment,
-      returnRate: investment > 0 ? (profit / investment) * 100 : 0,
+      returnRate: costBasis > 0 ? (profit / costBasis) * 100 : 0,
       delta: index > 0 ? total - previousTotal : 0,
       growth: index > 0 && previousTotal > 0 ? ((total - previousTotal) / previousTotal) * 100 : 0,
     };

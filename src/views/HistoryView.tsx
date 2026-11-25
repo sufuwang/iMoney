@@ -7,7 +7,7 @@ import {
   Collapse,
   DatePicker,
   Empty,
-  List,
+  Listy,
   Row,
   Segmented,
   Space,
@@ -71,29 +71,37 @@ export default function HistoryView({
 
   const shift = (delta: number) => onSettings({ historyDate: anchor.add(delta, unit).toISOString() });
 
-  const renderTransactions = (data: Transaction[]) => (
-    <List
-      className="txn-list"
-      size="small"
-      dataSource={data}
-      locale={{ emptyText: <Empty description="暂无记录" image={Empty.PRESENTED_IMAGE_SIMPLE} /> }}
-      renderItem={(row) => {
-        const category = CATEGORY_MAP[row.category];
-        return (
-          <List.Item className="txn-item" onClick={() => onViewTransaction(row)}>
-            <List.Item.Meta
-              avatar={<CategoryAvatar categoryId={row.category} size={38} />}
-              title={<span className="txn-name">{row.note || category?.name || row.category}</span>}
-              description={`${category?.name ?? row.category} · ${dayjs(row.date).format('MM-DD')}`}
-            />
-            <strong className={row.type === 'income' ? 'txn-amount income' : 'txn-amount expense'}>
-              {row.type === 'income' ? '+' : '-'}{formatMoney(baseAmount(row, settings.currencyConfigs))}
-            </strong>
-          </List.Item>
-        );
-      }}
-    />
-  );
+  const renderTransactions = (data: Transaction[]) => {
+    if (data.length === 0) {
+      return <Empty description="暂无记录" image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+    }
+    return (
+      <Listy
+        items={data}
+        rowKey="id"
+        classNames={{ root: 'txn-list', item: 'txn-item' }}
+        itemRender={(row) => {
+          const category = CATEGORY_MAP[row.category];
+          return (
+            <div className="listy-row" onClick={() => onViewTransaction(row)}>
+              <div className="listy-meta">
+                <CategoryAvatar categoryId={row.category} size={38} />
+                <div className="listy-meta-content">
+                  <span className="txn-name">{row.note || category?.name || row.category}</span>
+                  <span className="listy-meta-description">
+                    {`${category?.name ?? row.category} · ${dayjs(row.date).format('MM-DD')}`}
+                  </span>
+                </div>
+              </div>
+              <strong className={row.type === 'income' ? 'txn-amount income' : 'txn-amount expense'}>
+                {row.type === 'income' ? '+' : '-'}{formatMoney(baseAmount(row, settings.currencyConfigs))}
+              </strong>
+            </div>
+          );
+        }}
+      />
+    );
+  };
 
   const renderStructure = (stats: typeof expenseStats, type: 'expense' | 'income') => (
     <Card size="small" title={type === 'expense' ? '支出结构' : '收入结构'}>
@@ -139,19 +147,23 @@ export default function HistoryView({
         {ranked.length === 0 ? (
           <Empty description="暂无数据" image={Empty.PRESENTED_IMAGE_SIMPLE} />
         ) : (
-          <List
-            className="rank-list"
-            size="small"
-            dataSource={ranked}
-            renderItem={(row, index) => (
-              <List.Item className="clickable-list-item" onClick={() => onViewTransaction(row)}>
-                <List.Item.Meta
-                  avatar={<Avatar style={{ backgroundColor: index < 3 ? '#1677ff' : '#bfbfbf' }}>{index + 1}</Avatar>}
-                  title={row.note || CATEGORY_MAP[row.category]?.name || row.category}
-                  description={`${CATEGORY_MAP[row.category]?.name ?? row.category} · ${dayjs(row.date).format('MM-DD')}`}
-                />
+          <Listy
+            items={ranked}
+            rowKey="id"
+            classNames={{ root: 'rank-list', item: 'clickable-list-item' }}
+            itemRender={(row, index) => (
+              <div className="listy-row" onClick={() => onViewTransaction(row)}>
+                <div className="listy-meta">
+                  <Avatar style={{ backgroundColor: index < 3 ? '#1677ff' : '#bfbfbf' }}>{index + 1}</Avatar>
+                  <div className="listy-meta-content">
+                    <span className="txn-name">{row.note || CATEGORY_MAP[row.category]?.name || row.category}</span>
+                    <span className="listy-meta-description">
+                      {`${CATEGORY_MAP[row.category]?.name ?? row.category} · ${dayjs(row.date).format('MM-DD')}`}
+                    </span>
+                  </div>
+                </div>
                 <Typography.Text strong>{formatMoney(baseAmount(row, settings.currencyConfigs))}</Typography.Text>
-              </List.Item>
+              </div>
             )}
           />
         )}
@@ -160,7 +172,7 @@ export default function HistoryView({
   };
 
   return (
-    <Space direction="vertical" size={12} style={{ width: '100%' }} className="history-page">
+    <Space orientation="vertical" size={12} style={{ width: '100%' }} className="history-page">
       <Card size="small" styles={{ body: { padding: 12 } }}>
         <Segmented
           block
@@ -224,7 +236,7 @@ export default function HistoryView({
             key={mode}
             ghost
             className="txn-groups"
-            expandIconPosition="end"
+            expandIconPlacement="end"
             items={groups.map((group) => {
               const groupSummary = summarize(group.rows, settings.currencyConfigs);
               const date = dayjs(group.key);

@@ -1,5 +1,5 @@
 import { useMemo, useState, type CSSProperties } from 'react';
-import { Button, Card, Col, Collapse, Empty, List, Row, Space, Typography } from 'antd';
+import { Button, Card, Col, Collapse, Empty, Listy, Row, Space, Typography } from 'antd';
 import {
   Area,
   AreaChart,
@@ -25,8 +25,10 @@ import type { AssetSnapshot, CurrencyConfig } from '../types';
 const INVESTMENT_TYPES = ASSET_TYPES.filter((item) => item.value !== CASH_ASSET_TYPE);
 const CASH_COLOR = ASSET_TYPES.find((item) => item.value === CASH_ASSET_TYPE)?.color ?? '#d4b46f';
 const ASSET_TOTAL_COLOR = '#4f46e5';
-const returnRateOf = (amount: number, profit: number) =>
-  amount > 0 ? (profit / amount) * 100 : 0;
+const returnRateOf = (amount: number, profit: number) => {
+  const costBasis = amount + profit;
+  return costBasis > 0 ? (profit / costBasis) * 100 : 0;
+};
 
 interface Props {
   assets: AssetSnapshot[];
@@ -259,36 +261,39 @@ export default function InvestmentView({ assets, configs, onAddAsset, onDeleteAs
   }, []);
 
   const renderAssetItems = (data: typeof details) => (
-    <List
-      className="txn-list asset-list"
-      size="small"
-      dataSource={data}
-      locale={{ emptyText: <Empty description="暂无资产记录" image={Empty.PRESENTED_IMAGE_SIMPLE} /> }}
-      renderItem={(row) => {
+    <Listy
+      items={data}
+      rowKey="id"
+      rowHoverable={false}
+      classNames={{ root: 'txn-list asset-list', item: 'txn-item' }}
+      itemRender={(row) => {
         const type = ASSET_TYPES.find((item) => item.value === row.type);
         const amount = convertToBase(row.amount, row.currency, configs);
         const profit = convertToBase(row.profit ?? 0, row.currency, configs);
-        const rate = amount > 0 ? (profit / amount) * 100 : 0;
+        const costBasis = amount + profit;
+        const rate = costBasis > 0 ? (profit / costBasis) * 100 : 0;
         const profitText = row.type === CASH_ASSET_TYPE
           ? '不计收益'
-          : `收益 ${profit >= 0 ? '+' : '-'}${formatMoney(Math.abs(profit))}${amount > 0 ? ` · ${rate >= 0 ? '+' : ''}${rate.toFixed(1)}%` : ''}`;
+          : `收益 ${profit >= 0 ? '+' : '-'}${formatMoney(Math.abs(profit))}${costBasis > 0 ? ` · ${rate >= 0 ? '+' : ''}${rate.toFixed(1)}%` : ''}`;
         const description = `${profitText}${row.currency !== 'CNY' ? ` · ${row.currency} ${row.amount.toLocaleString('zh-CN')}` : ''}`;
         return (
-          <List.Item className="txn-item">
-            <List.Item.Meta
-              avatar={<AssetAvatar type={row.type} size={38} />}
-              title={<span className="txn-name">{type?.label ?? row.type}</span>}
-              description={description}
-            />
+          <div className="listy-row">
+            <div className="listy-meta">
+              <AssetAvatar type={row.type} size={38} />
+              <div className="listy-meta-content">
+                <span className="txn-name">{type?.label ?? row.type}</span>
+                <span className="listy-meta-description">{description}</span>
+              </div>
+            </div>
             <strong className="txn-amount">{formatMoney(amount)}</strong>
-          </List.Item>
+          </div>
         );
       }}
     />
   );
 
   return (
-    <Space direction="vertical" size={12} style={{ width: '100%' }}>
+    <Space orientation="vertical" size={12} style={{ width: '100%' }}>
       <Card size="small" styles={{ body: { padding: '14px 4px' } }}>
         <MetricStrip
           uniformSize
@@ -522,7 +527,7 @@ export default function InvestmentView({ assets, configs, onAddAsset, onDeleteAs
           <Collapse
             ghost
             className="txn-groups"
-            expandIconPosition="end"
+            expandIconPlacement="end"
             items={groupedDetails.map((group) => ({
               key: group.month,
               label: (

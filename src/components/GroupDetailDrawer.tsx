@@ -1,4 +1,4 @@
-import { Drawer, Empty, List, Tag, Typography } from 'antd';
+import { Drawer, Empty, Listy, Tag, Typography } from 'antd';
 import { CalendarOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { CATEGORY_MAP } from '../constants';
@@ -39,25 +39,28 @@ export default function GroupDetailDrawer({ label, rows, currencies, onClose, on
       onClose={onClose}
       closable={{ placement: 'end' }}
       placement={isMobile ? 'bottom' : 'right'}
-      height={isMobile ? '82vh' : undefined}
-      width={isMobile ? undefined : 480}
+      size={isMobile ? '82vh' : 480}
     >
       {rows.length === 0 ? (
         <Empty description="暂无记录" />
       ) : (
-        <List
-          dataSource={[...rows].sort((a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf())}
-          renderItem={(row) => (
-            <List.Item className="clickable-list-item" onClick={() => onSelect(row)}>
-              <List.Item.Meta
-                avatar={<CategoryAvatar categoryId={row.category} size={34} />}
-                title={row.note || CATEGORY_MAP[row.category]?.name || row.category}
-                description={dayjs(row.date).format('YYYY-MM-DD')}
-              />
+        <Listy
+          items={[...rows].sort((a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf())}
+          rowKey="id"
+          classNames={{ item: 'clickable-list-item' }}
+          itemRender={(row) => (
+            <div className="listy-row" onClick={() => onSelect(row)}>
+              <div className="listy-meta">
+                <CategoryAvatar categoryId={row.category} size={34} />
+                <div className="listy-meta-content">
+                  <span className="txn-name">{row.note || CATEGORY_MAP[row.category]?.name || row.category}</span>
+                  <span className="listy-meta-description">{dayjs(row.date).format('YYYY-MM-DD')}</span>
+                </div>
+              </div>
               <Typography.Text strong style={{ color: row.type === 'income' ? 'var(--income)' : undefined }}>
                 {row.type === 'income' ? '+' : '-'}{formatMoney(baseAmount(row, currencies))}
               </Typography.Text>
-            </List.Item>
+            </div>
           )}
         />
       )}

@@ -349,7 +349,7 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
   };
 
   return (
-    <Space direction="vertical" size={16} style={{ width: '100%' }} className="trends-page">
+    <Space orientation="vertical" size={16} style={{ width: '100%' }} className="trends-page">
       <Card size="small" styles={{ body: { padding: 12 } }}>
         <Segmented
           block

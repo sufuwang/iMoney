@@ -51,8 +51,7 @@ export default function TransactionDetailDrawer({
       onClose={onClose}
       closable={{ placement: 'end' }}
       placement={isMobile ? 'bottom' : 'right'}
-      height={isMobile ? '78vh' : undefined}
-      width={isMobile ? undefined : 420}
+      size={isMobile ? '78vh' : 420}
       footer={
         transaction && (
           <Space style={{ justifyContent: 'flex-end', display: 'flex' }}>

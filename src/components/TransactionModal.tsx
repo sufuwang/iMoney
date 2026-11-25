@@ -136,6 +136,7 @@ export default function TransactionModal({
       (sum, item) => sum + convertToBase(read(item.value, 'profit'), assetCurrency, currencies), 0,
     );
     const investment = total;
+    const costBasis = investment + profit;
     const cash = convertToBase(read(CASH_ASSET_TYPE, 'amount'), assetCurrency, currencies);
     return {
       total,
@@ -143,7 +144,7 @@ export default function TransactionModal({
       profit,
       investment,
       assetTotal: investment + cash,
-      returnRate: investment > 0 ? (profit / investment) * 100 : 0,
+      returnRate: costBasis > 0 ? (profit / costBasis) * 100 : 0,
     };
   }, [watchedAssets, assetCurrency, currencies]);
   const currencyOptions = currencies
@@ -241,8 +242,7 @@ export default function TransactionModal({
       onClose={onCancel}
       closable={{ placement: 'end' }}
       placement={isMobile ? 'bottom' : 'right'}
-      height={isMobile ? '84vh' : undefined}
-      width={isMobile ? undefined : 520}
+      size={isMobile ? '84vh' : 520}
       destroyOnHidden
       className="app-drawer entry-drawer"
       title={<DrawerHead icon={<HeaderIcon />} title={title} subtitle={subtitle} />}

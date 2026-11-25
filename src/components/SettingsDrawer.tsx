@@ -75,8 +75,7 @@ export default function SettingsDrawer({
       onClose={onClose}
       closable={{ placement: 'end' }}
       placement={isMobile ? 'bottom' : 'right'}
-      height={isMobile ? '84vh' : undefined}
-      width={isMobile ? undefined : 440}
+      size={isMobile ? '84vh' : 440}
       className="app-drawer settings-drawer"
       title={<DrawerHead icon={<SettingOutlined />} title="设置" subtitle="币种、备份与本地数据" />}
       styles={{ body: { padding: 0 } }}

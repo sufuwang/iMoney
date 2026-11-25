@@ -125,7 +125,7 @@ export default function HealthView({ transactions, settings, onViewExpenseGroup 
   const scoreText = score >= 80 ? '非常健康' : score >= 60 ? '状态良好' : score >= 40 ? '需要关注' : '亟需改善';
 
   return (
-    <Space direction="vertical" size={14} style={{ width: '100%' }}>
+    <Space orientation="vertical" size={14} style={{ width: '100%' }}>
       <Card size="small">
         <div className="health-score">
           <div className="health-score-ring" style={{ background: `conic-gradient(${scoreColor} ${score * 3.6}deg, #eef0f5 0)` }}>

@@ -546,19 +546,22 @@ b, strong { font-variant-numeric: tabular-nums; }
 .detail-hero { display: flex; flex-direction: column; align-items: center; padding: 20px 0; }
 
 /* ---------- Transactions & structure ---------- */
+.txn-item,
+.clickable-list-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0;
+}
 .txn-list .txn-item {
-  align-items: center !important;
   padding: 9px 6px !important;
   border-radius: 10px;
   cursor: pointer;
   transition: background 0.2s;
 }
 .txn-list .txn-item:hover { background: #f7f8fc; }
-.txn-item .ant-list-item-meta { align-items: center !important; margin-bottom: 0 !important; min-width: 0; }
-.txn-item .ant-list-item-meta-avatar { margin-inline-end: 12px !important; }
-.txn-item .ant-list-item-meta-content { min-width: 0; }
+.listy-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-width: 0; }
+.listy-meta { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+.listy-meta-content { min-width: 0; flex: 1; }
 .txn-name { display: block; font-size: 14px; font-weight: 600; line-height: 1.4; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.txn-item .ant-list-item-meta-description { margin-top: 2px; font-size: 11px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.listy-meta-description { display: block; margin-top: 2px; font-size: 11px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .txn-amount { margin-left: 10px; font-size: 15px; font-weight: 700; letter-spacing: -0.2px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 .txn-groups .ant-collapse-item { border-bottom: 0 !important; }
@@ -596,7 +599,6 @@ b, strong { font-variant-numeric: tabular-nums; }
 .category-row-percent { width: 50px; text-align: right; font-size: 12px; color: var(--ink-3); }
 .category-list .category-row.is-hidden { opacity: 0.42; }
 .clickable-list-item { cursor: pointer; border-radius: var(--control-radius); padding: 9px !important; transition: background 0.2s; }
-.rank-list .ant-list-item-meta { align-items: center !important; }
 .clickable-list-item:hover { background: #f7f8fc; }
 .clickable-list-item:active { background: var(--soft); }
 /* ---------- Borderless controls (history & trends) ---------- */
