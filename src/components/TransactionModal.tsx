@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react';
 import {
   Button,
   DatePicker,
@@ -18,10 +18,13 @@ import {
   GoldOutlined,
   PayCircleOutlined,
   PlusCircleOutlined,
+  RiseOutlined,
+  WalletOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { ASSET_TYPES, CATEGORIES } from '../constants';
+import { ASSET_TYPES, CASH_ASSET_TYPE, CATEGORIES } from '../constants';
 import useIsMobile from '../hooks/useIsMobile';
+import { convertToBase, formatMoney, futureDateDisabled } from '../lib/finance';
 import type { AssetSnapshot, AssetType, CurrencyConfig, Transaction, TransactionType } from '../types';
 import { assetTypeIcon, categoryIcon } from './CategoryAvatar';
 import DrawerHead from './DrawerHead';
@@ -35,12 +38,37 @@ interface FormValues {
   note: string;
 }
 
+interface AssetFieldValues {
+  amount: number | null;
+  profit: number | null;
+}
+
 interface AssetFormValues {
   month: dayjs.Dayjs;
-  type: AssetType;
   currency: string;
-  amount: number;
+  assets: Record<AssetType, AssetFieldValues>;
 }
+
+const INVESTMENT_TYPES = ASSET_TYPES.filter((item) => item.value !== CASH_ASSET_TYPE);
+
+const emptyAssetFields = (): AssetFormValues['assets'] =>
+  Object.fromEntries(
+    ASSET_TYPES.map((item) => [item.value, { amount: null, profit: null }]),
+  ) as AssetFormValues['assets'];
+
+const amountRules = (label: string) => [
+  { required: true, message: `请填写${label}金额` },
+  {
+    validator: (_: unknown, value: number | null) =>
+      value === null || value === undefined || value > 0
+        ? Promise.resolve()
+        : Promise.reject(new Error(`${label}金额需大于 0`)),
+  },
+];
+
+const profitRules = (label: string) => [
+  { required: true, message: `请填写${label}累计收益` },
+];
 
 type EntryMode = 'transaction' | 'asset';
 
@@ -53,7 +81,7 @@ interface Props {
   recentNotes: string[];
   onCancel: () => void;
   onSubmit: (value: Omit<Transaction, 'id'>) => void;
-  onSaveAsset: (value: Omit<AssetSnapshot, 'id'>) => void;
+  onSaveAssets: (values: Omit<AssetSnapshot, 'id'>[]) => void;
 }
 
 export default function TransactionModal({
@@ -65,7 +93,7 @@ export default function TransactionModal({
   recentNotes,
   onCancel,
   onSubmit,
-  onSaveAsset,
+  onSaveAssets,
 }: Props) {
   const [form] = Form.useForm<FormValues>();
   const [assetForm] = Form.useForm<AssetFormValues>();
@@ -76,6 +104,47 @@ export default function TransactionModal({
   const txnSymbol = currencies.find((item) => item.code === txnCurrency)?.symbol ?? '¥';
   const assetCurrency = Form.useWatch('currency', assetForm) ?? 'CNY';
   const assetSymbol = currencies.find((item) => item.code === assetCurrency)?.symbol ?? '¥';
+  const watchedAssets = Form.useWatch('assets', assetForm);
+  const clearValidationErrors = useCallback(() => {
+    form.setFields([
+      { name: 'amount', errors: [] },
+      { name: 'currency', errors: [] },
+      { name: 'category', errors: [] },
+      { name: 'date', errors: [] },
+      { name: 'note', errors: [] },
+    ]);
+    assetForm.setFields([
+      { name: 'month', errors: [] },
+      { name: 'currency', errors: [] },
+      { name: 'assets', errors: [] },
+      ...ASSET_TYPES.flatMap((item) => [
+        { name: ['assets', item.value, 'amount'], errors: [] },
+        ...(item.value === CASH_ASSET_TYPE
+          ? []
+          : [{ name: ['assets', item.value, 'profit'], errors: [] }]),
+      ]),
+    ] as Parameters<typeof assetForm.setFields>[0]);
+  }, [form, assetForm]);
+  const assetSummary = useMemo(() => {
+    const read = (type: AssetType, key: keyof AssetFieldValues) =>
+      Number(watchedAssets?.[type]?.[key] ?? 0);
+    const total = INVESTMENT_TYPES.reduce(
+      (sum, item) => sum + convertToBase(read(item.value, 'amount'), assetCurrency, currencies), 0,
+    );
+    const profit = INVESTMENT_TYPES.reduce(
+      (sum, item) => sum + convertToBase(read(item.value, 'profit'), assetCurrency, currencies), 0,
+    );
+    const investment = total - profit;
+    const cash = convertToBase(read(CASH_ASSET_TYPE, 'amount'), assetCurrency, currencies);
+    return {
+      total,
+      cash,
+      profit,
+      investment,
+      assetTotal: investment + profit + cash,
+      returnRate: investment > 0 ? (profit / investment) * 100 : 0,
+    };
+  }, [watchedAssets, assetCurrency, currencies]);
   const currencyOptions = currencies
     .filter((item) => item.enabled)
     .map((item) => ({
@@ -85,6 +154,7 @@ export default function TransactionModal({
 
   useEffect(() => {
     if (!open) return;
+    clearValidationErrors();
     const type = editing?.type ?? 'expense';
     setEntryType(type);
     form.setFieldsValue({
@@ -95,19 +165,20 @@ export default function TransactionModal({
       date: dayjs(editing?.date ?? new Date()),
       note: editing?.note ?? '',
     });
-  }, [open, editing, form]);
+  }, [open, editing, form, clearValidationErrors]);
 
   useEffect(() => {
     if (!open || mode !== 'asset') return;
+    assetForm.resetFields();
     assetForm.setFieldsValue({
       month: dayjs().startOf('month'),
-      type: 'active_fund',
       currency: 'CNY',
-      amount: null,
+      assets: emptyAssetFields(),
     });
   }, [open, mode, assetForm]);
 
   const handleTypeSwitch = (value: string) => {
+    clearValidationErrors();
     if (value === 'asset') {
       onModeChange('asset');
       return;
@@ -120,26 +191,38 @@ export default function TransactionModal({
   };
 
   const handleOk = async () => {
-    if (mode === 'asset') {
-      const values = await assetForm.validateFields();
-      onSaveAsset({
-        month: values.month.format('YYYY-MM'),
-        type: values.type,
+    try {
+      if (mode === 'asset') {
+        const values = await assetForm.validateFields();
+        const rows = ASSET_TYPES.flatMap((item) => {
+          const field = values.assets[item.value];
+          const amount = Number(field?.amount ?? 0);
+          const profit = item.value === CASH_ASSET_TYPE ? 0 : Number(field?.profit ?? 0);
+          if (amount <= 0) return [];
+          return [{
+            month: values.month.format('YYYY-MM'),
+            type: item.value,
+            currency: values.currency,
+            amount,
+            profit,
+          }];
+        });
+        onSaveAssets(rows);
+        assetForm.setFieldsValue({ assets: emptyAssetFields() });
+        return;
+      }
+      const values = await form.validateFields();
+      onSubmit({
+        type: entryType,
+        amount: values.amount as number,
         currency: values.currency,
-        amount: values.amount,
+        category: values.category,
+        note: values.note ?? '',
+        date: values.date.format('YYYY-MM-DD'),
       });
-      assetForm.setFieldsValue({ amount: null });
-      return;
+    } catch {
+      // 校验失败仅通过输入框红框提示
     }
-    const values = await form.validateFields();
-    onSubmit({
-      type: entryType,
-      amount: values.amount as number,
-      currency: values.currency,
-      category: values.category,
-      note: values.note ?? '',
-      date: values.date.format('YYYY-MM-DD'),
-    });
   };
 
   const isAsset = mode === 'asset';
@@ -164,8 +247,8 @@ export default function TransactionModal({
       title={<DrawerHead icon={<HeaderIcon />} title={title} subtitle={subtitle} />}
       footer={
         <div className="drawer-footer">
-          <Button block size="large" onClick={onCancel}>取消</Button>
-          <Button block type="primary" size="large" onClick={() => void handleOk()}>
+          <Button block onClick={onCancel}>取消</Button>
+          <Button block type="primary" onClick={() => void handleOk()}>
             {isAsset ? '保存资产' : editing ? '保存修改' : '完成记账'}
           </Button>
         </div>
@@ -207,18 +290,24 @@ export default function TransactionModal({
                 </Form.Item>
               </div>
               <Form.Item
-                className="entry-amount-item"
                 name="amount"
-                rules={[{ required: true, message: '请输入金额' }, { type: 'number', min: 0.01, message: '金额需大于 0' }]}
+                label="当前金额"
+                rules={[
+                  { required: true, message: '请输入金额' },
+                  {
+                    validator: (_, value: number | null) =>
+                      value === null || value === undefined || value > 0
+                        ? Promise.resolve()
+                        : Promise.reject(new Error('金额需大于 0')),
+                  },
+                ]}
               >
                 <InputNumber
-                  className="amount-input"
+                  className="asset-entry-input"
                   prefix={txnSymbol}
-                  min={0.01}
+                  min={0}
                   precision={2}
-                  step={0.01}
                   inputMode="decimal"
-                  pattern="[0-9]*[.,]?[0-9]*"
                   style={{ width: '100%' }}
                   placeholder="0.00"
                 />
@@ -272,10 +361,38 @@ export default function TransactionModal({
                   <span>备注可选填，方便日后查找</span>
                 </span>
               </div>
-              <Form.Item name="date" label="日期" rules={[{ required: true, message: '请选择日期' }]}>
-                <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" allowClear={false} inputReadOnly />
+              <Form.Item
+                name="date"
+                label="日期"
+                rules={[
+                  { required: true, message: '请选择日期' },
+                  {
+                    validator: (_, value: dayjs.Dayjs | null) =>
+                      !value || !value.isAfter(dayjs(), 'day')
+                        ? Promise.resolve()
+                        : Promise.reject(new Error('日期不能晚于今天')),
+                  },
+                ]}
+              >
+                <DatePicker
+                  style={{ width: '100%' }}
+                  format="YYYY-MM-DD"
+                  allowClear={false}
+                  inputReadOnly
+                  disabledDate={futureDateDisabled('day')}
+                />
               </Form.Item>
-              <Form.Item name="note" label="备注">
+              <Form.Item
+                name="note"
+                label="备注"
+                rules={[
+                  { required: true, message: '请输入备注' },
+                  {
+                    validator: (_, value: string | undefined) =>
+                      value?.trim() ? Promise.resolve() : Promise.reject(new Error('请输入备注')),
+                  },
+                ]}
+              >
                 <Input.TextArea rows={2} maxLength={200} showCount placeholder="写点什么，方便以后回忆…" />
               </Form.Item>
               {recentNotes.length > 0 && (
@@ -309,8 +426,8 @@ export default function TransactionModal({
                   <PayCircleOutlined />
                 </span>
                 <span className="entry-card-titles">
-                  <strong>金额</strong>
-                  <span>填写本月该类别的资产总额</span>
+                  <strong>投资金额与收益</strong>
+                  <span>一次填写主动基金、纳指、标普；收益为累计盈亏，亏损填负数</span>
                 </span>
                 <Form.Item name="currency" noStyle rules={[{ required: true }]}>
                   <Select
@@ -321,57 +438,102 @@ export default function TransactionModal({
                   />
                 </Form.Item>
               </div>
+              {INVESTMENT_TYPES.map((item) => {
+                const Icon = assetTypeIcon(item.value);
+                return (
+                  <div key={item.value} className="asset-entry-row">
+                    <span className="asset-entry-label" style={{ '--category-color': item.color } as CSSProperties}>
+                      <span className="asset-entry-icon"><Icon /></span>
+                      {item.label}
+                    </span>
+                    <Form.Item
+                      name={['assets', item.value, 'amount']}
+                      rules={amountRules(item.label)}
+                    >
+                      <InputNumber
+                        className="asset-entry-input"
+                        prefix={assetSymbol}
+                        min={0}
+                        precision={2}
+                        inputMode="decimal"
+                        style={{ width: '100%' }}
+                        placeholder="0.00"
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name={['assets', item.value, 'profit']}
+                      rules={profitRules(item.label)}
+                    >
+                      <InputNumber
+                        className="asset-entry-input"
+                        prefix={assetSymbol}
+                        precision={2}
+                        inputMode="decimal"
+                        style={{ width: '100%' }}
+                        placeholder="0.00"
+                      />
+                    </Form.Item>
+                  </div>
+                );
+              })}
+            </section>
+
+            <section className="entry-card">
+              <div className="entry-card-head">
+                <span className="entry-card-icon tone-amber">
+                  <WalletOutlined />
+                </span>
+                <span className="entry-card-titles">
+                  <strong>现金</strong>
+                  <span>填写银行卡、交易软件等账户中的可用余额合计</span>
+                </span>
+              </div>
               <Form.Item
-                className="entry-amount-item"
-                name="amount"
-                rules={[{ required: true, message: '请输入金额' }, { type: 'number', min: 0.01, message: '金额需大于 0' }]}
+                name={['assets', CASH_ASSET_TYPE, 'amount']}
+                label="当前金额"
+                rules={amountRules('现金')}
               >
                 <InputNumber
-                  className="amount-input"
+                  className="asset-entry-input"
                   prefix={assetSymbol}
-                  min={0.01}
+                  min={0}
                   precision={2}
                   inputMode="decimal"
-                  pattern="[0-9]*[.,]?[0-9]*"
                   style={{ width: '100%' }}
                   placeholder="0.00"
                 />
               </Form.Item>
             </section>
 
-            <section className="entry-card">
+            <section className="entry-card asset-summary-card">
               <div className="entry-card-head">
                 <span className="entry-card-icon tone-amber">
-                  <AppstoreOutlined />
+                  <RiseOutlined />
                 </span>
                 <span className="entry-card-titles">
-                  <strong>资产类别</strong>
-                  <span>现金、基金、股票等分别记录</span>
+                  <strong>自动计算</strong>
+                  <span>资产总额 = 资产总投资 + 资产收益 + 现金</span>
                 </span>
               </div>
-              <Form.Item
-                className="entry-plain-item"
-                name="type"
-                rules={[{ required: true, message: '请选择资产类别' }]}
-              >
-                <Radio.Group className="category-radio asset-type-radio" optionType="button">
-                  {ASSET_TYPES.map((item) => {
-                    const Icon = assetTypeIcon(item.value);
-                    return (
-                      <Radio.Button
-                        key={item.value}
-                        value={item.value}
-                        style={{ '--category-color': item.color } as CSSProperties}
-                      >
-                        <span className="category-option">
-                          <span className="category-tile"><Icon /></span>
-                          <span className="category-name">{item.label}</span>
-                        </span>
-                      </Radio.Button>
-                    );
-                  })}
-                </Radio.Group>
-              </Form.Item>
+              <div className="asset-summary-grid">
+                <div className="asset-summary-cell">
+                  <span>资产总额</span>
+                  <strong>{formatMoney(assetSummary.assetTotal)}</strong>
+                </div>
+                <div className="asset-summary-cell">
+                  <span>资产总投资</span>
+                  <strong>{formatMoney(assetSummary.investment)}</strong>
+                </div>
+                <div className="asset-summary-cell">
+                  <span>资产收益率</span>
+                  <strong className={assetSummary.returnRate >= 0 ? 'income' : 'expense'}>
+                    {`${assetSummary.returnRate >= 0 ? '+' : ''}${assetSummary.returnRate.toFixed(2)}%`}
+                  </strong>
+                </div>
+              </div>
+              <Typography.Text type="secondary" className="entry-tip">
+                {assetCurrency === 'CNY' ? '按人民币汇总' : '按所选币种折算人民币汇总'}：投资类总资产 {formatMoney(assetSummary.total)}，累计收益 {formatMoney(assetSummary.profit)}，现金 {formatMoney(assetSummary.cash)}。现金计入资产总额，不参与收益计算；留空或填 0 的类别不会保存。
+              </Typography.Text>
             </section>
 
             <section className="entry-card">
@@ -384,13 +546,26 @@ export default function TransactionModal({
                   <span>按自然月保存，便于观察资产变化</span>
                 </span>
               </div>
-              <Form.Item name="month" label="月份" rules={[{ required: true, message: '请选择月份' }]}>
+              <Form.Item
+                name="month"
+                label="月份"
+                rules={[
+                  { required: true, message: '请选择月份' },
+                  {
+                    validator: (_, value: dayjs.Dayjs | null) =>
+                      !value || !value.isAfter(dayjs(), 'month')
+                        ? Promise.resolve()
+                        : Promise.reject(new Error('月份不能晚于本月')),
+                  },
+                ]}
+              >
                 <DatePicker
                   picker="month"
                   format="YYYY-MM"
                   allowClear={false}
                   inputReadOnly
                   style={{ width: '100%' }}
+                  disabledDate={futureDateDisabled('month')}
                 />
               </Form.Item>
               <Typography.Text type="secondary" className="entry-tip">

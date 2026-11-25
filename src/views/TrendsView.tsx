@@ -25,11 +25,19 @@ import {
   effectiveMode,
   formatAxisMoney,
   formatMoney,
+  futureDateDisabled,
   inRange,
   summarize,
   trendData,
 } from '../lib/finance';
 import type { AppSettings, CategoryStat, Transaction, ViewMode } from '../types';
+
+const INCOME_COLOR = '#10b981';
+const EXPENSE_COLOR = '#f43f5e';
+const FLOW_LEGEND = [
+  { key: 'income', label: '收入', color: INCOME_COLOR },
+  { key: 'expense', label: '支出', color: EXPENSE_COLOR },
+] as const;
 
 interface Props {
   transactions: Transaction[];
@@ -85,6 +93,7 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
   const isMobile = useIsMobile();
   const [start, setStart] = useState<Dayjs>(() => defaultTrendRange(settings.trendView)[0]);
   const [end, setEnd] = useState<Dayjs>(() => defaultTrendRange(settings.trendView)[1]);
+  const [hiddenFlowTypes, setHiddenFlowTypes] = useState<string[]>([]);
 
   const changeMode = (view: ViewMode) => {
     const [nextStart, nextEnd] = defaultTrendRange(view);
@@ -116,7 +125,7 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
     return (
       <Card
         size="small"
-        title={type === 'expense' ? '分类支出动态' : '分类收入动态'}
+        title={type === 'expense' ? '支出分类走势' : '收入分类走势'}
         extra={
           active.length !== stats.length ? (
             <Button type="link" size="small" onClick={() => onSettings({ hiddenTrendCategories: [] })}>全选</Button>
@@ -226,10 +235,43 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
         </text>
       );
     };
+    const renderPieLabelLine = (props: unknown) => {
+      const point = props as {
+        name?: string | number;
+        midAngle?: number;
+        cx?: number;
+        cy?: number;
+        outerRadius?: number;
+        payload?: { category?: string; color?: string };
+      };
+      if (point.midAngle === undefined || !topCategories.has(point.payload?.category ?? '')) return null;
+      const angle = (point.midAngle * Math.PI) / 180;
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      const outer = point.outerRadius ?? 0;
+      const startX = (point.cx ?? 0) + cos * (outer + 2);
+      const startY = (point.cy ?? 0) - sin * (outer + 2);
+      const labelX = (point.cx ?? 0) + cos * (outer + 10);
+      const labelY = (point.cy ?? 0) - sin * (outer + 10);
+      const elbowX = labelX - Math.sign(cos || 1) * 5;
+      const color = point.payload?.color
+        ?? data.find((item) => item.name === point.name)?.color
+        ?? '#b9bfcc';
+      return (
+        <polyline
+          points={`${startX},${startY} ${elbowX},${startY} ${elbowX},${labelY}`}
+          fill="none"
+          stroke={color}
+          strokeWidth={1}
+          opacity={0.75}
+          pointerEvents="none"
+        />
+      );
+    };
     return (
       <Card
         size="small"
-        title={type === 'expense' ? '支出构成比例' : '收入来源比例'}
+        title={type === 'expense' ? '支出构成' : '收入构成'}
         extra={
           stats.some((item) => hidden.includes(item.category)) ? (
             <Button type="link" size="small" onClick={() => onSettings({ hiddenPieCategories: [] })}>全选</Button>
@@ -278,7 +320,7 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
                       outerRadius="82%"
                       paddingAngle={2}
                       label={renderPieLabel}
-                      labelLine={false}
+                      labelLine={renderPieLabelLine}
                       isAnimationActive={false}
                       onClick={(entry) => {
                         const category = (entry as { category?: string }).category;
@@ -362,6 +404,7 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
               allowClear={false}
               inputReadOnly
               placement="bottomLeft"
+              disabledDate={futureDateDisabled(settings.trendView)}
               onChange={(value) => value && setStart(value)}
             />
             <span className="range-sep">至</span>
@@ -372,6 +415,7 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
               allowClear={false}
               inputReadOnly
               placement="bottomLeft"
+              disabledDate={futureDateDisabled(settings.trendView)}
               onChange={(value) => value && setEnd(value)}
             />
             <Button onClick={() => changeMode(settings.trendView)}>重置</Button>
@@ -386,6 +430,7 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
               inputReadOnly
               placement="bottomLeft"
               style={{ flex: 1, minWidth: 0 }}
+              disabledDate={futureDateDisabled(settings.trendView)}
               onChange={(values) => {
                 if (values?.[0] && values[1]) {
                   setStart(values[0]);
@@ -408,26 +453,62 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
         />
       </Card>
 
-      <Card size="small" title="收支走势对比">
+      <Card
+        size="small"
+        title="收支走势"
+        extra={
+          hiddenFlowTypes.length > 0 ? (
+            <Button type="link" size="small" onClick={() => setHiddenFlowTypes([])}>全选</Button>
+          ) : undefined
+        }
+      >
+        <div className="chart-legend">
+          {FLOW_LEGEND.map((item) => {
+            const checked = !hiddenFlowTypes.includes(item.key);
+            return (
+              <button
+                key={item.key}
+                type="button"
+                className={`chart-legend-item${checked ? ' is-active' : ''}`}
+                style={{ '--legend-color': item.color } as CSSProperties}
+                aria-pressed={checked}
+                onClick={() =>
+                  setHiddenFlowTypes((current) =>
+                    checked
+                      ? [...current, item.key]
+                      : current.filter((key) => key !== item.key),
+                  )
+                }
+              >
+                <span className="chart-legend-mark" />
+                <span className="chart-legend-label">{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
         <div className="chart-container chart-container-tall">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={flowData} margin={{ top: 12, right: 12, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.35} />
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                  <stop offset="5%" stopColor={INCOME_COLOR} stopOpacity={0.35} />
+                  <stop offset="95%" stopColor={INCOME_COLOR} stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.35} />
-                  <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
+                  <stop offset="5%" stopColor={EXPENSE_COLOR} stopOpacity={0.35} />
+                  <stop offset="95%" stopColor={EXPENSE_COLOR} stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eef0f5" />
               <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} minTickGap={20} />
               <YAxis tickFormatter={formatAxisMoney} tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} width={52} />
               <Tooltip content={<ChartTooltip />} />
-              <Area type="monotone" dataKey="income" name="收入" stroke="#10b981" fill="url(#incomeGradient)" strokeWidth={2} isAnimationActive={false} />
-              <Area type="monotone" dataKey="expense" name="支出" stroke="#f43f5e" fill="url(#expenseGradient)" strokeWidth={2} isAnimationActive={false} />
+              {!hiddenFlowTypes.includes('income') && (
+                <Area type="monotone" dataKey="income" name="收入" stroke={INCOME_COLOR} fill="url(#incomeGradient)" strokeWidth={2} isAnimationActive={false} />
+              )}
+              {!hiddenFlowTypes.includes('expense') && (
+                <Area type="monotone" dataKey="expense" name="支出" stroke={EXPENSE_COLOR} fill="url(#expenseGradient)" strokeWidth={2} isAnimationActive={false} />
+              )}
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -443,7 +524,7 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
         <Col xs={24} lg={12}>{renderPie(incomeStats, 'income')}</Col>
       </Row>
 
-      <Card size="small" title="周期均值分析">
+      <Card size="small" title="周期均值">
         <div ref={averageStatsRef}>
           <Row gutter={[16, 12]} className="period-average">
             {averageStats.map((item) => (

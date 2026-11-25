@@ -12,11 +12,12 @@ interface Props {
   categoryId: string | null;
   rows: Transaction[];
   currencies: CurrencyConfig[];
+  title?: string;
   onClose: () => void;
   onSelect: (transaction: Transaction) => void;
 }
 
-export default function CategoryDetailDrawer({ categoryId, rows, currencies, onClose, onSelect }: Props) {
+export default function CategoryDetailDrawer({ categoryId, rows, currencies, title, onClose, onSelect }: Props) {
   const category = categoryId ? CATEGORY_MAP[categoryId] : undefined;
   const summary = summarize(rows, currencies);
   const isMobile = useIsMobile();
@@ -27,7 +28,7 @@ export default function CategoryDetailDrawer({ categoryId, rows, currencies, onC
       title={
         <DrawerHead
           icon={<AppstoreOutlined />}
-          title={`${category?.name ?? '分类'}明细`}
+          title={title ?? `${category?.name ?? '分类'}明细`}
           subtitle={`${rows.length} 笔记录`}
           extra={
             <Tag color={summary.balance >= 0 ? 'green' : 'red'}>

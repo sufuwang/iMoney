@@ -12,7 +12,11 @@ export function parseTransactions(raw: string): Transaction[] {
     : parsed && typeof parsed === 'object' && 'transactions' in parsed
       ? (parsed as { transactions: unknown }).transactions
       : null;
-  if (!Array.isArray(list)) throw new Error('备份文件中没有找到交易记录');
+  if (!Array.isArray(list)) {
+    // 兼容仅包含资产记录的旧备份，交易部分按空处理
+    if (parsed && typeof parsed === 'object' && 'assets' in parsed) return [];
+    throw new Error('备份文件中没有找到交易记录');
+  }
 
   return list.map((item, index) => {
     if (!item || typeof item !== 'object') throw new Error(`第 ${index + 1} 条记录格式无效`);

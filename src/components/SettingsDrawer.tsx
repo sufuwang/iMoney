@@ -78,7 +78,7 @@ export default function SettingsDrawer({
       height={isMobile ? '84vh' : undefined}
       width={isMobile ? undefined : 440}
       className="app-drawer settings-drawer"
-      title={<DrawerHead icon={<SettingOutlined />} title="更多设置" subtitle="汇率与本地数据管理" />}
+      title={<DrawerHead icon={<SettingOutlined />} title="设置" subtitle="币种、备份与本地数据" />}
       styles={{ body: { padding: 0 } }}
     >
       <div className="settings-body">
@@ -88,7 +88,7 @@ export default function SettingsDrawer({
               <SwapOutlined />
             </span>
             <span className="settings-card-titles">
-              <strong>多币种汇率</strong>
+              <strong>币种汇率</strong>
               <span>基准 CNY · 统计金额按汇率折算</span>
             </span>
             <span className="settings-badge">{enabledCount} 种启用</span>
@@ -137,7 +137,7 @@ export default function SettingsDrawer({
               <DatabaseOutlined />
             </span>
             <span className="settings-card-titles">
-              <strong>数据管理</strong>
+              <strong>备份与数据</strong>
               <span>数据保存在本机浏览器，备份为 JSON 文件</span>
             </span>
           </div>
@@ -212,8 +212,6 @@ export default function SettingsDrawer({
               : '尚未备份，建议立即导出一次'}
           </div>
         </section>
-
-        <p className="settings-footnote">iMoney · 数据仅存储于本机</p>
       </div>
     </Drawer>
   );

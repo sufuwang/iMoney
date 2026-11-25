@@ -44,10 +44,22 @@ function normalizeCurrencies(value: unknown): CurrencyConfig[] {
 function normalizeAssets(value: unknown): AssetSnapshot[] {
   if (!Array.isArray(value)) return [];
   const byKey = new Map<string, AssetSnapshot>();
-  const push = (month: string, type: AssetType, amount: unknown, id?: string, currency?: string) => {
+  const push = (
+    month: string,
+    type: AssetType,
+    amount: unknown,
+    id?: string,
+    currency?: string,
+    profit?: unknown,
+  ) => {
     if (typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0) return;
     byKey.set(`${month}-${type}`, {
-      id: id ?? crypto.randomUUID(), month, type, currency: currency ?? 'CNY', amount,
+      id: id ?? crypto.randomUUID(),
+      month,
+      type,
+      currency: currency ?? 'CNY',
+      amount,
+      profit: typeof profit === 'number' && Number.isFinite(profit) ? profit : 0,
     });
   };
 
@@ -62,6 +74,7 @@ function normalizeAssets(value: unknown): AssetSnapshot[] {
         row.amount,
         typeof row.id === 'string' ? row.id : undefined,
         typeof row.currency === 'string' ? row.currency : 'CNY',
+        row.profit,
       );
       return;
     }
@@ -86,13 +99,14 @@ export function saveAssets(assets: AssetSnapshot[]) {
 export function loadTransactions(fallback: Transaction[]): Transaction[] {
   const saved = read<unknown>(STORAGE_KEYS.transactions);
   if (!Array.isArray(saved)) return fallback;
-  return saved
+  const rows = saved
     .filter((item): item is Transaction => Boolean(item) && typeof item === 'object')
     .map((item) => ({
       ...item,
       currency: typeof item.currency === 'string' && item.currency ? item.currency : 'CNY',
       note: typeof item.note === 'string' ? item.note : '',
     }));
+  return rows.length > 0 ? rows : fallback;
 }
 
 export function saveTransactions(transactions: Transaction[]) {

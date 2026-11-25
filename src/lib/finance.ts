@@ -11,6 +11,10 @@ const rateOf = (currency: string, configs: CurrencyConfig[]) =>
 export const convertToBase = (amount: number, currency: string, configs: CurrencyConfig[]) =>
   amount * rateOf(currency, configs);
 
+/** 日期选择器的统一上限：日/月/年粒度均不可选择未来时间。 */
+export const futureDateDisabled = (unit: 'day' | 'month' | 'year') => (current: Dayjs) =>
+  current.isAfter(dayjs(), unit);
+
 export const baseAmount = (transaction: Transaction, configs: CurrencyConfig[]) =>
   convertToBase(transaction.amount, transaction.currency, configs);
 
@@ -52,7 +56,7 @@ export function rangeFor(mode: ViewMode, anchor: Dayjs): [Dayjs, Dayjs] {
 export function defaultTrendRange(mode: ViewMode): [Dayjs, Dayjs] {
   const now = dayjs();
   if (mode === 'day') return [now.startOf('month'), now];
-  if (mode === 'month') return [now.startOf('year'), now.endOf('year')];
+  if (mode === 'month') return [now.startOf('year'), now.endOf('month')];
   return [now.subtract(4, 'year').startOf('year'), now.endOf('year')];
 }
 

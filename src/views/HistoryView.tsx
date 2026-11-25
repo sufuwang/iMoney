@@ -20,6 +20,7 @@ import {
   baseAmount,
   categoryStats,
   formatMoney,
+  futureDateDisabled,
   groupByDate,
   inRange,
   rangeFor,
@@ -47,8 +48,11 @@ export default function HistoryView({
   onViewCategory,
 }: Props) {
   const mode = settings.historyView;
-  const anchor = dayjs(settings.historyDate);
-  const [start, end] = useMemo(() => rangeFor(mode, anchor), [mode, settings.historyDate]);
+  const unit: 'day' | 'month' | 'year' = mode === 'day' ? 'day' : mode === 'month' ? 'month' : 'year';
+  const today = dayjs();
+  const storedAnchor = dayjs(settings.historyDate);
+  const anchor = storedAnchor.isAfter(today, unit) ? today : storedAnchor;
+  const [start, end] = useMemo(() => rangeFor(mode, anchor), [mode, anchor]);
   const rows = useMemo(() => inRange(transactions, start, end), [transactions, start, end]);
   const summary = useMemo(() => summarize(rows, settings.currencyConfigs), [rows, settings.currencyConfigs]);
   const expenseStats = useMemo(
@@ -65,7 +69,6 @@ export default function HistoryView({
     [rows, mode],
   );
 
-  const unit: 'day' | 'month' | 'year' = mode === 'day' ? 'day' : mode === 'month' ? 'month' : 'year';
   const shift = (delta: number) => onSettings({ historyDate: anchor.add(delta, unit).toISOString() });
 
   const renderTransactions = (data: Transaction[]) => (
@@ -93,7 +96,7 @@ export default function HistoryView({
   );
 
   const renderStructure = (stats: typeof expenseStats, type: 'expense' | 'income') => (
-    <Card size="small" title={type === 'expense' ? '支出结构' : '收入构成'}>
+    <Card size="small" title={type === 'expense' ? '支出结构' : '收入结构'}>
       {stats.length === 0 ? (
         <Empty description="暂无数据" image={Empty.PRESENTED_IMAGE_SIMPLE} />
       ) : (
@@ -132,7 +135,7 @@ export default function HistoryView({
       .sort((a, b) => baseAmount(b, settings.currencyConfigs) - baseAmount(a, settings.currencyConfigs))
       .slice(0, 5);
     return (
-      <Card size="small" title={type === 'expense' ? '支出榜单' : '收益榜单'}>
+      <Card size="small" title={type === 'expense' ? '支出排行' : '收入排行'}>
         {ranked.length === 0 ? (
           <Empty description="暂无数据" image={Empty.PRESENTED_IMAGE_SIMPLE} />
         ) : (
@@ -175,9 +178,15 @@ export default function HistoryView({
             allowClear={false}
             inputReadOnly
             format={mode === 'day' ? 'YYYY-MM-DD' : mode === 'month' ? 'YYYY-MM' : 'YYYY'}
+            disabledDate={futureDateDisabled(unit)}
             onChange={(value) => value && onSettings({ historyDate: value.toISOString() })}
           />
-          <Button icon={<RightOutlined />} onClick={() => shift(1)} aria-label="下一周期" />
+          <Button
+            icon={<RightOutlined />}
+            onClick={() => shift(1)}
+            disabled={!anchor.isBefore(today, unit)}
+            aria-label="下一周期"
+          />
           <Button size="small" className="today-btn" onClick={() => onSettings({ historyDate: new Date().toISOString() })}>
             {mode === 'day' ? '今天' : mode === 'month' ? '本月' : '今年'}
           </Button>
@@ -206,7 +215,7 @@ export default function HistoryView({
 
       <Card
         size="small"
-        title="流水明细"
+        title="收支明细"
         extra={<Typography.Text type="secondary">{rows.length} 笔</Typography.Text>}
         styles={{ body: { padding: '6px 16px 10px' } }}
       >

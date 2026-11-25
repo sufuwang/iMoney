@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ConfigProvider, message } from 'antd';
 import {
-  LeftOutlined,
+  DownOutlined,
   PlusOutlined,
-  RightOutlined,
   SettingOutlined,
+  UpOutlined,
   VerticalAlignTopOutlined,
 } from '@ant-design/icons';
 import zhCN from 'antd/locale/zh_CN';
@@ -16,7 +16,7 @@ import SettingsDrawer from './components/SettingsDrawer';
 import TransactionDetailDrawer from './components/TransactionDetailDrawer';
 import TransactionModal from './components/TransactionModal';
 import { useFinanceStore, parseTransactions } from './hooks/useFinanceStore';
-import { parseAssets } from './lib/assets';
+import { assetRows, parseAssets } from './lib/assets';
 import { formatMoney, inRange, summarize } from './lib/finance';
 import { saveTextFile } from './lib/platform';
 import { loadAssets, saveAssets } from './lib/storage';
@@ -38,11 +38,12 @@ export default function App() {
   const [assets, setAssets] = useState<AssetSnapshot[]>(() => loadAssets());
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [fabOpen, setFabOpen] = useState(true);
+  const [showBackToTop, setShowBackToTop] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [entryMode, setEntryMode] = useState<'transaction' | 'asset'>('transaction');
   const [editing, setEditing] = useState<Transaction | null>(null);
   const [viewing, setViewing] = useState<Transaction | null>(null);
-  const [categoryDetail, setCategoryDetail] = useState<{ id: string; rows: Transaction[] } | null>(null);
+  const [categoryDetail, setCategoryDetail] = useState<{ id: string; rows: Transaction[]; title?: string } | null>(null);
 
   const yearRows = useMemo(
     () => inRange(transactions, dayjs().startOf('year'), dayjs().endOf('year')),
@@ -52,6 +53,12 @@ export default function App() {
     () => summarize(yearRows, settings.currencyConfigs),
     [yearRows, settings.currencyConfigs],
   );
+  const yearReturnRate = useMemo(() => {
+    const currentYear = dayjs().format('YYYY');
+    const currentYearAssets = assetRows(assets, settings.currencyConfigs)
+      .filter((row) => row.month.startsWith(currentYear));
+    return currentYearAssets[currentYearAssets.length - 1]?.returnRate ?? 0;
+  }, [assets, settings.currencyConfigs]);
   // 常用备注：从历史记录动态统计，优先近三个月高频，其次全量频次与最近使用时间
   const recentNotes = useMemo(() => {
     const recentFrom = dayjs().subtract(90, 'day');
@@ -99,16 +106,18 @@ export default function App() {
     setModalOpen(true);
   };
 
-  const handleSaveAsset = (input: Omit<AssetSnapshot, 'id'>) => {
+  const handleSaveAssets = (inputs: Omit<AssetSnapshot, 'id'>[]) => {
     setAssets((prev) => {
-      const exist = prev.some((item) => item.month === input.month && item.type === input.type);
-      const next = exist
-        ? prev.map((item) =>
-            item.month === input.month && item.type === input.type ? { ...item, ...input } : item,
-          )
-        : [...prev, { ...input, id: crypto.randomUUID() }];
+      const next = [...prev];
+      inputs.forEach((input) => {
+        const index = next.findIndex((item) => item.month === input.month && item.type === input.type);
+        if (index >= 0) next[index] = { ...next[index], ...input };
+        else next.push({ ...input, id: crypto.randomUUID() });
+      });
       return next.sort((a, b) => a.month.localeCompare(b.month) || a.type.localeCompare(b.type));
     });
+    setModalOpen(false);
+    message.success(`已保存 ${inputs.length} 类资产`);
   };
 
   const handleDeleteAsset = (id: string) => {
@@ -132,6 +141,7 @@ export default function App() {
     try {
       const rows = parseTransactions(raw);
       const importedAssets = parseAssets(raw);
+      if (rows.length === 0 && importedAssets.length === 0) throw new Error('备份文件中没有可导入的数据');
       store.replaceTransactions(rows);
       if (importedAssets.length > 0) setAssets(importedAssets);
       message.success(
@@ -143,6 +153,35 @@ export default function App() {
   };
 
   useEffect(() => saveAssets(assets), [assets]);
+
+  useEffect(() => {
+    const updateBackToTop = () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const distanceToBottom = Math.max(0, scrollable - window.scrollY);
+      setShowBackToTop(scrollable > 0 && distanceToBottom / scrollable <= 0.6);
+    };
+    updateBackToTop();
+    window.addEventListener('scroll', updateBackToTop, { passive: true });
+    window.addEventListener('resize', updateBackToTop);
+    return () => {
+      window.removeEventListener('scroll', updateBackToTop);
+      window.removeEventListener('resize', updateBackToTop);
+    };
+  }, [activeTab, transactions.length, assets.length]);
+
+  useEffect(() => {
+    if (!fabOpen || settingsOpen || modalOpen) return;
+    let timer = window.setTimeout(() => setFabOpen(false), 6000);
+    const resetTimer = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => setFabOpen(false), 6000);
+    };
+    window.addEventListener('click', resetTimer, { passive: true });
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener('click', resetTimer);
+    };
+  }, [fabOpen, settingsOpen, modalOpen]);
 
   useEffect(() => {
     const checkBackup = () => {
@@ -183,6 +222,10 @@ export default function App() {
               <div><span>本年收入</span><b>{formatMoney(yearSummary.income, 0)}</b></div>
               <div><span>本年支出</span><b>{formatMoney(yearSummary.expense, 0)}</b></div>
               <div><span>本年储蓄率</span><b>{(yearSummary.savingsRate * 100).toFixed(0)}%</b></div>
+              <div>
+                <span>本年收益率</span>
+                <b>{`${yearReturnRate >= 0 ? '+' : ''}${yearReturnRate.toFixed(2)}%`}</b>
+              </div>
             </div>
           </div>
         </header>
@@ -209,6 +252,7 @@ export default function App() {
             <HealthView
               transactions={transactions}
               settings={settings}
+              onViewExpenseGroup={(title, rows) => setCategoryDetail({ id: 'expense-group', rows, title })}
             />
           )}
           {activeTab === 'investment' && (
@@ -226,33 +270,38 @@ export default function App() {
           role="group"
           aria-label="快捷操作"
         >
-          <button
-            type="button"
-            className="fab-btn fab-action"
-            aria-label="回到顶部"
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          >
-            <VerticalAlignTopOutlined />
-          </button>
-          <span className="fab-divider fab-action" />
-          <button
-            type="button"
-            className="fab-btn fab-action"
-            aria-label="记一笔"
-            onClick={openAdd}
-          >
-            <PlusOutlined />
-          </button>
-          <span className="fab-divider fab-action" />
-          <button
-            type="button"
-            className="fab-btn fab-action"
-            aria-label="更多设置"
-            onClick={() => setSettingsOpen(true)}
-          >
-            <SettingOutlined />
-          </button>
-          <span className="fab-divider fab-action" />
+          <div className={`fab-actions${fabOpen ? '' : ' is-collapsed'}`}>
+            <div className={`fab-optional${showBackToTop ? ' is-visible' : ''}`} aria-hidden={!showBackToTop}>
+              <button
+                type="button"
+                className="fab-btn fab-action"
+                aria-label="回到顶部"
+                tabIndex={showBackToTop ? 0 : -1}
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              >
+                <VerticalAlignTopOutlined />
+              </button>
+              <span className="fab-divider fab-action" />
+            </div>
+            <button
+              type="button"
+              className="fab-btn fab-action"
+              aria-label="记一笔"
+              onClick={openAdd}
+            >
+              <PlusOutlined />
+            </button>
+            <span className="fab-divider fab-action" />
+            <button
+              type="button"
+              className="fab-btn fab-action"
+              aria-label="设置"
+              onClick={() => setSettingsOpen(true)}
+            >
+              <SettingOutlined />
+            </button>
+            <span className="fab-divider fab-action" />
+          </div>
           <button
             type="button"
             className="fab-btn fab-toggle"
@@ -260,7 +309,7 @@ export default function App() {
             aria-expanded={fabOpen}
             onClick={() => setFabOpen((prev) => !prev)}
           >
-            {fabOpen ? <RightOutlined /> : <LeftOutlined />}
+            {fabOpen ? <DownOutlined /> : <UpOutlined />}
           </button>
         </div>
 
@@ -276,7 +325,7 @@ export default function App() {
         recentNotes={recentNotes}
         onCancel={() => setModalOpen(false)}
         onSubmit={handleSubmit}
-        onSaveAsset={handleSaveAsset}
+        onSaveAssets={handleSaveAssets}
       />
       <TransactionDetailDrawer
         transaction={viewing}
@@ -289,6 +338,7 @@ export default function App() {
         categoryId={categoryDetail?.id ?? null}
         rows={categoryDetail?.rows ?? []}
         currencies={settings.currencyConfigs}
+        title={categoryDetail?.title}
         onClose={() => setCategoryDetail(null)}
         onSelect={(transaction) => { setCategoryDetail(null); setViewing(transaction); }}
       />

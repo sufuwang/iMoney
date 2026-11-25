@@ -28,7 +28,7 @@ export interface CurrencyConfig {
   enabled: boolean;
 }
 
-export type AssetType = 'active_fund' | 'nasdaq' | 'sp500';
+export type AssetType = 'active_fund' | 'nasdaq' | 'sp500' | 'cash';
 
 export interface AssetSnapshot {
   id: string;
@@ -36,6 +36,7 @@ export interface AssetSnapshot {
   type: AssetType;
   currency: string;
   amount: number;
+  profit: number;
 }
 
 export interface AppSettings {

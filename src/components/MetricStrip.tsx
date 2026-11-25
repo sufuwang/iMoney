@@ -6,6 +6,7 @@ interface MetricItem {
 
 interface Props {
   items: MetricItem[];
+  uniformSize?: boolean;
 }
 
 const sizeFor = (text: string) => {
@@ -15,7 +16,8 @@ const sizeFor = (text: string) => {
   return 11;
 };
 
-export default function MetricStrip({ items }: Props) {
+export default function MetricStrip({ items, uniformSize = false }: Props) {
+  const sharedSize = uniformSize && items.length > 0 ? sizeFor(items[0].value) : null;
   return (
     <div className="metric-strip">
       {items.map((item) => (
@@ -23,7 +25,7 @@ export default function MetricStrip({ items }: Props) {
           <span className="metric-label">{item.label}</span>
           <strong
             className={`metric-value${item.tone ? ` ${item.tone}` : ''}`}
-            style={{ fontSize: sizeFor(item.value) }}
+            style={{ fontSize: sharedSize ?? sizeFor(item.value) }}
             title={item.value}
           >
             {item.value}

@@ -4,6 +4,6 @@ export async function saveTextFile(fileName: string, content: string) {
   anchor.href = url;
   anchor.download = fileName;
   anchor.click();
-  URL.revokeObjectURL(url);
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
   return true;
 }

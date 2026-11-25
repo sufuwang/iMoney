@@ -61,6 +61,7 @@ const ICONS: Record<string, IconComponent> = {
   asset_fund: FundOutlined,
   asset_nasdaq: RiseOutlined,
   asset_sp500: LineChartOutlined,
+  asset_cash: WalletOutlined,
 };
 
 const LEGACY_ICONS: Record<string, IconComponent> = {
@@ -95,6 +96,23 @@ export default function CategoryAvatar({ categoryId, size = 36 }: Props) {
       style={{
         backgroundColor: `${category?.color ?? '#8c8c8c'}1F`,
         color: category?.color ?? '#8c8c8c',
+        flexShrink: 0,
+      }}
+    />
+  );
+}
+
+export function AssetAvatar({ type, size = 38 }: { type: AssetType; size?: number }) {
+  const asset = ASSET_TYPES.find((item) => item.value === type);
+  const Icon = assetTypeIcon(type);
+  return (
+    <Avatar
+      shape="circle"
+      size={size}
+      icon={<Icon />}
+      style={{
+        backgroundColor: `${asset?.color ?? '#8c8c8c'}1F`,
+        color: asset?.color ?? '#8c8c8c',
         flexShrink: 0,
       }}
     />

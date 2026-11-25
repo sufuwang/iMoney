@@ -45,10 +45,13 @@ export const DEFAULT_CURRENCY_CONFIGS: CurrencyConfig[] = [
   { code: 'GBP', symbol: '£', name: '英镑', rate: 9.1, enabled: true },
 ];
 
+export const CASH_ASSET_TYPE: AssetType = 'cash';
+
 export const ASSET_TYPES: { value: AssetType; label: string; icon: string; color: string }[] = [
   { value: 'active_fund', label: '主动基金', icon: 'asset_fund', color: '#7ba4d0' },
   { value: 'nasdaq', label: '纳指', icon: 'asset_nasdaq', color: '#66b694' },
   { value: 'sp500', label: '标普', icon: 'asset_sp500', color: '#9d8ed3' },
+  { value: CASH_ASSET_TYPE, label: '现金', icon: 'asset_cash', color: '#d4b46f' },
 ];
 
 export const CHART_COLORS = [

@@ -16,6 +16,7 @@ import type { AppSettings, Transaction } from '../types';
 interface Props {
   transactions: Transaction[];
   settings: AppSettings;
+  onViewExpenseGroup: (title: string, rows: Transaction[]) => void;
 }
 
 interface MonthData {
@@ -32,7 +33,7 @@ const clamp = (value: number, min = 0, max = 100) => Math.max(min, Math.min(max,
 // 必要支出：居住、餐饮、交通、医疗、教育、通讯；其余归为弹性支出
 const NECESSARY_CATEGORIES = new Set(['food', 'transport', 'housing', 'medical', 'education', 'communication']);
 
-export default function HealthView({ transactions, settings }: Props) {
+export default function HealthView({ transactions, settings, onViewExpenseGroup }: Props) {
   const configs = settings.currencyConfigs;
   const anchor = dayjs(settings.historyDate);
 
@@ -73,6 +74,9 @@ export default function HealthView({ transactions, settings }: Props) {
     .reduce((sum, item) => sum + item.amount, 0);
   const monthExpense = necessaryAmount + flexibleAmount;
   const necessaryPercent = monthExpense > 0 ? Math.round((necessaryAmount / monthExpense) * 100) : 0;
+  const expenseRows = currentRows.filter((row) => row.type === 'expense');
+  const necessaryRows = expenseRows.filter((row) => NECESSARY_CATEGORIES.has(row.category));
+  const flexibleRows = expenseRows.filter((row) => !NECESSARY_CATEGORIES.has(row.category));
 
   // 记账习惯评分：截止所选日期，近 30 天有记录的天数占比
   const recordCoverage = useMemo(() => {
@@ -157,7 +161,7 @@ export default function HealthView({ transactions, settings }: Props) {
         </div>
       </Card>
 
-      <Card size="small" title="储蓄率趋势" extra={<Typography.Text type="secondary">近 6 个月</Typography.Text>}>
+      <Card size="small" title="储蓄率走势" extra={<Typography.Text type="secondary">近 6 个月</Typography.Text>}>
         <div className="chart-container">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={months} margin={{ top: 12, right: 8, left: 0, bottom: 0 }}>
@@ -187,12 +191,17 @@ export default function HealthView({ transactions, settings }: Props) {
         </div>
       </Card>
 
-      <Card size="small" title="本月支出结构" extra={<Typography.Text type="secondary">{current.label}</Typography.Text>}>
+      <Card size="small" title="本月支出拆分" extra={<Typography.Text type="secondary">{current.label}</Typography.Text>}>
         {monthExpense === 0 ? (
           <Typography.Text type="secondary">本月还没有支出记录</Typography.Text>
         ) : (
           <div className="health-split">
-            <div>
+            <button
+              type="button"
+              className="health-split-item"
+              disabled={necessaryRows.length === 0}
+              onClick={() => onViewExpenseGroup('必要支出明细', necessaryRows)}
+            >
               <div className="health-split-head">
                 <span>必要支出</span>
                 <strong>{formatMoney(necessaryAmount, 0)} · {necessaryPercent}%</strong>
@@ -201,8 +210,13 @@ export default function HealthView({ transactions, settings }: Props) {
               <Typography.Text type="secondary" className="health-dimension-hint">
                 餐饮、居住、交通、医疗等固定开销
               </Typography.Text>
-            </div>
-            <div>
+            </button>
+            <button
+              type="button"
+              className="health-split-item"
+              disabled={flexibleRows.length === 0}
+              onClick={() => onViewExpenseGroup('弹性支出明细', flexibleRows)}
+            >
               <div className="health-split-head">
                 <span>弹性支出</span>
                 <strong>{formatMoney(flexibleAmount, 0)} · {100 - necessaryPercent}%</strong>
@@ -211,7 +225,7 @@ export default function HealthView({ transactions, settings }: Props) {
               <Typography.Text type="secondary" className="health-dimension-hint">
                 购物、娱乐、旅行等可选消费
               </Typography.Text>
-            </div>
+            </button>
           </div>
         )}
       </Card>

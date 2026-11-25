@@ -1,4 +1,4 @@
-import { ASSET_TYPES } from '../constants';
+import { ASSET_TYPES, CASH_ASSET_TYPE } from '../constants';
 import { convertToBase } from './finance';
 import type { AssetSnapshot, AssetType, CurrencyConfig } from '../types';
 
@@ -7,34 +7,55 @@ export interface AssetRow {
   active_fund: number;
   nasdaq: number;
   sp500: number;
+  cash: number;
+  profitByType: Record<AssetType, number>;
   total: number;
+  profit: number;
+  investment: number;
+  returnRate: number;
   delta: number;
   growth: number;
 }
 
-const emptyValues = (): Record<AssetType, number> => ({ active_fund: 0, nasdaq: 0, sp500: 0 });
+interface MonthValues {
+  amount: Record<AssetType, number>;
+  profit: Record<AssetType, number>;
+}
+
+const emptyTypes = (): Record<AssetType, number> => ({ active_fund: 0, nasdaq: 0, sp500: 0, cash: 0 });
+const emptyMonth = (): MonthValues => ({ amount: emptyTypes(), profit: emptyTypes() });
 
 export function assetRows(snapshots: AssetSnapshot[], configs: CurrencyConfig[]): AssetRow[] {
-  const byMonth = new Map<string, Record<AssetType, number>>();
+  const byMonth = new Map<string, MonthValues>();
   snapshots.forEach((item) => {
     if (!item || typeof item.month !== 'string' || !/^\d{4}-(0[1-9]|1[0-2])$/.test(item.month)) return;
-    const values = byMonth.get(item.month) ?? emptyValues();
-    if (item.type in values && Number.isFinite(item.amount)) {
-      values[item.type] += convertToBase(item.amount, item.currency ?? 'CNY', configs);
+    const values = byMonth.get(item.month) ?? emptyMonth();
+    if (item.type in values.amount && Number.isFinite(item.amount) && Number.isFinite(item.profit ?? 0)) {
+      const currency = item.currency ?? 'CNY';
+      values.amount[item.type] += convertToBase(item.amount, currency, configs);
+      values.profit[item.type] += convertToBase(item.profit ?? 0, currency, configs);
     }
     byMonth.set(item.month, values);
   });
 
   const months = [...byMonth.entries()].sort(([a], [b]) => a.localeCompare(b));
   return months.map(([month, values], index) => {
-    const total = ASSET_TYPES.reduce((sum, item) => sum + values[item.value], 0);
-    const previousTotal = index > 0
-      ? ASSET_TYPES.reduce((sum, item) => sum + months[index - 1][1][item.value], 0)
-      : 0;
+    const sumOf = (source: Record<AssetType, number>) =>
+      ASSET_TYPES.reduce((sum, item) => sum + source[item.value], 0);
+    const total = sumOf(values.amount);
+    const profit = ASSET_TYPES
+      .filter((item) => item.value !== CASH_ASSET_TYPE)
+      .reduce((sum, item) => sum + values.profit[item.value], 0);
+    const investment = total - profit;
+    const previousTotal = index > 0 ? sumOf(months[index - 1][1].amount) : 0;
     return {
       month,
-      ...values,
+      ...values.amount,
+      profitByType: values.profit,
       total,
+      profit,
+      investment,
+      returnRate: investment > 0 ? (profit / investment) * 100 : 0,
       delta: index > 0 ? total - previousTotal : 0,
       growth: index > 0 && previousTotal > 0 ? ((total - previousTotal) / previousTotal) * 100 : 0,
     };
@@ -55,10 +76,22 @@ export function parseAssets(raw: string): AssetSnapshot[] {
   }
 
   const byKey = new Map<string, AssetSnapshot>();
-  const push = (month: string, type: AssetType, amount: unknown, id?: string, currency?: string) => {
+  const push = (
+    month: string,
+    type: AssetType,
+    amount: unknown,
+    id?: string,
+    currency?: string,
+    profit?: unknown,
+  ) => {
     if (typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0) return;
     byKey.set(`${month}-${type}`, {
-      id: id ?? crypto.randomUUID(), month, type, currency: currency ?? 'CNY', amount,
+      id: id ?? crypto.randomUUID(),
+      month,
+      type,
+      currency: currency ?? 'CNY',
+      amount,
+      profit: typeof profit === 'number' && Number.isFinite(profit) ? profit : 0,
     });
   };
 
@@ -75,6 +108,7 @@ export function parseAssets(raw: string): AssetSnapshot[] {
         row.amount,
         typeof row.id === 'string' ? row.id : undefined,
         typeof row.currency === 'string' ? row.currency : 'CNY',
+        row.profit,
       );
       return;
     }

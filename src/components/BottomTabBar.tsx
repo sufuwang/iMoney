@@ -7,11 +7,11 @@ import {
 } from '@ant-design/icons';
 import type { TabKey } from '../types';
 
-const ITEMS: { key: TabKey; label: string; icon: ReactNode }[] = [
-  { key: 'history', label: '明细', icon: <UnorderedListOutlined /> },
-  { key: 'trends', label: '统计', icon: <BarChartOutlined /> },
-  { key: 'health', label: '健康', icon: <HeartOutlined /> },
-  { key: 'investment', label: '投资', icon: <FundOutlined /> },
+const ITEMS: { key: TabKey; label: string; title: string; icon: ReactNode }[] = [
+  { key: 'history', label: '账本', title: '收支账本', icon: <UnorderedListOutlined /> },
+  { key: 'trends', label: '分析', title: '统计分析', icon: <BarChartOutlined /> },
+  { key: 'health', label: '健康', title: '财务健康', icon: <HeartOutlined /> },
+  { key: 'investment', label: '资产', title: '资产管理', icon: <FundOutlined /> },
 ];
 
 interface Props {
@@ -25,6 +25,8 @@ export default function BottomTabBar({ active, onChange }: Props) {
       key={item.key}
       type="button"
       className={`tabbar-item${active === item.key ? ' is-active' : ''}`}
+      title={item.title}
+      aria-label={item.title}
       onClick={() => onChange(item.key)}
     >
       <span className="tabbar-icon">{item.icon}</span>
