@@ -136,7 +136,7 @@ export default function TransactionModal({
       (sum, item) => sum + convertToBase(read(item.value, 'profit'), assetCurrency, currencies), 0,
     );
     const investment = total;
-    const costBasis = investment + profit;
+    const costBasis = Math.abs(profit) + investment;
     const cash = convertToBase(read(CASH_ASSET_TYPE, 'amount'), assetCurrency, currencies);
     return {
       total,

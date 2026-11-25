@@ -26,7 +26,7 @@ const INVESTMENT_TYPES = ASSET_TYPES.filter((item) => item.value !== CASH_ASSET_
 const CASH_COLOR = ASSET_TYPES.find((item) => item.value === CASH_ASSET_TYPE)?.color ?? '#d4b46f';
 const ASSET_TOTAL_COLOR = '#4f46e5';
 const returnRateOf = (amount: number, profit: number) => {
-  const costBasis = amount + profit;
+  const costBasis = Math.abs(profit) + amount;
   return costBasis > 0 ? (profit / costBasis) * 100 : 0;
 };
 
@@ -270,7 +270,7 @@ export default function InvestmentView({ assets, configs, onAddAsset, onDeleteAs
         const type = ASSET_TYPES.find((item) => item.value === row.type);
         const amount = convertToBase(row.amount, row.currency, configs);
         const profit = convertToBase(row.profit ?? 0, row.currency, configs);
-        const costBasis = amount + profit;
+        const costBasis = Math.abs(profit) + amount;
         const rate = costBasis > 0 ? (profit / costBasis) * 100 : 0;
         const profitText = row.type === CASH_ASSET_TYPE
           ? '不计收益'
