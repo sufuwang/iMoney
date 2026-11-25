@@ -191,7 +191,7 @@ export default function HealthView({ transactions, settings, onViewExpenseGroup 
         </div>
       </Card>
 
-      <Card size="small" title="本月支出拆分" extra={<Typography.Text type="secondary">{current.label}</Typography.Text>}>
+      <Card size="small" title="支出拆分" extra={<Typography.Text type="secondary">{current.label}</Typography.Text>}>
         {monthExpense === 0 ? (
           <Typography.Text type="secondary">本月还没有支出记录</Typography.Text>
         ) : (

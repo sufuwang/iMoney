@@ -146,15 +146,6 @@ b, strong { font-variant-numeric: tabular-nums; }
 .ant-card-body { padding: 16px !important; }
 .ant-card-small > .ant-card-body { padding: 14px 16px !important; }
 
-.ant-statistic-title { font-size: 11px !important; color: var(--ink-3) !important; }
-.ant-statistic-content { font-size: 20px !important; font-weight: 600 !important; }
-.period-average .ant-statistic-content,
-.period-average .ant-statistic-content-prefix,
-.period-average .ant-statistic-content-value {
-  font-size: var(--stat-size, 19px) !important;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
 .ant-segmented { background: var(--soft) !important; padding: 3px; border-radius: var(--control-radius); }
 .ant-segmented-item-selected { border-radius: var(--control-radius) !important; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important; }
 .ant-segmented-item-label { font-size: 13px; }
@@ -705,16 +696,6 @@ b, strong { font-variant-numeric: tabular-nums; }
 .chart-tooltip-row strong { margin-left: auto; }
 .chart-tooltip-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
 .section-divider { height: 1px; background: #eef0f5; margin: 18px 0 14px; }
-.average-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.average-chip {
-  display: flex; align-items: center; justify-content: space-between; gap: 8px;
-  width: 100%; min-width: 0; border: 1px solid #eef0f5; background: #fff;
-  border-radius: var(--control-radius); padding: 10px 12px; cursor: pointer; font-size: 12px;
-  text-align: left; transition: border-color 0.2s, background 0.2s;
-}
-.average-chip:active { border-color: var(--primary); background: #f7f7ff; }
-.chip-name { color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.chip-value { font-size: 13px; font-weight: 600; margin-left: auto; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 /* ---------- Health & settings ---------- */
 .trend-range { display: flex; flex-direction: row; align-items: center; gap: 10px; margin-top: 12px; }

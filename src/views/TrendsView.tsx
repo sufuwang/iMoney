@@ -1,5 +1,5 @@
-import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
-import { Button, Card, Col, DatePicker, Empty, Row, Segmented, Space, Statistic, Typography } from 'antd';
+import { useMemo, useState, type CSSProperties } from 'react';
+import { Button, Card, Col, DatePicker, Empty, Row, Segmented, Space } from 'antd';
 import {
   Area,
   AreaChart,
@@ -20,7 +20,6 @@ import useIsMobile from '../hooks/useIsMobile';
 import { CHART_COLORS, VIEW_LABELS } from '../constants';
 import {
   categoryStats,
-  createBuckets,
   defaultTrendRange,
   effectiveMode,
   formatAxisMoney,
@@ -125,7 +124,7 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
     return (
       <Card
         size="small"
-        title={type === 'expense' ? '支出分类走势' : '收入分类走势'}
+        title={type === 'expense' ? '支出走势' : '收入走势'}
         extra={
           active.length !== stats.length ? (
             <Button type="link" size="small" onClick={() => onSettings({ hiddenTrendCategories: [] })}>全选</Button>
@@ -349,52 +348,6 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
     );
   };
 
-  const buckets = createBuckets(start, end, mode);
-  const periods = Math.max(1, buckets.length);
-  const days = Math.max(1, end.diff(start, 'day') + 1);
-  const months = Math.max(1, end.diff(start, 'month') + 1);
-  const years = Math.max(1, end.diff(start, 'year') + 1);
-  const averageStats = [
-    { label: '日均结余', value: summary.balance / days },
-    { label: '月均结余', value: summary.balance / months },
-    { label: '年均结余', value: summary.balance / years },
-  ];
-  // 金额过长时自动缩小字号，保证单行显示
-  const averageStatsRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    const root = averageStatsRef.current;
-    if (!root) return;
-
-    let lastWidth = -1;
-    const fit = () => {
-      const width = root.clientWidth;
-      if (!width || width === lastWidth) return;
-      lastWidth = width;
-      const nodes = [...root.querySelectorAll<HTMLElement>('.ant-statistic-content')];
-      if (!nodes.length) return;
-      nodes.forEach((node) => node.style.setProperty('--stat-size', '19px'));
-      let size = 19;
-      nodes.forEach((node) => {
-        const available = node.clientWidth;
-        if (!available || node.scrollWidth <= available) return;
-        size = Math.min(size, Math.floor((19 * available) / node.scrollWidth) - 1);
-      });
-      size = Math.max(10, size);
-      const apply = () => nodes.forEach((node) => node.style.setProperty('--stat-size', `${size}px`));
-      apply();
-      while (size > 10 && nodes.some((node) => node.scrollWidth > node.clientWidth)) {
-        size -= 1;
-        apply();
-      }
-    };
-
-    fit();
-    const observer = new ResizeObserver(fit);
-    observer.observe(root);
-    return () => observer.disconnect();
-  }, [summary.balance, days, months, years]);
-
   return (
     <Space direction="vertical" size={16} style={{ width: '100%' }} className="trends-page">
       <Card size="small" styles={{ body: { padding: 12 } }}>
@@ -532,61 +485,6 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
         <Col xs={24} lg={12}>{renderPie(expenseStats, 'expense')}</Col>
         <Col xs={24} lg={12}>{renderPie(incomeStats, 'income')}</Col>
       </Row>
-
-      <Card size="small" title="周期均值">
-        <div ref={averageStatsRef}>
-          <Row gutter={[16, 12]} className="period-average">
-            {averageStats.map((item) => (
-              <Col key={item.label} xs={8}>
-                <Statistic title={item.label} value={item.value} precision={2} prefix="¥" />
-              </Col>
-            ))}
-          </Row>
-        </div>
-        <div className="section-divider" />
-        <Row gutter={[16, 16]}>
-          <Col xs={24} lg={12}>
-            <Typography.Title level={5}>支出分类均值 · 每期</Typography.Title>
-            {expenseStats.length === 0 ? (
-              <Typography.Text type="secondary">暂无数据</Typography.Text>
-            ) : (
-              <div className="average-grid">
-                {expenseStats.slice(0, 8).map((stat) => (
-                  <button
-                    key={stat.category}
-                    type="button"
-                    className="average-chip"
-                    onClick={() => onViewCategory(stat.category, rows.filter((row) => row.category === stat.category))}
-                  >
-                    <span className="chip-name">{stat.name}</span>
-                    <strong className="chip-value">{formatMoney(stat.amount / periods)}</strong>
-                  </button>
-                ))}
-              </div>
-            )}
-          </Col>
-          <Col xs={24} lg={12}>
-            <Typography.Title level={5}>收入分类均值 · 每期</Typography.Title>
-            {incomeStats.length === 0 ? (
-              <Typography.Text type="secondary">暂无数据</Typography.Text>
-            ) : (
-              <div className="average-grid">
-                {incomeStats.slice(0, 8).map((stat) => (
-                  <button
-                    key={stat.category}
-                    type="button"
-                    className="average-chip"
-                    onClick={() => onViewCategory(stat.category, rows.filter((row) => row.category === stat.category))}
-                  >
-                    <span className="chip-name">{stat.name}</span>
-                    <strong className="chip-value">{formatMoney(stat.amount / periods)}</strong>
-                  </button>
-                ))}
-              </div>
-            )}
-          </Col>
-        </Row>
-      </Card>
     </Space>
   );
 }

@@ -494,7 +494,7 @@ export default function InvestmentView({ assets, configs, onAddAsset, onDeleteAs
 
       <Row gutter={[12, 12]}>
         <Col xs={24} sm={12}>
-          <Card size="small" title="现金余额走势">
+          <Card size="small" title="现金走势">
             {rows.length === 0 ? (
               <Empty description="暂无数据" image={Empty.PRESENTED_IMAGE_SIMPLE} />
             ) : (
