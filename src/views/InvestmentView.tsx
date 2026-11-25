@@ -163,7 +163,7 @@ export default function InvestmentView({ assets, configs, onAddAsset, onDeleteAs
       returnRateOf(row[type.value], row.profitByType[type.value]),
     ])),
     现金: row.cash,
-    资产总额: row.investment + row.profit + row.cash,
+    资产总额: row.total,
     总收益率: row.returnRate,
   }));
   const activeReturnTypes = INVESTMENT_TYPES.filter((type) => !hiddenReturnTypes.includes(type.value));

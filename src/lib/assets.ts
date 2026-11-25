@@ -43,10 +43,12 @@ export function assetRows(snapshots: AssetSnapshot[], configs: CurrencyConfig[])
     const sumOf = (source: Record<AssetType, number>) =>
       ASSET_TYPES.reduce((sum, item) => sum + source[item.value], 0);
     const total = sumOf(values.amount);
+    const cash = values.amount[CASH_ASSET_TYPE];
     const profit = ASSET_TYPES
       .filter((item) => item.value !== CASH_ASSET_TYPE)
       .reduce((sum, item) => sum + values.profit[item.value], 0);
-    const investment = total - profit;
+    // 投资类资产金额 = 总资产 - 现金；资产总投资 = 投资类金额 - 累计收益
+    const investment = total - cash - profit;
     const previousTotal = index > 0 ? sumOf(months[index - 1][1].amount) : 0;
     return {
       month,

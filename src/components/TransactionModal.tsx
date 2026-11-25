@@ -428,7 +428,7 @@ export default function TransactionModal({
                 </span>
                 <span className="entry-card-titles">
                   <strong>投资金额与收益</strong>
-                  <span>一次填写主动基金、纳指、标普；收益为累计盈亏，亏损填负数</span>
+                  <span>左侧填当前金额，右侧填累计收益；收益为累计盈亏，亏损填负数</span>
                 </span>
                 <Form.Item name="currency" noStyle rules={[{ required: true }]}>
                   <Select
@@ -458,7 +458,7 @@ export default function TransactionModal({
                         precision={2}
                         inputMode="decimal"
                         style={{ width: '100%' }}
-                        placeholder="0.00"
+                        placeholder="当前金额"
                       />
                     </Form.Item>
                     <Form.Item
@@ -471,7 +471,7 @@ export default function TransactionModal({
                         precision={2}
                         inputMode="decimal"
                         style={{ width: '100%' }}
-                        placeholder="0.00"
+                        placeholder="累计收益"
                       />
                     </Form.Item>
                   </div>
