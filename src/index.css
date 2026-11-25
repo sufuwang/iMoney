@@ -490,14 +490,13 @@ b, strong { font-variant-numeric: tabular-nums; }
 .entry-drawer .asset-type-radio { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .entry-drawer .category-option { gap: clamp(3px, 0.6vh, 6px); }
 .entry-drawer .note-grid {
-  display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px;
-  scrollbar-width: none;
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding-bottom: 2px;
 }
-.entry-drawer .note-grid::-webkit-scrollbar { display: none; }
 .entry-drawer .note-chip {
-  flex: 0 0 auto; height: 30px; gap: 5px; padding: 0 10px;
+  min-height: 30px; height: auto; gap: 5px; padding: 5px 10px;
   font-size: 12px; background: #f4f6fb;
 }
+.entry-drawer .note-chip-text { white-space: normal; line-height: 1.3; word-break: break-word; }
 .entry-drawer .ant-drawer-body textarea { min-height: clamp(37px, 4.5vh, 49px); }
 
 /* ---------- Entry cards ---------- */
@@ -604,6 +603,7 @@ b, strong { font-variant-numeric: tabular-nums; }
 .category-row-name { flex: 1; font-size: 13px; }
 .category-row-amount { width: 92px; text-align: right; font-size: 13px; font-weight: 500; }
 .category-row-percent { width: 50px; text-align: right; font-size: 12px; color: var(--ink-3); }
+.category-list .category-row.is-hidden { opacity: 0.42; }
 .clickable-list-item { cursor: pointer; border-radius: var(--control-radius); padding: 9px !important; transition: background 0.2s; }
 .rank-list .ant-list-item-meta { align-items: center !important; }
 .clickable-list-item:hover { background: #f7f8fc; }
@@ -665,6 +665,12 @@ b, strong { font-variant-numeric: tabular-nums; }
 .chart-container-compact { height: 200px; }
 .chart-container-tall { height: 260px; }
 .pie-container { height: 220px; width: 100%; }
+.ant-card:has(.chart-legend, .category-list) .ant-card-extra .ant-btn-link,
+.ant-card:has(.chart-legend, .category-list) .ant-card-extra .ant-btn-link:hover,
+.ant-card:has(.chart-legend, .category-list) .ant-card-extra .ant-btn-link:focus-visible,
+.ant-card:has(.chart-legend, .category-list) .ant-card-extra .ant-btn-link:active {
+  color: var(--primary) !important;
+}
 .chart-legend { display: flex; flex-wrap: wrap; gap: 7px; padding: 2px 0 12px; }
 .chart-legend-item {
   display: inline-flex; align-items: center; gap: 7px; height: 28px;

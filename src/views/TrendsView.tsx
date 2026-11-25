@@ -191,6 +191,13 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
 
   const renderPie = (stats: CategoryStat[], type: 'expense' | 'income') => {
     const hidden = settings.hiddenPieCategories;
+    const toggleCategory = (category: string) => {
+      onSettings({
+        hiddenPieCategories: hidden.includes(category)
+          ? hidden.filter((value) => value !== category)
+          : [...hidden, category],
+      });
+    };
     const active = stats.filter((item) => !hidden.includes(item.category) && item.category);
     const total = active.reduce((acc, item) => acc + item.amount, 0);
     const data = active.map((item) => ({
@@ -282,30 +289,6 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
           <Empty description="暂无数据" image={Empty.PRESENTED_IMAGE_SIMPLE} />
         ) : (
           <>
-            <div className="chart-legend">
-              {stats.map((item, index) => {
-                const checked = !hidden.includes(item.category);
-                return (
-                  <button
-                    key={item.category}
-                    type="button"
-                    className={`chart-legend-item${checked ? ' is-active' : ''}`}
-                    style={{ '--legend-color': item.color || CHART_COLORS[index % CHART_COLORS.length] } as CSSProperties}
-                    aria-pressed={checked}
-                    onClick={() =>
-                      onSettings({
-                        hiddenPieCategories: checked
-                          ? [...hidden, item.category]
-                          : hidden.filter((value) => value !== item.category),
-                      })
-                    }
-                  >
-                    <span className="chart-legend-mark" />
-                    <span className="chart-legend-label">{item.name}</span>
-                  </button>
-                );
-              })}
-            </div>
             {data.length === 0 ? (
               <Empty description="已隐藏全部分类" image={Empty.PRESENTED_IMAGE_SIMPLE} />
             ) : (
@@ -334,6 +317,32 @@ export default function TrendsView({ transactions, settings, onSettings, onViewC
                 </ResponsiveContainer>
               </div>
             )}
+            <div className="category-list">
+              {stats.map((item) => {
+                const checked = !hidden.includes(item.category);
+                return (
+                  <div
+                    key={item.category}
+                    className={`category-row${checked ? '' : ' is-hidden'}`}
+                    role="button"
+                    tabIndex={0}
+                    aria-pressed={checked}
+                    onClick={() => toggleCategory(item.category)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        toggleCategory(item.category);
+                      }
+                    }}
+                  >
+                    <span className="category-dot" style={{ background: item.color }} />
+                    <span className="category-row-name">{item.name}</span>
+                    <span className="category-row-amount">{formatMoney(item.amount)}</span>
+                    <span className="category-row-percent">{(item.percent * 100).toFixed(1)}%</span>
+                  </div>
+                );
+              })}
+            </div>
           </>
         )}
       </Card>

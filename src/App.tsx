@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ConfigProvider, message } from 'antd';
+import { BorderBeam, ConfigProvider, message } from 'antd';
 import {
   DownOutlined,
   PlusOutlined,
@@ -269,53 +269,64 @@ export default function App() {
           )}
         </main>
 
-        <div
-          className={`fab-group${fabOpen ? '' : ' is-collapsed'}`}
-          role="group"
-          aria-label="快捷操作"
+        <BorderBeam
+          size={40}
+          lineWidth={1.5}
+          duration={2}
+          color={[
+            { color: '#1677ff', percent: 0 },
+            { color: '#36cfc9', percent: 52 },
+            { color: '#95de64', percent: 100 },
+          ]}
         >
-          <div className={`fab-actions${fabOpen ? '' : ' is-collapsed'}`}>
-            <div className={`fab-optional${showBackToTop ? ' is-visible' : ''}`} aria-hidden={!showBackToTop}>
+          <div
+            className={`fab-group${fabOpen ? '' : ' is-collapsed'}`}
+            role="group"
+            aria-label="快捷操作"
+          >
+            <div className={`fab-actions${fabOpen ? '' : ' is-collapsed'}`}>
+              <div className={`fab-optional${showBackToTop ? ' is-visible' : ''}`} aria-hidden={!showBackToTop}>
+                <button
+                  type="button"
+                  className="fab-btn fab-action"
+                  aria-label="回到顶部"
+                  tabIndex={showBackToTop ? 0 : -1}
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                >
+                  <VerticalAlignTopOutlined />
+                </button>
+                <span className="fab-divider fab-action" />
+              </div>
               <button
                 type="button"
                 className="fab-btn fab-action"
-                aria-label="回到顶部"
-                tabIndex={showBackToTop ? 0 : -1}
-                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                aria-label="记一笔"
+                onClick={openAdd}
               >
-                <VerticalAlignTopOutlined />
+                <PlusOutlined />
+              </button>
+              <span className="fab-divider fab-action" />
+              <button
+                type="button"
+                className="fab-btn fab-action"
+                aria-label="设置"
+                onClick={() => setSettingsOpen(true)}
+              >
+                <SettingOutlined />
               </button>
               <span className="fab-divider fab-action" />
             </div>
             <button
               type="button"
-              className="fab-btn fab-action"
-              aria-label="记一笔"
-              onClick={openAdd}
+              className="fab-btn fab-toggle"
+              aria-label={fabOpen ? '收起快捷操作' : '展开快捷操作'}
+              aria-expanded={fabOpen}
+              onClick={() => setFabOpen((prev) => !prev)}
             >
-              <PlusOutlined />
+              {fabOpen ? <DownOutlined /> : <UpOutlined />}
             </button>
-            <span className="fab-divider fab-action" />
-            <button
-              type="button"
-              className="fab-btn fab-action"
-              aria-label="设置"
-              onClick={() => setSettingsOpen(true)}
-            >
-              <SettingOutlined />
-            </button>
-            <span className="fab-divider fab-action" />
           </div>
-          <button
-            type="button"
-            className="fab-btn fab-toggle"
-            aria-label={fabOpen ? '收起快捷操作' : '展开快捷操作'}
-            aria-expanded={fabOpen}
-            onClick={() => setFabOpen((prev) => !prev)}
-          >
-            {fabOpen ? <DownOutlined /> : <UpOutlined />}
-          </button>
-        </div>
+        </BorderBeam>
 
         <BottomTabBar active={activeTab} onChange={setActiveTab} />
       </div>
