@@ -280,6 +280,7 @@ b, strong { font-variant-numeric: tabular-nums; }
 /* ---------- Drawer & form ---------- */
 .drawer-footer { display: flex; gap: 10px; }
 .drawer-footer .ant-btn {
+  height: 44px;
   border-radius: var(--control-radius) !important;
   font-size: 13px;
   font-weight: 500;
@@ -369,7 +370,14 @@ b, strong { font-variant-numeric: tabular-nums; }
   background: #fff;
   box-shadow: 0 4px 16px rgba(30, 27, 75, 0.04);
 }
-.entry-tabs .entry-mode { margin-bottom: 0 !important; padding: 2px; }
+.entry-tabs .entry-mode { margin-bottom: 0 !important; padding: 2px; height: 44px; }
+.entry-tabs .ant-segmented-item,
+.entry-tabs .ant-segmented-item-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+}
 .entry-tabs .ant-segmented-item-selected { color: var(--primary); font-weight: 600; }
 .entry-drawer .ant-input,
 .entry-drawer .ant-input-affix-wrapper,
@@ -387,6 +395,12 @@ b, strong { font-variant-numeric: tabular-nums; }
 .entry-drawer .ant-select-focused .ant-select-selector {
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.12) !important;
 }
+.entry-drawer .ant-picker,
+.entry-drawer .asset-entry-input,
+.entry-drawer .asset-entry-input.ant-input-number-affix-wrapper { height: 44px; }
+.entry-drawer .entry-amount-input,
+.entry-drawer .entry-amount-input.ant-input-number-affix-wrapper { height: 48px; }
+.entry-drawer .entry-amount-input input { font-size: 18px; }
 .app-drawer .ant-form-item-explain,
 .app-drawer .ant-form-item-explain-error,
 .app-drawer .ant-form-item-explain-warning { display: none !important; }

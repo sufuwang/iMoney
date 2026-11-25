@@ -59,24 +59,28 @@ export default function App() {
       .filter((row) => row.month.startsWith(currentYear));
     return currentYearAssets[currentYearAssets.length - 1]?.returnRate ?? 0;
   }, [assets, settings.currencyConfigs]);
-  // 常用备注：从历史记录动态统计，优先近三个月高频，其次全量频次与最近使用时间
+  // 常用备注：按支出/收入分别统计，优先近三个月高频，其次全量频次与最近使用时间
   const recentNotes = useMemo(() => {
-    const recentFrom = dayjs().subtract(90, 'day');
-    const stats = new Map<string, { count: number; recent: number; last: number }>();
-    transactions.forEach((row) => {
-      const note = row.note.trim();
-      if (!note) return;
-      const date = dayjs(row.date);
-      const current = stats.get(note) ?? { count: 0, recent: 0, last: 0 };
-      current.count += 1;
-      if (!date.isBefore(recentFrom)) current.recent += 1;
-      current.last = Math.max(current.last, date.valueOf());
-      stats.set(note, current);
-    });
-    return [...stats.entries()]
-      .sort((a, b) => b[1].recent - a[1].recent || b[1].count - a[1].count || b[1].last - a[1].last)
-      .slice(0, 6)
-      .map(([note]) => note);
+    const collect = (type: 'expense' | 'income') => {
+      const recentFrom = dayjs().subtract(90, 'day');
+      const stats = new Map<string, { count: number; recent: number; last: number }>();
+      transactions.forEach((row) => {
+        if (row.type !== type) return;
+        const note = row.note.trim();
+        if (!note) return;
+        const date = dayjs(row.date);
+        const current = stats.get(note) ?? { count: 0, recent: 0, last: 0 };
+        current.count += 1;
+        if (!date.isBefore(recentFrom)) current.recent += 1;
+        current.last = Math.max(current.last, date.valueOf());
+        stats.set(note, current);
+      });
+      return [...stats.entries()]
+        .sort((a, b) => b[1].recent - a[1].recent || b[1].count - a[1].count || b[1].last - a[1].last)
+        .slice(0, 4)
+        .map(([note]) => note);
+    };
+    return { expense: collect('expense'), income: collect('income') };
   }, [transactions]);
 
   const openAdd = () => { setEditing(null); setEntryMode('transaction'); setModalOpen(true); };

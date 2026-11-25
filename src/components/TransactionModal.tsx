@@ -78,7 +78,7 @@ interface Props {
   onModeChange: (mode: EntryMode) => void;
   editing: Transaction | null;
   currencies: CurrencyConfig[];
-  recentNotes: string[];
+  recentNotes: { expense: string[]; income: string[] };
   onCancel: () => void;
   onSubmit: (value: Omit<Transaction, 'id'>) => void;
   onSaveAssets: (values: Omit<AssetSnapshot, 'id'>[]) => void;
@@ -99,6 +99,7 @@ export default function TransactionModal({
   const [assetForm] = Form.useForm<AssetFormValues>();
   const isMobile = useIsMobile();
   const [entryType, setEntryType] = useState<TransactionType>('expense');
+  const currentNotes = recentNotes[entryType];
   const categories = CATEGORIES.filter((item) => item.type === entryType);
   const txnCurrency = Form.useWatch('currency', form) ?? 'CNY';
   const txnSymbol = currencies.find((item) => item.code === txnCurrency)?.symbol ?? '¥';
@@ -303,7 +304,7 @@ export default function TransactionModal({
                 ]}
               >
                 <InputNumber
-                  className="asset-entry-input"
+                  className="asset-entry-input entry-amount-input"
                   prefix={txnSymbol}
                   min={0}
                   precision={2}
@@ -358,7 +359,7 @@ export default function TransactionModal({
                 </span>
                 <span className="entry-card-titles">
                   <strong>时间与备注</strong>
-                  <span>备注可选填，方便日后查找</span>
+                  <span>备注必填，方便日后查找</span>
                 </span>
               </div>
               <Form.Item
@@ -395,11 +396,11 @@ export default function TransactionModal({
               >
                 <Input.TextArea rows={2} maxLength={200} showCount placeholder="写点什么，方便以后回忆…" />
               </Form.Item>
-              {recentNotes.length > 0 && (
+              {currentNotes.length > 0 && (
                 <div className="entry-suggest">
                   <span className="entry-mini-label">常用备注</span>
                   <div className="note-grid">
-                    {recentNotes.slice(0, 4).map((note) => (
+                    {currentNotes.map((note) => (
                       <button
                         key={note}
                         type="button"
