@@ -47,8 +47,8 @@ export function assetRows(snapshots: AssetSnapshot[], configs: CurrencyConfig[])
     const profit = ASSET_TYPES
       .filter((item) => item.value !== CASH_ASSET_TYPE)
       .reduce((sum, item) => sum + values.profit[item.value], 0);
-    // 投资类资产金额 = 总资产 - 现金；资产总投资 = 投资类金额 - 累计收益
-    const investment = total - cash - profit;
+    // 投资本金 = 总资产 - 现金（即非现金资产当前金额）
+    const investment = total - cash;
     const previousTotal = index > 0 ? sumOf(months[index - 1][1].amount) : 0;
     return {
       month,

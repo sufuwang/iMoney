@@ -135,14 +135,14 @@ export default function TransactionModal({
     const profit = INVESTMENT_TYPES.reduce(
       (sum, item) => sum + convertToBase(read(item.value, 'profit'), assetCurrency, currencies), 0,
     );
-    const investment = total - profit;
+    const investment = total;
     const cash = convertToBase(read(CASH_ASSET_TYPE, 'amount'), assetCurrency, currencies);
     return {
       total,
       cash,
       profit,
       investment,
-      assetTotal: investment + profit + cash,
+      assetTotal: investment + cash,
       returnRate: investment > 0 ? (profit / investment) * 100 : 0,
     };
   }, [watchedAssets, assetCurrency, currencies]);
@@ -513,7 +513,7 @@ export default function TransactionModal({
                 </span>
                 <span className="entry-card-titles">
                   <strong>自动计算</strong>
-                  <span>资产总额 = 资产总投资 + 资产收益 + 现金</span>
+                  <span>资产总额 = 投资本金 + 现金</span>
                 </span>
               </div>
               <div className="asset-summary-grid">
@@ -522,7 +522,7 @@ export default function TransactionModal({
                   <strong>{formatMoney(assetSummary.assetTotal)}</strong>
                 </div>
                 <div className="asset-summary-cell">
-                  <span>资产总投资</span>
+                  <span>投资本金</span>
                   <strong>{formatMoney(assetSummary.investment)}</strong>
                 </div>
                 <div className="asset-summary-cell">
@@ -533,7 +533,7 @@ export default function TransactionModal({
                 </div>
               </div>
               <Typography.Text type="secondary" className="entry-tip">
-                {assetCurrency === 'CNY' ? '按人民币汇总' : '按所选币种折算人民币汇总'}：投资类总资产 {formatMoney(assetSummary.total)}，累计收益 {formatMoney(assetSummary.profit)}，现金 {formatMoney(assetSummary.cash)}。现金计入资产总额，不参与收益计算；留空或填 0 的类别不会保存。
+                {assetCurrency === 'CNY' ? '按人民币汇总' : '按所选币种折算人民币汇总'}：投资本金 {formatMoney(assetSummary.investment)}，累计收益 {formatMoney(assetSummary.profit)}，现金 {formatMoney(assetSummary.cash)}。现金计入资产总额，不参与收益计算；留空或填 0 的类别不会保存。
               </Typography.Text>
             </section>
 

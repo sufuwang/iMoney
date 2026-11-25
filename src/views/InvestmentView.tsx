@@ -25,10 +25,8 @@ import type { AssetSnapshot, CurrencyConfig } from '../types';
 const INVESTMENT_TYPES = ASSET_TYPES.filter((item) => item.value !== CASH_ASSET_TYPE);
 const CASH_COLOR = ASSET_TYPES.find((item) => item.value === CASH_ASSET_TYPE)?.color ?? '#d4b46f';
 const ASSET_TOTAL_COLOR = '#4f46e5';
-const returnRateOf = (amount: number, profit: number) => {
-  const investment = amount - profit;
-  return investment > 0 ? (profit / investment) * 100 : 0;
-};
+const returnRateOf = (amount: number, profit: number) =>
+  amount > 0 ? (profit / amount) * 100 : 0;
 
 interface Props {
   assets: AssetSnapshot[];
@@ -270,11 +268,10 @@ export default function InvestmentView({ assets, configs, onAddAsset, onDeleteAs
         const type = ASSET_TYPES.find((item) => item.value === row.type);
         const amount = convertToBase(row.amount, row.currency, configs);
         const profit = convertToBase(row.profit ?? 0, row.currency, configs);
-        const investment = amount - profit;
-        const rate = investment > 0 ? (profit / investment) * 100 : 0;
+        const rate = amount > 0 ? (profit / amount) * 100 : 0;
         const profitText = row.type === CASH_ASSET_TYPE
           ? '不计收益'
-          : `收益 ${profit >= 0 ? '+' : '-'}${formatMoney(Math.abs(profit))}${investment > 0 ? ` · ${rate >= 0 ? '+' : ''}${rate.toFixed(1)}%` : ''}`;
+          : `收益 ${profit >= 0 ? '+' : '-'}${formatMoney(Math.abs(profit))}${amount > 0 ? ` · ${rate >= 0 ? '+' : ''}${rate.toFixed(1)}%` : ''}`;
         const description = `${profitText}${row.currency !== 'CNY' ? ` · ${row.currency} ${row.amount.toLocaleString('zh-CN')}` : ''}`;
         return (
           <List.Item className="txn-item">
@@ -297,7 +294,7 @@ export default function InvestmentView({ assets, configs, onAddAsset, onDeleteAs
           uniformSize
           items={[
             { label: '总资产', value: formatMoney(latest?.total ?? 0) },
-            { label: '资产总投资', value: formatMoney(latest?.investment ?? 0) },
+            { label: '投资本金', value: formatMoney(latest?.investment ?? 0) },
             {
               label: '资产收益率',
               value: `${returnRate >= 0 ? '+' : ''}${returnRate.toFixed(2)}%`,
@@ -307,7 +304,7 @@ export default function InvestmentView({ assets, configs, onAddAsset, onDeleteAs
         />
       </Card>
 
-      <Card size="small" title="资产配置" extra={<Typography.Text type="secondary">{latest ? dayjs(`${latest.month}-01`).format('YYYY年M月') : '暂无'}</Typography.Text>}>
+      <Card size="small" title="资产配置">
         {allocation.length === 0 ? (
           <Empty description="暂无数据" image={Empty.PRESENTED_IMAGE_SIMPLE} />
         ) : (
@@ -352,9 +349,12 @@ export default function InvestmentView({ assets, configs, onAddAsset, onDeleteAs
         size="small"
         title="资产走势"
         extra={
-          hiddenInvestmentTypes.length > 0 ? (
-            <Button type="link" size="small" onClick={() => setHiddenInvestmentTypes([])}>全选</Button>
-          ) : undefined
+          <Space size={4} align="center">
+            <Typography.Text type="secondary">投资本金 = 主动基金 + 纳指 + 标普</Typography.Text>
+            {hiddenInvestmentTypes.length > 0 && (
+              <Button type="link" size="small" onClick={() => setHiddenInvestmentTypes([])}>全选</Button>
+            )}
+          </Space>
         }
       >
         {rows.length === 0 ? (
@@ -503,7 +503,7 @@ export default function InvestmentView({ assets, configs, onAddAsset, onDeleteAs
           </Card>
         </Col>
         <Col xs={24} sm={12}>
-          <Card size="small" title="总资产走势" extra={<Typography.Text type="secondary">资产总投资 + 资产收益 + 现金</Typography.Text>}>
+          <Card size="small" title="总资产走势" extra={<Typography.Text type="secondary">总资产 = 投资本金 + 现金</Typography.Text>}>
             {rows.length === 0 ? (
               <Empty description="暂无数据" image={Empty.PRESENTED_IMAGE_SIMPLE} />
             ) : (
