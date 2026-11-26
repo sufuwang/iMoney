@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type TouchEvent,
+} from 'react';
 import {
   Button,
   DatePicker,
@@ -50,6 +58,7 @@ interface AssetFormValues {
 }
 
 const INVESTMENT_TYPES = ASSET_TYPES.filter((item) => item.value !== CASH_ASSET_TYPE);
+const ENTRY_SWIPE_MODES = ['expense', 'income', 'asset'] as const;
 
 const emptyAssetFields = (): AssetFormValues['assets'] =>
   Object.fromEntries(
@@ -99,6 +108,9 @@ export default function TransactionModal({
   const [assetForm] = Form.useForm<AssetFormValues>();
   const isMobile = useIsMobile();
   const [entryType, setEntryType] = useState<TransactionType>('expense');
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const transactionPageRef = useRef<HTMLDivElement>(null);
+  const assetPageRef = useRef<HTMLDivElement>(null);
   const currentNotes = recentNotes[entryType];
   const categories = CATEGORIES.filter((item) => item.type === entryType);
   const txnCurrency = Form.useWatch('currency', form) ?? 'CNY';
@@ -179,7 +191,25 @@ export default function TransactionModal({
     });
   }, [open, mode, assetForm]);
 
+  const animatePageSwitch = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const node = toIndex === 2 ? assetPageRef.current : transactionPageRef.current;
+    const offset = toIndex > fromIndex ? 28 : -28;
+    requestAnimationFrame(() => {
+      node?.animate?.(
+        [
+          { opacity: 0, transform: `translateX(${offset}px)` },
+          { opacity: 1, transform: 'translateX(0)' },
+        ],
+        { duration: 220, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
+      );
+    });
+  };
+
   const handleTypeSwitch = (value: string) => {
+    const currentIndex = mode === 'asset' ? 2 : entryType === 'expense' ? 0 : 1;
+    const nextIndex = value === 'asset' ? 2 : value === 'income' ? 1 : 0;
+    animatePageSwitch(currentIndex, nextIndex);
     clearValidationErrors();
     if (value === 'asset') {
       onModeChange('asset');
@@ -190,6 +220,32 @@ export default function TransactionModal({
     setEntryType(type);
     const first = CATEGORIES.find((item) => item.type === type);
     form.setFieldsValue({ type, category: first?.id ?? '' });
+  };
+
+  const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+    const target = event.target as Element;
+    if (target.closest('input, textarea, select, .ant-segmented, .ant-select, .ant-picker')) {
+      touchStartRef.current = null;
+      return;
+    }
+    const touch = event.touches[0];
+    touchStartRef.current = touch ? { x: touch.clientX, y: touch.clientY } : null;
+  };
+
+  const handleTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
+    const start = touchStartRef.current;
+    touchStartRef.current = null;
+    const touch = event.changedTouches[0];
+    if (!start || !touch) return;
+
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+    if (Math.abs(deltaX) < 56 || Math.abs(deltaX) <= Math.abs(deltaY) * 1.2) return;
+
+    const current = mode === 'asset' ? 'asset' : entryType;
+    const currentIndex = ENTRY_SWIPE_MODES.indexOf(current);
+    const next = ENTRY_SWIPE_MODES[currentIndex + (deltaX < 0 ? 1 : -1)];
+    if (next) handleTypeSwitch(next);
   };
 
   const handleOk = async () => {
@@ -255,7 +311,7 @@ export default function TransactionModal({
         </div>
       }
     >
-      <div className="entry-body">
+      <div className="entry-body" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
         <div className="entry-tabs">
           <Segmented
             block
@@ -270,7 +326,7 @@ export default function TransactionModal({
           />
         </div>
 
-        <div hidden={isAsset}>
+        <div ref={transactionPageRef} hidden={isAsset}>
           <Form form={form} layout="vertical" initialValues={{ type: 'expense' }} requiredMark={false}>
             <section className="entry-card">
               <div className="entry-card-head">
@@ -419,7 +475,7 @@ export default function TransactionModal({
           </Form>
         </div>
 
-        <div hidden={!isAsset}>
+        <div ref={assetPageRef} hidden={!isAsset}>
           <Form form={assetForm} layout="vertical" requiredMark={false}>
             <section className="entry-card">
               <div className="entry-card-head">
